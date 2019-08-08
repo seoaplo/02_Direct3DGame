@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header">
+      <UniqueIdentifier>{690ae65b-9fed-4ec8-8496-538ab9a03013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{3f22ab0d-e2ef-449c-a6d8-3326e3407ced}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCore">
+      <UniqueIdentifier>{ef8bd5fb-0ca7-4fb2-8da3-5b9466b8c2ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Write">
+      <UniqueIdentifier>{1af6c143-83f3-40a8-8233-35294551dd99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Sound">
+      <UniqueIdentifier>{fa34dd3d-81f4-42b6-b3a6-50de58ae3bf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Input">
+      <UniqueIdentifier>{d7128c3e-b25a-49b3-b101-7471665887b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Timer">
+      <UniqueIdentifier>{8c6590a6-3af0-4a73-baba-7584751d7e38}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SCore.h">
+      <Filter>SCore</Filter>
+    </ClInclude>
+    <ClInclude Include="SDevice.h">
+      <Filter>SCore</Filter>
+    </ClInclude>
+    <ClInclude Include="Swindow.h">
+      <Filter>SCore</Filter>
+    </ClInclude>
+    <ClInclude Include="SInputManager.h">
+      <Filter>Manager\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SKeyInput.h">
+      <Filter>Manager\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SMouseInput.h">
+      <Filter>Manager\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SStickInput.h">
+      <Filter>Manager\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SDirectWrite.h">
+      <Filter>Manager\Write</Filter>
+    </ClInclude>
+    <ClInclude Include="SSoundManager.h">
+      <Filter>Manager\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="SSound.h">
+      <Filter>Manager\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="STimer.h">
+      <Filter>Manager\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="SUtils.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="SDxBasic.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="STemplate.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="S3DGameLib.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SCore.cpp">
+      <Filter>SCore</Filter>
+    </ClCompile>
+    <ClCompile Include="SDevice.cpp">
+      <Filter>SCore</Filter>
+    </ClCompile>
+    <ClCompile Include="Swindow.cpp">
+      <Filter>SCore</Filter>
+    </ClCompile>
+    <ClCompile Include="SInputManager.cpp">
+      <Filter>Manager\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="SKeyInput.cpp">
+      <Filter>Manager\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="SMouseInput.cpp">
+      <Filter>Manager\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="SStickInput.cpp">
+      <Filter>Manager\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="SDirectWrite.cpp">
+      <Filter>Manager\Write</Filter>
+    </ClCompile>
+    <ClCompile Include="SSoundManager.cpp">
+      <Filter>Manager\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="SSound.cpp">
+      <Filter>Manager\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="STimer.cpp">
+      <Filter>Manager\Timer</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
