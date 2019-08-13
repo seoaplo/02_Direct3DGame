@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{85E42D55-55BC-4664-BCE9-0E0EA00063B9}</ProjectGuid>
-    <RootNamespace>My02IndexBuffer</RootNamespace>
+    <ProjectGuid>{904CAC31-ACF5-4842-9E57-6E7782B25CDD}</ProjectGuid>
+    <RootNamespace>My04AlphaBlend</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -119,14 +119,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Sample.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SDXObject.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\shader\IndexTestPS.shader" />
-    <None Include="..\..\shader\IndexTestVS.shader" />
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SDXObject.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\shader\AlphaBlendTest\AlphaBlendTestPS.shader" />
+    <None Include="..\..\shader\AlphaBlendTest\AlphaBlendTestVS.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

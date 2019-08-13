@@ -12,10 +12,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\data\shader\IndexTestPS.shader">
+    <None Include="..\..\shader\IndexTestPS.shader">
       <Filter>Shader</Filter>
     </None>
-    <None Include="..\..\data\shader\IndexTestVS.shader">
+    <None Include="..\..\shader\IndexTestVS.shader">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

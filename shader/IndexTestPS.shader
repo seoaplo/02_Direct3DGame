@@ -1,16 +1,7 @@
-struct OUTPUT
+//--------------------------------------------------------------------------------------
+// Pixel Shader
+//--------------------------------------------------------------------------------------
+float4 PS(in float4 p : SV_POSITION) : SV_Target
 {
-	float4 Pos : POSITION;
-	float4 Color : COLOR0;
-};
-
-struct INPUT
-{
-	float4 Pos : POSITION;
-	float4 Color : COLOR0;
-};
-
-OUTPUT PS(INPUT var)
-{
-	return var;
+	return float4(1.0f, 1.0f, 0.0f, 1.0f);
 }

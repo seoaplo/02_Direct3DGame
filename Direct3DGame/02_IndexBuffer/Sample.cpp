@@ -64,19 +64,33 @@ HRESULT Sample::LoadShaderAndInputLayout()
 
 	ID3DBlob* VertexBlob = nullptr;
 
-	D3DX11CompileFromFile(L"../../data/shader/IndexTestVS.shader", nullptr, nullptr, "VS", "vs_5_0", dwShaderFlag,
+	D3DX11CompileFromFile(L"../../shader/IndexTestVS.shader", nullptr, nullptr, "VS", "vs_5_0", dwShaderFlag,
 		NULL, nullptr, &VertexBlob, nullptr, &hr);
 
+	GetDevice()->CreateVertexShader(VertexBlob->GetBufferPointer(), VertexBlob->GetBufferSize(),
+									nullptr, &m_pVS);
 	HRESULT_FAILED_RETURN(hr);
 
 	ID3DBlob* PixelBlob = nullptr; 
 
-	D3DX11CompileFromFile(L"../../data/shader/IndexTestPS.shader", nullptr, nullptr, "PS", "ps_5_0", dwShaderFlag,
+	D3DX11CompileFromFile(L"../../shader/IndexTestPS.shader", nullptr, nullptr, "PS", "ps_5_0", dwShaderFlag,
 		NULL, nullptr, &PixelBlob, nullptr, &hr);
+
+	GetDevice()->CreatePixelShader(PixelBlob->GetBufferPointer(), PixelBlob->GetBufferSize(),
+		nullptr, &m_pPS);
 
 	HRESULT_FAILED_RETURN(hr);
 
-	
+	const D3D11_INPUT_ELEMENT_DESC Layout[] =
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+
+	GetDevice()->CreateInputLayout(Layout, 1, VertexBlob->GetBufferPointer(), VertexBlob->GetBufferSize(),
+									&m_pVertexLayout);
+
+	SAFE_RELEASE(VertexBlob);
+	SAFE_RELEASE(PixelBlob);
 
 	return true;
 }
@@ -92,25 +106,57 @@ bool Sample::Init()
 }
 bool Sample::Frame()
 {
-
 	return true;
 }
 bool Sample::Render()
 {
+	m_pImmediateContext->VSSetShader(m_pVS, nullptr, 0);
+	m_pImmediateContext->PSSetShader(m_pPS, nullptr, 0);
+	m_pImmediateContext->IASetInputLayout(m_pVertexLayout);
 
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+	m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	m_pImmediateContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	m_pImmediateContext->DrawIndexed(3, 0, 0);
 	return true;
 }
 bool Sample::Release()
 {
-
+	SAFE_RELEASE(m_pIndexBuffer);
+	SAFE_RELEASE(m_pVertexBuffer);
+	SAFE_RELEASE(m_pVertexLayout);
+	SAFE_RELEASE(m_pVS);
+	SAFE_RELEASE(m_pPS);
 	return true;
 }
 
 Sample::Sample()
 {
+	m_pIndexBuffer = nullptr;
+	m_pVertexBuffer = nullptr;
+	m_pVertexLayout = nullptr;
+	m_pVS = nullptr;
+	m_pPS = nullptr;
 }
 
 
 Sample::~Sample()
 {
+}
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
+{
+	Sample g_Sample;
+	RECT rc{ 0, 0, 1024, 768 };
+	if (!g_Sample.InitWindow(hInstance, nCmdShow, const_cast<TCHAR*>(L"TextureTest"), rc, false))
+	{
+		MessageBox(0, _T("Sample  초기화 실패"), _T("Fatal error"), MB_OK);
+		return 0;
+	}
+	ShowCursor(TRUE);
+	g_Sample.Run();
+	return 1;
 }
