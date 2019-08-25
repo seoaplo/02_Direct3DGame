@@ -25,12 +25,10 @@ public:
 	//===============================================================================
 	// Vector Operator
 	//===============================================================================
-	SVector operator=(const SVector& vSource);
 	SVector operator+(const SVector& vSource);
 	SVector operator-(const SVector& vSource);
-
-	float Dot(const SVector& vSource);
-	SVector Cross(const SVector& vSource);
+	float operator|(const SVector& vSource);
+	SVector operator^(const SVector& vSource);
 
 public:
 	//===============================================================================

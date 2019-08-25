@@ -24,6 +24,9 @@
     <ClInclude Include="SDevice.h" />
     <ClInclude Include="SDirectWrite.h" />
     <ClInclude Include="SDxBasic.h" />
+    <ClInclude Include="SDxHelperEX.h" />
+    <ClInclude Include="SDXObject.h" />
+    <ClInclude Include="SDXState.h" />
     <ClInclude Include="SInputManager.h" />
     <ClInclude Include="SKeyInput.h" />
     <ClInclude Include="SMouseInput.h" />
@@ -31,22 +34,29 @@
     <ClInclude Include="SSoundManager.h" />
     <ClInclude Include="SStickInput.h" />
     <ClInclude Include="STemplate.h" />
+    <ClInclude Include="STextureManager.h" />
     <ClInclude Include="STimer.h" />
     <ClInclude Include="SUtils.h" />
     <ClInclude Include="Swindow.h" />
+    <ClInclude Include="STexture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SCore.cpp" />
     <ClCompile Include="SDevice.cpp" />
     <ClCompile Include="SDirectWrite.cpp" />
+    <ClCompile Include="SDxHelperEX.cpp" />
+    <ClCompile Include="SDXObject.cpp" />
+    <ClCompile Include="SDXState.cpp" />
     <ClCompile Include="SInputManager.cpp" />
     <ClCompile Include="SKeyInput.cpp" />
     <ClCompile Include="SMouseInput.cpp" />
     <ClCompile Include="SSound.cpp" />
     <ClCompile Include="SSoundManager.cpp" />
     <ClCompile Include="SStickInput.cpp" />
+    <ClCompile Include="STextureManager.cpp" />
     <ClCompile Include="STimer.cpp" />
     <ClCompile Include="Swindow.cpp" />
+    <ClCompile Include="STexture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

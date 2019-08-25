@@ -47,9 +47,18 @@ void main()
 
 	std::cout << "DirectMath Dot = " << fTest << std::endl;
 
-	fTest = MyVector.Dot(MyVector2);
+	fTest = MyVector | MyVector2;
 
 	std::cout << "MyMath Dot = " << fTest << std::endl;
+
+	D3DXVECTOR3 D3DRetVector;
+	SVector MyRetVector;
+
+	D3DXVec3Cross(&D3DRetVector, &DirectVector, &DirectVector2);
+	MyRetVector = MyVector ^ MyVector2;
+
+	std::cout << "DirectMath Cross = (" << D3DRetVector.x << ", " << D3DRetVector.y << ", " << D3DRetVector.z  << ")"<< std::endl;
+	std::cout << "MyMath Cross = (" << MyRetVector.x << ", " << MyRetVector.y << ", " << MyRetVector.z << ")" << std::endl;
 
 	return;
 }

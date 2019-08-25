@@ -21,15 +21,6 @@ float	SVector::SquredSize()
 //===============================================================================
 // Vector Operator
 //===============================================================================
-SVector SVector::operator=(const SVector& vSource)
-{
-	SVector RetVector;
-	RetVector.x = vSource.x;
-	RetVector.y = vSource.y;
-	RetVector.z = vSource.z;
-
-	return RetVector;
-}
 SVector SVector::operator+(const SVector& vSource)
 {
 	SVector RetVector;
@@ -49,16 +40,20 @@ SVector SVector::operator-(const SVector& vSource)
 	return RetVector;
 }
 
-float SVector::Dot(const SVector& vSource)
+float SVector::operator|(const SVector& vSource)
 {
 	float RetScalar;
 	RetScalar = (x * vSource.x) + (y * vSource.y) + (z * vSource.z);
 
 	return RetScalar;
 }
-SVector SVector::Cross(const SVector& vSource)
+SVector SVector::operator^(const SVector& vSource)
 {
 	SVector RetVector;
+
+	RetVector.x = (y * vSource.z) - (z * vSource.y);
+	RetVector.y = (z * vSource.x) - (x * vSource.z);
+	RetVector.z = (x * vSource.y) - (y * vSource.x);
 	return RetVector;
 }
 
@@ -99,6 +94,7 @@ SVector SVector::operator+(const float& fSource)
 
 	return *this;
 }
+
 
 SVector::SVector()
 {

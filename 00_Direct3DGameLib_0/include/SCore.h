@@ -1,9 +1,10 @@
 #pragma once
+
 #include "STimer.h"
 #include "SDirectWrite.h"
 #include "SInputManager.h"
-#include "Swindow.h"
 #include "SSoundManager.h"
+#include "Swindow.h"
 
 class SCore	: public SWindow
 {

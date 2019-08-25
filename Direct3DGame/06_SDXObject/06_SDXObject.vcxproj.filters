@@ -8,16 +8,20 @@
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="SDXObject.cpp" />
+    <ClCompile Include="xTexture.cpp" />
+    <ClCompile Include="SDxHelperEX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
     <ClInclude Include="SDXObject.h" />
+    <ClInclude Include="xTexture.h" />
+    <ClInclude Include="SDxHelperEX.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestPS.shader">
+    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestPS.hlsl">
       <Filter>Shader</Filter>
     </None>
-    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestVS.shader">
+    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestVS.hlsl">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

@@ -120,15 +120,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SDxHelperEX.cpp" />
     <ClCompile Include="SDXObject.cpp" />
+    <ClCompile Include="xTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
+    <ClInclude Include="SDxHelperEX.h" />
     <ClInclude Include="SDXObject.h" />
+    <ClInclude Include="xTexture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestPS.shader" />
-    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestVS.shader" />
+    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestPS.hlsl" />
+    <None Include="..\..\shader\SDXObjectTest\SDXObjectTestVS.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

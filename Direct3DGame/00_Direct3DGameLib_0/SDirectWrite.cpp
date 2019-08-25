@@ -13,7 +13,7 @@ bool SDirectWrite::Set(HWND hWnd, int iWidth, int iHeight, IDXGISurface1* pSurfa
 	hr = CreateDeviceIndependentResources();
 	hr = CreateDeviceResources(pSurface);
 	SetText(D2D1::Point2F(static_cast<float> (iWidth), static_cast<float> (iHeight)),
-				(wchar_t*)(L"TBasisSample!"), D2D1::ColorF(1, 1, 1, 1));
+				(wchar_t*)(L"Ready"), D2D1::ColorF(1, 1, 1, 1));
 	
 	m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 	m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);

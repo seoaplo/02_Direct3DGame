@@ -1,7 +1,7 @@
 #pragma once
 #include "SCore.h"
-
-
+#include "SDXObject.h"
+#include "SDXState.h"
 
 
 #ifdef _WIN64
