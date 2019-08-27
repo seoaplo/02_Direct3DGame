@@ -4,6 +4,7 @@
 #define DIRECTINPUT_VERSION 0x0800 
 
 // Window Basic Header
+#include <WinSock2.h>
 #include <windows.h>
 #include <assert.h>
 #include <tchar.h>

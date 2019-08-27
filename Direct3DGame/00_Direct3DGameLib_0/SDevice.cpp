@@ -93,7 +93,6 @@ HRESULT	SDevice::CreateGIFactory()
 	}
 
 	HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&m_pDxgiFactory);
-
 	return hr;
 }
 
@@ -108,22 +107,21 @@ HRESULT	SDevice::CreateSwapChain(HWND hWnd, UINT iWidth, UINT iHeight, BOOL IsFu
 	}
 
 	// 스왑체인 디스크립터 설정
-	DXGI_SWAP_CHAIN_DESC sd;
-	ZeroMemory(&sd, sizeof(sd));
+	ZeroMemory(&m_SwapChainDesc, sizeof(m_SwapChainDesc));
 	
-	sd.BufferCount = 1;
-	sd.BufferDesc.Height = iHeight;
-	sd.BufferDesc.Width = iWidth;
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 60;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.OutputWindow = hWnd;
-	sd.SampleDesc.Count = 1;
-	sd.Windowed = !IsFullScreen;
-	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	m_SwapChainDesc.BufferCount = 1;
+	m_SwapChainDesc.BufferDesc.Height = iHeight;
+	m_SwapChainDesc.BufferDesc.Width = iWidth;
+	m_SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	m_SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+	m_SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	m_SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	m_SwapChainDesc.OutputWindow = hWnd;
+	m_SwapChainDesc.SampleDesc.Count = 1;
+	m_SwapChainDesc.Windowed = !IsFullScreen;
+	m_SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	// 팩토리에서 스왑체인 생성
-	hr = m_pDxgiFactory->CreateSwapChain(m_pD3DDevice, &sd, &m_pDxgiSwapChain);
+	hr = m_pDxgiFactory->CreateSwapChain(m_pD3DDevice, &m_SwapChainDesc, &m_pDxgiSwapChain);
 
 	return hr;
 }

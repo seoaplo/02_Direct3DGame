@@ -51,10 +51,10 @@ public:
 	// Render
 	//===============================================================================================
 	bool			Render() {return true;}
-	bool			Begin();
-	bool			DrawText(RECT rc, TCHAR* pText, D2D1::ColorF Color = D2D1::ColorF(1, 0, 0, 1)); // Format 방식
+	bool			Pre();
+	bool			DrawText(RECT rc, const TCHAR* pText, D2D1::ColorF Color = D2D1::ColorF(1, 0, 0, 1)); // Format 방식
 	bool			DrawText(D2D1_POINT_2F origin, D2D1::ColorF Color = D2D1::ColorF(1, 0, 0, 1));	// Layout 방식
-	bool			End();
+	bool			Post();
 
 	//===============================================================================================
 	// Release

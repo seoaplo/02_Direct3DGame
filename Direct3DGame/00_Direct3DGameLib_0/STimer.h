@@ -1,5 +1,5 @@
 #pragma once
-#include "SUtils.h"
+#include "SDxBasic.h"
 #include "SDirectWrite.h"
 #include "STemplate.h"
 
@@ -45,15 +45,7 @@ public:
 	void	Start();
 	void	Stop();
 	bool	IsStarted()const { return m_bStarted; }
-	float	GetElapsedTime()
-	{
-		if (m_bStarted)
-		{
-			QueryPerformanceCounter((LARGE_INTEGER*)&m_Elapse);
-			m_fEventTime = static_cast<float>(m_Elapse.LowPart - m_Start.LowPart) / static_cast<float>(m_Frequency.LowPart);
-		}
-		return m_fEventTime;
-	}
+	float	GetElapsedTime();
 
 	//===================================================================================
 	// FPS
@@ -76,7 +68,7 @@ private:
 	// Debug Render
 	//===================================================================================
 	D3DXVECTOR2 m_vStart;
-	D3DXVECTOR2 m_vEnd;
+	D3DXVECTOR2 m_vPost;
 
 	bool m_bDebugFlag;
 	UINT m_iClientHeight;
@@ -110,7 +102,7 @@ public:
 	// Debug Render
 	//===================================================================================
 	void	SetDebugFlag(bool bFlag) { m_bDebugFlag = bFlag; };
-	void	SetDebugRect(D3DXVECTOR2 vStart, D3DXVECTOR2 vEnd);
+	void	SetDebugRect(D3DXVECTOR2 vStart, D3DXVECTOR2 vPost);
 private:
 	SGrobalTimer() {} ;
 public:

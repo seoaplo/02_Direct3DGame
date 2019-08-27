@@ -1,6 +1,6 @@
 #pragma once
-#include "SUtils.h"
 #include "SDxBasic.h"
+#include "SUtils.h"
 
 class SDevice
 {
@@ -23,7 +23,7 @@ public:
 	D3D_FEATURE_LEVEL		m_FeatureLevel;				// Device Feature Level
 	D3D11_VIEWPORT			m_ViewPort;					// ViewPort
 	BOOL					m_IsFullSceenMode;			// FullScreen Flag
-
+	DXGI_SWAP_CHAIN_DESC	m_SwapChainDesc;
 public:
 	//==============================================================================================
 	// Getter and Setter Functions

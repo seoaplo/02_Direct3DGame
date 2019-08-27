@@ -1,8 +1,6 @@
 #pragma once
 #include "SCore.h"
-#include "SDXObject.h"
-#include "SDXState.h"
-
+#include "SModel.h"
 
 #ifdef _WIN64
 #pragma comment(lib, "fmod64_vc.lib")

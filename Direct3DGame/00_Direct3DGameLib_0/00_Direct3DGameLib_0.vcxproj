@@ -25,11 +25,12 @@
     <ClInclude Include="SDirectWrite.h" />
     <ClInclude Include="SDxBasic.h" />
     <ClInclude Include="SDxHelperEX.h" />
-    <ClInclude Include="SDXObject.h" />
     <ClInclude Include="SDXState.h" />
     <ClInclude Include="SInputManager.h" />
     <ClInclude Include="SKeyInput.h" />
+    <ClInclude Include="SModel.h" />
     <ClInclude Include="SMouseInput.h" />
+    <ClInclude Include="SObjStd.h" />
     <ClInclude Include="SSound.h" />
     <ClInclude Include="SSoundManager.h" />
     <ClInclude Include="SStickInput.h" />
@@ -45,10 +46,10 @@
     <ClCompile Include="SDevice.cpp" />
     <ClCompile Include="SDirectWrite.cpp" />
     <ClCompile Include="SDxHelperEX.cpp" />
-    <ClCompile Include="SDXObject.cpp" />
     <ClCompile Include="SDXState.cpp" />
     <ClCompile Include="SInputManager.cpp" />
     <ClCompile Include="SKeyInput.cpp" />
+    <ClCompile Include="SModel.cpp" />
     <ClCompile Include="SMouseInput.cpp" />
     <ClCompile Include="SSound.cpp" />
     <ClCompile Include="SSoundManager.cpp" />

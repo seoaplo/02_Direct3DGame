@@ -7,7 +7,11 @@ HRESULT STexture::Load(ID3D11Device* pDevice, const TCHAR* szFileName)
 	ID3D11ShaderResourceView* CreateTextureSRV = nullptr;
 
 	hr = D3DX11CreateShaderResourceViewFromFile(pDevice, szFileName, nullptr, nullptr, &CreateTextureSRV, nullptr);
-	m_pSRV.Attach(CreateTextureSRV);
+	if (SUCCEEDED(hr))
+	{
+		m_pSRV.Attach(CreateTextureSRV);
+		m_pSRV->GetDesc(&m_TextureDesc);
+	}
 	
 	return hr;
 }

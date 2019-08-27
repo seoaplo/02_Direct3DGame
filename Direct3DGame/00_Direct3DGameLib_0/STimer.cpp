@@ -14,7 +14,7 @@ bool STimer::Init()
 	m_iFramePerSecond	= 0;
 	m_iFPSElapse		= 0;
 	m_fSecPerFrame		= 0.0f;
-	Start();
+	this->Start();
 	
 	return true;
 }
@@ -41,6 +41,7 @@ bool STimer::Frame()
 	return true;
 }
 
+
 bool STimer::Render()
 {
 	return true;
@@ -65,6 +66,18 @@ void STimer::Reset()
 	m_fEventTime = 0.0f;
 	ZeroMemory(&m_Start, sizeof(m_Start));
 	ZeroMemory(&m_Elapse, sizeof(m_Elapse));
+}
+
+float STimer::GetElapsedTime()
+{
+	{
+		if (m_bStarted)
+		{
+			QueryPerformanceCounter((LARGE_INTEGER*)&m_Elapse);
+			m_fEventTime = static_cast<float>(m_Elapse.LowPart - m_Start.LowPart) / static_cast<float>(m_Frequency.LowPart);
+		}
+		return m_fEventTime;
+	}
 }
 
 STimer::STimer()
@@ -109,13 +122,13 @@ bool	SGrobalTimer::Render()
 		m_Timer.GetSPF(),
 		m_Timer.GetElapsedTime());
 
-	RECT rc = { (LONG)m_vStart.x , (LONG)m_vStart.y , (LONG)m_vEnd.x, (LONG)m_vEnd.y };
+	RECT rc = { (LONG)m_vStart.x , (LONG)m_vStart.y , (LONG)m_vPost.x, (LONG)m_vPost.y };
 
 	return I_DirectWrite.DrawTextW(rc, DebugString, D2D1::ColorF(1, 1, 1, 0.5));
 }
 
-void SGrobalTimer::SetDebugRect(D3DXVECTOR2 vStart, D3DXVECTOR2 vEnd)
+void SGrobalTimer::SetDebugRect(D3DXVECTOR2 vStart, D3DXVECTOR2 vPost)
 {
 	m_vStart = vStart;
-	m_vEnd = vEnd;
+	m_vPost = vPost;
 }

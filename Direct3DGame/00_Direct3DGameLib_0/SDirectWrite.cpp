@@ -13,7 +13,7 @@ bool SDirectWrite::Set(HWND hWnd, int iWidth, int iHeight, IDXGISurface1* pSurfa
 	hr = CreateDeviceIndependentResources();
 	hr = CreateDeviceResources(pSurface);
 	SetText(D2D1::Point2F(static_cast<float> (iWidth), static_cast<float> (iHeight)),
-				(wchar_t*)(L"Ready"), D2D1::ColorF(1, 1, 1, 1));
+				(wchar_t*)(L"TBasisSample!"), D2D1::ColorF(1, 1, 1, 1));
 	
 	m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 	m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
@@ -89,7 +89,7 @@ HRESULT SDirectWrite::CreateDeviceResources(IDXGISurface1* pSurface)
 
 #pragma region Render
 
-bool SDirectWrite::Begin()
+bool SDirectWrite::Pre()
 {
 	if (m_pD2DRenderTargetView)
 	{
@@ -103,7 +103,7 @@ bool SDirectWrite::Begin()
 	}
 	return true;
 }
-bool SDirectWrite::End()
+bool SDirectWrite::Post()
 {
 	if (m_pD2DRenderTargetView && FAILED(m_pD2DRenderTargetView->EndDraw()))
 	{
@@ -113,9 +113,9 @@ bool SDirectWrite::End()
 }
 
 // Format 방식
-bool SDirectWrite::DrawText(RECT rc, TCHAR* pText, D2D1::ColorF Color)
+bool SDirectWrite::DrawText(RECT rc, const TCHAR* pText, D2D1::ColorF Color)
 {
-	if(!Begin()) return false;
+	if(!Pre()) return false;
 
 	if (m_pD2DRenderTargetView&&m_pBlackBrush)
 	{
@@ -128,14 +128,14 @@ bool SDirectWrite::DrawText(RECT rc, TCHAR* pText, D2D1::ColorF Color)
 		m_pD2DRenderTargetView->DrawText(pText, (UINT)wcslen(pText), m_pTextFormat, layoutRect, m_pBlackBrush);
 	}
 
-	if (!End()) return false;
+	if (!Post()) return false;
 
 	return true;
 }
 // Layout 방식
 bool SDirectWrite::DrawText(D2D1_POINT_2F pos, D2D1::ColorF Color)
 {
-	if (!Begin()) return false;
+	if (!Pre()) return false;
 
 	D2D1_POINT_2F origin = D2D1::Point2F(
 		static_cast<FLOAT>(pos.x / m_fDPIScaleX),
@@ -143,7 +143,7 @@ bool SDirectWrite::DrawText(D2D1_POINT_2F pos, D2D1::ColorF Color)
 	m_pBlackBrush->SetColor(Color);
 	m_pD2DRenderTargetView->DrawTextLayout(origin, m_pTextLayout, m_pBlackBrush);
 
-	if (!End()) return false;
+	if (!Post()) return false;
 
 	return true;
 }

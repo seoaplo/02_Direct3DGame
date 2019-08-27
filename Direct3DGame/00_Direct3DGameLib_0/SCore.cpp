@@ -1,16 +1,14 @@
 #include "SCore.h"
 
-
+using namespace DXGame;
 
 SCore::SCore()
 {
 }
 
-
 SCore::~SCore()
 {
 }
-
 
 // CoreFrameWork
 bool	SCore::CoreInit()
@@ -31,10 +29,11 @@ bool	SCore::CoreInit()
 		return false;
 	if (!I_InputManager.InitDirectInput(m_hInstance, m_hWnd, true, true, false))
 		return false;
-
-	if (!BeginInit())	return false;
+	if (!I_InputManager.Init())
+		return false;
+	if (!PreInit())	return false;
 	if (!Init())	return false;
-	if (!EndInit())	return false;
+	if (!PostInit())	return false;
 
 	return true;
 }
@@ -48,16 +47,19 @@ bool	SCore::CoreFrame()
 		return false;
 	if (!I_InputManager.Frame())
 		return false;
-
-	if (!BeginFrame())	return false;
+	SDxState::SetState(m_pD3DDevice);
+	ApplyRS(m_pImmediateContext, SDxState::g_pRSNoneCullSolid);
+	ApplySS(m_pImmediateContext, SDxState::g_pSSClampPoint);
+	ApplyBS(m_pImmediateContext, SDxState::g_pAlphaBlend);
+	if (!PreFrame())	return false;
 	if (!Frame())	return false;
-	if (!EndFrame())	return false;
+	if (!PostFrame())	return false;
 
 	return true;
 }
 bool	SCore::CoreRender()
 {
-	if(!BeginRender())	return false;
+	if(!PreRender())	return false;
 	if (!Render())	return false;
 
 	if (!I_Timer.Render())
@@ -68,17 +70,16 @@ bool	SCore::CoreRender()
 		return false;
 	if (!I_InputManager.Render(m_rcClientRect.left, m_rcClientRect.top, m_rcClientRect.right, m_rcClientRect.bottom))
 		return false;
-
-	if (!EndRender())	return false;
+	if (!PostRender())	return false;
 
 	return true;
 }
 bool	SCore::CoreRelease()
 {
 
-	if (!BeginRelease())	return false;
+	if (!PreRelease())	return false;
 	if (!Release())	return false;
-	if (!EndRelease())	return false;
+	if (!PostRelease())	return false;
 
 	if (!I_Timer.Release())
 		return false;
@@ -107,7 +108,7 @@ bool	SCore::CoreRelease()
 
 // GameFrameWork
 
-bool SCore::BeginInit()
+bool SCore::PreInit()
 {
 	
 
@@ -120,14 +121,14 @@ bool SCore::BeginInit()
 
 	return true;
 }
-bool SCore::BeginFrame(){ return true; }
-bool SCore::BeginRender()
+bool SCore::PreFrame(){ return true; }
+bool SCore::PreRender()
 {
-	float Color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	float Color[4] = { 1.0f, 0.5f, 0.5f, 1.0f };
 	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, Color);
 	return true;
 }
-bool SCore::BeginRelease(){ return true; }
+bool SCore::PreRelease(){ return true; }
 
 bool SCore::Init(){ return true; }
 bool SCore::Frame(){ return true; }
@@ -137,15 +138,15 @@ bool SCore::Render()
 }
 bool SCore::Release(){ return true; }
 
-bool SCore::EndInit(){ return true; }
-bool SCore::EndFrame(){ return true; }
-bool SCore::EndRender()
+bool SCore::PostInit(){ return true; }
+bool SCore::PostFrame(){ return true; }
+bool SCore::PostRender()
 {
 
 	m_pDxgiSwapChain->Present(0, 0);
 	return true; 
 }
-bool SCore::EndRelease(){ return true; }
+bool SCore::PostRelease(){ return true; }
 
 int SCore::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {

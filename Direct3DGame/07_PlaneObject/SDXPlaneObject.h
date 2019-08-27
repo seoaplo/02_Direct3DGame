@@ -1,9 +1,8 @@
 #pragma once
-#include "SDXObject.h"
 #include "SVector.h"
 #include "SMatrix.h"
 
-struct PNCT_VERTEX
+struct PNCT_VB
 {
 	DXGame::SVector3 p;
 	DXGame::SVector3 n;
@@ -19,7 +18,7 @@ struct VS_CB
 	float etc[4];
 };
 
-class SDXPlaneObject : public SDXObject
+class SDXPlaneObject : public SModel
 {
 public:
 	D3DXMATRIX m_matWorld;
@@ -29,7 +28,6 @@ public:
 	vector<UINT>			m_iTextureList;
 public:
 	bool Init()												override;
-	bool Load(ID3D11Device* pDevice, std::wstring filename)	override;
 	bool Render(ID3D11DeviceContext*	pContext)			override;
 	bool Frame()											override;
 	bool Release()											override;
@@ -44,16 +42,16 @@ public:
 		bool bDynamic = false);
 
 	bool LoadSRV(T_STR name, int iIndex = 0);
+	bool Load(ID3D11Device* pDevice, std::wstring filename);
 public:
 	void	Set(
 		ID3D11Device*			pDevice,
 		ID3D11DeviceContext*	pImmediateContext,
 		D3DXVECTOR3 vPos, RECT rcClient)
 	{
-		m_pDevice = pDevice;
-		m_pDeviceContext = pImmediateContext;
+		m_pd3dDevice = pDevice;
+		m_pContext = pImmediateContext;
 
-		m_Pos = vPos;
 		g_rtClient = rcClient;
 	}
 public:

@@ -1,10 +1,10 @@
 #pragma once
-
 #include "STimer.h"
+#include "SDXState.h"
 #include "SDirectWrite.h"
 #include "SInputManager.h"
-#include "SSoundManager.h"
 #include "Swindow.h"
+#include "SSoundManager.h"
 
 class SCore	: public SWindow
 {
@@ -17,20 +17,20 @@ public:
 
 	// GameFrameWork
 
-	virtual bool BeginInit();
-	virtual bool BeginFrame();
-	virtual	bool BeginRender();
-	virtual bool BeginRelease();
+	virtual bool PreInit();
+	virtual bool PreFrame();
+	virtual	bool PreRender();
+	virtual bool PreRelease();
 
 	virtual bool Init();
 	virtual bool Frame();
 	virtual	bool Render();
 	virtual bool Release();
 
-	virtual bool EndInit();
-	virtual bool EndFrame();
-	virtual	bool EndRender();
-	virtual bool EndRelease();
+	virtual bool PostInit();
+	virtual bool PostFrame();
+	virtual	bool PostRender();
+	virtual bool PostRelease();
 
 	virtual int WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
 

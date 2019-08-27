@@ -75,9 +75,6 @@
     <ClInclude Include="SDxHelperEX.h">
       <Filter>DXGame</Filter>
     </ClInclude>
-    <ClInclude Include="SDXObject.h">
-      <Filter>DXGame</Filter>
-    </ClInclude>
     <ClInclude Include="STexture.h">
       <Filter>DXGame</Filter>
     </ClInclude>
@@ -87,6 +84,8 @@
     <ClInclude Include="SDXState.h">
       <Filter>DXGame</Filter>
     </ClInclude>
+    <ClInclude Include="SModel.h" />
+    <ClInclude Include="SObjStd.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SCore.cpp">
@@ -125,9 +124,6 @@
     <ClCompile Include="SDxHelperEX.cpp">
       <Filter>DXGame</Filter>
     </ClCompile>
-    <ClCompile Include="SDXObject.cpp">
-      <Filter>DXGame</Filter>
-    </ClCompile>
     <ClCompile Include="STexture.cpp">
       <Filter>DXGame</Filter>
     </ClCompile>
@@ -137,5 +133,6 @@
     <ClCompile Include="SDXState.cpp">
       <Filter>DXGame</Filter>
     </ClCompile>
+    <ClCompile Include="SModel.cpp" />
   </ItemGroup>
 </Project>

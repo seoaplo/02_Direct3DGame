@@ -9,22 +9,10 @@ bool		SSoundManager::Init()
 bool		SSoundManager::Frame()
 {
 	m_pSystem->update();
-	//for (ITOR itor = m_SoundList.begin(); itor != m_SoundList.end(); itor++)
-	//{
-	//	SSound* pSound = (*itor).second;
-	//	pSound->Frame();
-	//}
-	// 현재 사운드에서 Frame은 사용되지 않는다.
 	return true;
 }
 bool		SSoundManager::Render()
 {
-	//for (ITOR itor = m_SoundList.begin(); itor != m_SoundList.end(); itor++)
-	//{
-	//	SSound* pSound = (*itor).second;
-	//	pSound->Render();
-	//}
-	// 현재 사운드에서 Render는 사용되지 않는다.
 	return true;
 }
 bool		SSoundManager::Release()

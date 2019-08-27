@@ -1,45 +1,83 @@
 #pragma once
 #include "SDxBasic.h"
+#include "SUtils.h"
+
 namespace DXGame
 {
-	class SDXState
+	class SDxState
 	{
 	public:
-		//ID3D11BlendState
-		static ID3D11BlendState*	m_pAlphaBlend;
-		static ID3D11BlendState*	m_pAlphaBlendDisable;
+		static ID3D11RasterizerState* g_pRSWireFrame;
+		static ID3D11RasterizerState* g_pRSSolid;
+		static ID3D11RasterizerState* g_pRSBackCullSolid;
+		static ID3D11RasterizerState* g_pRSNoneCullSolid;
+		static ID3D11RasterizerState* g_pRSFrontCullSolid;
+		static ID3D11RasterizerState* g_pRSSlopeScaledDepthBias;
+		static ID3D11RasterizerState* g_pRS[6];
 
-		//ID3D11RasterizerState
-		static ID3D11RasterizerState*  m_pRSWireFrame;
-		static ID3D11RasterizerState*  m_pRSSolidFrame;
+		static ID3D11BlendState*	  g_pAlphaBlend;
+		static ID3D11BlendState*	  g_pNoAlphaBlend;
+		static ID3D11BlendState*	  g_pBSColorOne;
+		static ID3D11BlendState*	  g_pBSOneOne;
+		static ID3D11BlendState*	  g_pBSOneZero;
+		static ID3D11BlendState*	  g_pBSAlphaOne;
+		static ID3D11BlendState*	  g_pBSMaxOneOne;
+		static ID3D11BlendState*      g_pBS[7];
 
-		//ID3D11SamplerState*  
-		static ID3D11SamplerState*   m_pSSWrapLinear;
+		static ID3D11SamplerState*	  g_pTexSS;
+		static ID3D11SamplerState*    g_pSSWrapLinear;
+		static ID3D11SamplerState*    g_pSSWrapPoint;
+		static ID3D11SamplerState*    g_pSSMirrorLinear;
+		static ID3D11SamplerState*    g_pSSMirrorPoint;
+		static ID3D11SamplerState*    g_pSSClampLinear;
+		static ID3D11SamplerState*    g_pSSClampPoint;
+		static ID3D11SamplerState*    g_pSSShadowMap;
+		static ID3D11SamplerState*    g_pSS[8];
 
-		static void SetState(ID3D11Device* pd3dDevice);
-		static void Release();
+		static  ID3D11DepthStencilState*	g_pDSSDepthEnable;
+		static  ID3D11DepthStencilState*	g_pDSSDepthDisable;
+		static  ID3D11DepthStencilState*	g_pDSSDepthEnableNoWrite;
+		static  ID3D11DepthStencilState*	g_pDSSDepthDisableNoWrite;
+		static  ID3D11DepthStencilState*	g_pDSSDepthStencilAdd;
+		static  ID3D11DepthStencilState*	g_pDSSDepthAlways;
+		static  ID3D11DepthStencilState*	g_pDSS[6];
 
-	static void ApplySS(ID3D11DeviceContext* pContext,
-		ID3D11SamplerState* pState, UINT iSlot = 0, UINT iArray = 1)
-	{
-		pContext->PSSetSamplers(iSlot, iArray, &pState);
+		static HRESULT SetState(ID3D11Device*	pd3dDevice);
+		static bool  Release();
+
+	public:
+		SDxState();
+		~SDxState();
 	};
 
-	static void ApplyRS(ID3D11DeviceContext* pContext,
+	static void ApplyRS(ID3D11DeviceContext*   pContext,
 		ID3D11RasterizerState* pState)
 	{
+		assert(pContext);
 		pContext->RSSetState(pState);
+	}
+	static void ApplyDSS(ID3D11DeviceContext*   pContext,
+		ID3D11DepthStencilState*	pDepthStencilState,
+		UINT iRef = 0x01)
+	{
+		assert(pContext);
+		pContext->OMSetDepthStencilState(pDepthStencilState, iRef);
+
 	};
-	static void ApplyBS(ID3D11DeviceContext* pContext,
-		ID3D11BlendState*	   pState,
+	static void ApplyBS(ID3D11DeviceContext*   pContext,
+		ID3D11BlendState*      pBlendState,
 		const FLOAT fBlendFactor[] = 0,
 		UINT iMask = 0xffffffff)
 	{
-		pContext->OMSetBlendState(pState, fBlendFactor, iMask);
-	};
-	public:
-		SDXState();
-		~SDXState();
-	};
+		assert(pContext);
+		pContext->OMSetBlendState(pBlendState, fBlendFactor, iMask);
+	}
+
+	static void ApplySS(ID3D11DeviceContext*   pContext, ID3D11SamplerState*      pSamplerState,
+		UINT iSlot = 0, UINT iArray = 1)
+	{
+		assert(pContext);
+		pContext->PSSetSamplers(iSlot, iArray, &pSamplerState);
+	}
 
 }
