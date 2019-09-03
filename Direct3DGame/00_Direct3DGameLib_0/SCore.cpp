@@ -18,6 +18,7 @@ bool	SCore::CoreInit()
 		MessageBox(0, L"Create Device ½ÇÆÐ", L"Fatal error", MB_OK);
 		return false;
 	}
+	SDxState::SetState(m_pD3DDevice);
 
 	if (!I_Timer.Init())
 		return false;
@@ -31,6 +32,10 @@ bool	SCore::CoreInit()
 		return false;
 	if (!I_InputManager.Init())
 		return false;
+
+	CreateDxResource();
+
+
 	if (!PreInit())	return false;
 	if (!Init())	return false;
 	if (!PostInit())	return false;
@@ -48,9 +53,10 @@ bool	SCore::CoreFrame()
 	if (!I_InputManager.Frame())
 		return false;
 	SDxState::SetState(m_pD3DDevice);
-	ApplyRS(m_pImmediateContext, SDxState::g_pRSNoneCullSolid);
+	ApplyRS(m_pImmediateContext, SDxState::g_pRSBackCullSolid);
 	ApplySS(m_pImmediateContext, SDxState::g_pSSClampPoint);
 	ApplyBS(m_pImmediateContext, SDxState::g_pAlphaBlend);
+	ApplyDSS(m_pImmediateContext, SDxState::g_pDSSDepthEnable);
 	if (!PreFrame())	return false;
 	if (!Frame())	return false;
 	if (!PostFrame())	return false;
@@ -71,6 +77,9 @@ bool	SCore::CoreRender()
 	if (!I_InputManager.Render(m_rcClientRect.left, m_rcClientRect.top, m_rcClientRect.right, m_rcClientRect.bottom))
 		return false;
 	if (!PostRender())	return false;
+
+	float Color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, Color);
 
 	return true;
 }
@@ -110,22 +119,12 @@ bool	SCore::CoreRelease()
 
 bool SCore::PreInit()
 {
-	
-
-	if (!I_Timer.Init()) return false;
-
-	IDXGISurface1*	pBackBuffer = nullptr;
-	HRESULT hr = GetSwapChain()->GetBuffer(0, __uuidof(IDXGISurface), (LPVOID*)&pBackBuffer);
-	I_DirectWrite.Set(m_hWnd, m_nWindowHeight, m_nWindowHeight, pBackBuffer);
-	SAFE_RELEASE(pBackBuffer);
 
 	return true;
 }
 bool SCore::PreFrame(){ return true; }
 bool SCore::PreRender()
 {
-	float Color[4] = { 1.0f, 0.5f, 0.5f, 1.0f };
-	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, Color);
 	return true;
 }
 bool SCore::PreRelease(){ return true; }
@@ -148,6 +147,38 @@ bool SCore::PostRender()
 }
 bool SCore::PostRelease(){ return true; }
 
+
+HRESULT SCore::CreateDxResource()
+{
+	IDXGISurface1*		pBackBuffer = NULL;
+	HRESULT hr = GetSwapChain()->GetBuffer(0, __uuidof(IDXGISurface), (LPVOID*)&pBackBuffer);
+	I_DirectWrite.Set(m_hWnd, m_nWindowWidth, m_nWindowHeight, pBackBuffer);
+	if (pBackBuffer)	pBackBuffer->Release();
+
+	if (FAILED(hr = GetSwapChain()->GetDesc(&m_SwapChainDesc)))
+	{
+		return hr;
+	}
+
+	if (FAILED(hr = UpdateDepthStencilView(m_pD3DDevice, m_SwapChainDesc.BufferDesc.Width, m_SwapChainDesc.BufferDesc.Height)))
+	{
+		return hr;
+	}
+	return CreateResource();
+}
+HRESULT SCore::DeleteDxResource()
+{
+	if (!I_DirectWrite.Release()) return false;
+	return DeleteResource();
+}
+HRESULT SCore::CreateResource()
+{
+	return S_OK;
+}
+HRESULT SCore::DeleteResource()
+{
+	return S_OK;
+}
 int SCore::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	return -1;

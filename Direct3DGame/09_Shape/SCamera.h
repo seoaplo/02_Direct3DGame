@@ -20,6 +20,8 @@ public:
 	void	CreateProjMatrix(RECT ClientRect);
 	void	Forward();
 	void	Backward();
+	void	RightRotation();
+	void	LeftRotation();
 	bool	Frame();
 public:
 	SCamera();

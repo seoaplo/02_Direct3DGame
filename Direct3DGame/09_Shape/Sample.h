@@ -3,17 +3,27 @@
 #include "S3DGameLib.h"
 #include "SDXPlaneObject.h"
 #include "SCamera.h"
+#include "SBox.h"
+#include "SDirection.h"
 
 class Sample : public SCore
 {
 public:
-	SDXPlaneObject	TestObject;
+	SBox				TestObject;
+	SDirection			m_TestDir;
+	SDXPlaneObject		m_Plane;
+
+	D3DXVECTOR3 XDir;
+	D3DXVECTOR3 YDir;
+	D3DXVECTOR3 ZDir;
 	std::vector<UINT>	m_Tex;
 	T_STR				m_DebugString;
 	
 	SCamera				m_CameraBack;
 	SCamera				m_CameraSide;
+	SCamera				m_CameraUp;
 	SCamera*			m_pMainCamera;
+
 	D3DXMATRIX			m_matObjWorld;
 
 public:

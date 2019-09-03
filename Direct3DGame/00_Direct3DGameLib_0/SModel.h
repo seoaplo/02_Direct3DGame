@@ -5,8 +5,8 @@
 class SModel
 {
 public:
-	ID3D11Device*						m_pd3dDevice;
-	ID3D11DeviceContext*				m_pContext;
+	ID3D11Device*							m_pDevice;
+	ID3D11DeviceContext*					m_pContext;
 	DXGame::SDxHelperEX						m_dxobj;
 
 	STexture*							m_pTexture;

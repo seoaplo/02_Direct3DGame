@@ -15,6 +15,7 @@ public:
 	bool	CoreRender();
 	bool	CoreRelease();
 
+public:
 	// GameFrameWork
 
 	virtual bool PreInit();
@@ -35,6 +36,12 @@ public:
 	virtual int WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
 	bool Run();
+public:
+	HRESULT		CreateDxResource();
+	HRESULT		DeleteDxResource();
+	virtual		HRESULT		CreateResource();
+	virtual		HRESULT		DeleteResource();
+
 public:
 	SCore();
 	~SCore();

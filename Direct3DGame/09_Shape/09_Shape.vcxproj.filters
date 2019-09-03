@@ -11,6 +11,8 @@
     <ClCompile Include="SDXPlaneObject.cpp" />
     <ClCompile Include="SMatrix.cpp" />
     <ClCompile Include="SVector.cpp" />
+    <ClCompile Include="SBox.cpp" />
+    <ClCompile Include="SDirection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
@@ -18,12 +20,17 @@
     <ClInclude Include="SDXPlaneObject.h" />
     <ClInclude Include="SMatrix.h" />
     <ClInclude Include="SVector.h" />
+    <ClInclude Include="SBox.h" />
+    <ClInclude Include="SDirection.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\shader\09_Shape\pixel.hlsl">
+    <FxCompile Include="..\..\shader\09_Shape\Line.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\shader\09_Shape\vertex.hlsl">
+    <FxCompile Include="..\..\shader\09_Shape\Plane.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\09_Shape\Box.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

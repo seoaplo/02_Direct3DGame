@@ -81,6 +81,7 @@ int STextureManager::Load(
 	}
 	pData->m_szName = filename;
 	pData->m_szPath = path;
+	pData->m_iIndex = m_TextureList.size();
 	m_TextureList.insert(make_pair(pData->m_iIndex, pData));
 	return pData->m_iIndex;
 }

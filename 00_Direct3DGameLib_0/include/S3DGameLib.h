@@ -1,6 +1,6 @@
 #pragma once
 #include "SCore.h"
-#include "SModel.h"
+#include "SDXShape.h"
 
 #ifdef _WIN64
 #pragma comment(lib, "fmod64_vc.lib")

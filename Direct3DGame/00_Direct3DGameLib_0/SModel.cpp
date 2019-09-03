@@ -18,8 +18,7 @@ bool SModel::Create(ID3D11Device* pDevice,
 		return false;
 	}
 
-	m_pd3dDevice = pDevice;
-	m_pd3dDevice->GetImmediateContext(&m_pContext);
+	m_pDevice = pDevice;
 
 	if (FAILED(LoadShaderFile(pDevice, pLoadShaderFile)))
 	{
@@ -78,7 +77,7 @@ HRESULT SModel::LoadTextures(ID3D11Device* pDevice, const TCHAR* pLoadTextureStr
 {
 	HRESULT hr = S_OK;
 	int iTextureID = I_TextureManager.Load(pDevice, pLoadTextureString);
-	m_dxobj.g_pTextureSRV.Attach(I_TextureManager.GetPtr(iTextureID)->m_pSRV.Get());
+	m_dxobj.g_pTextureSRV.Attach(I_TextureManager.GetPtr(iTextureID)->m_pSRV);
 
 	return hr;
 }
@@ -106,7 +105,7 @@ HRESULT SModel::CreateVertexBuffer()
 	void** pData = nullptr;
 	if (m_VertexList.size() > 0) pData = (void**)&m_VertexList.at(0);
 
-	m_dxobj.g_pVertexBuffer.Attach(DXGame::CreateVertexBuffer(m_pd3dDevice,
+	m_dxobj.g_pVertexBuffer.Attach(DXGame::CreateVertexBuffer(m_pDevice,
 		pData,
 		m_dxobj.m_iNumVertex,
 		m_dxobj.m_iVertexSize, true));
@@ -118,7 +117,7 @@ HRESULT	SModel::CreateIndexBuffer()
 	void** pData = nullptr;
 	if (m_IndexList.size() > 0) pData = (void**)&m_IndexList.at(0);
 
-	m_dxobj.g_pIndexBuffer.Attach(DXGame::CreateIndexBuffer(m_pd3dDevice,
+	m_dxobj.g_pIndexBuffer.Attach(DXGame::CreateIndexBuffer(m_pDevice,
 		pData,
 		m_dxobj.m_iNumIndex,
 		m_dxobj.m_iIndexSize));
@@ -127,7 +126,7 @@ HRESULT	SModel::CreateIndexBuffer()
 HRESULT SModel::CreateConstantBuffer()
 {
 	m_cbData.Color = D3DXVECTOR4(1, 1, 1, 1);
-	m_dxobj.g_pConstantBuffer.Attach(DXGame::CreateConstantBuffer(m_pd3dDevice, &m_cbData, 1, sizeof(VS_CONSTANT_BUFFER)));
+	m_dxobj.g_pConstantBuffer.Attach(DXGame::CreateConstantBuffer(m_pDevice, &m_cbData, 1, sizeof(VS_CONSTANT_BUFFER)));
 	return S_OK;
 }
 bool SModel::Draw(ID3D11DeviceContext* pContext, D3DXVECTOR3 vStart, D3DXVECTOR3 vPost, D3DXVECTOR4 vColor) { return true; }
@@ -142,7 +141,7 @@ HRESULT SModel::SetInputLayout()
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	UINT numElements = sizeof(layout) / sizeof(layout[0]);
-	m_dxobj.g_pInputlayout.Attach(DXGame::CreateInputlayout(m_pd3dDevice, m_dxobj.g_pVSBlob.Get()->GetBufferSize(),
+	m_dxobj.g_pInputlayout.Attach(DXGame::CreateInputlayout(m_pDevice, m_dxobj.g_pVSBlob.Get()->GetBufferSize(),
 		m_dxobj.g_pVSBlob.Get()->GetBufferPointer(), layout, numElements));
 	return hr;
 }
@@ -224,8 +223,7 @@ HRESULT SModel::DeleteResource()
 }
 SModel::SModel()
 {
-	m_pd3dDevice = nullptr;
-	m_pContext = nullptr;
+	m_pDevice = nullptr;
 	m_cbData.Color = D3DXVECTOR4(1, 1, 1, 1);
 	m_vCenter = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXMatrixIdentity(&m_matView);

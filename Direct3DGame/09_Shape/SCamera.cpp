@@ -39,6 +39,16 @@ void	SCamera::Backward()
 {
 	m_vPos = m_vPos - m_vLook * I_Timer.GetSPF() * 20.0f;
 }
+void	SCamera::RightRotation()
+{
+
+	m_vPos = m_vPos + m_vRight * I_Timer.GetSPF() * 20.0f;
+
+}
+void	SCamera::LeftRotation()
+{
+	m_vPos = m_vPos - m_vRight * I_Timer.GetSPF() * 20.0f;
+}
 bool	SCamera::Frame()
 {
 	CreateViewMatrix(m_vPos, m_vTarget, m_vUp);

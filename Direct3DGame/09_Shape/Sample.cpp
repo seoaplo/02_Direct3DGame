@@ -19,24 +19,48 @@ bool Sample::Init()
 	D3DXVECTOR3 Vector;
 
 	TestObject.Set(GetDevice(), m_pImmediateContext, Vector, m_rcClientRect);
-	TestObject.Load(GetDevice(), L"");
+
+	BOX_VERTEX_LIST vertices;
+
+	if (TestObject.Load(GetDevice(), L"../../data/Image/checker_with_numbers.bmp", vertices) == false)
+	{
+		return false;
+	}
+	m_TestDir.Set(GetDevice(), m_pImmediateContext, Vector, Vector, m_rcClientRect);
+	m_TestDir.Load(GetDevice());
+
+	PLANE_VERTEX_LIST planevertices;
+
+	m_Plane.Set(GetDevice(), m_pImmediateContext, Vector, m_rcClientRect);
+	m_Plane.Load(GetDevice(), L"../../data/Image/Attacker3.bmp", planevertices);
 
 	D3DXMatrixIdentity(&m_matObjWorld);
+	XDir = D3DXVECTOR3(1000.0f, 0.0f, 0.0f);
+	YDir = D3DXVECTOR3(0.0f, 1000.0f, 0.0f);
+	ZDir = D3DXVECTOR3(0.0f, 0.0f, 1000.0f);
 
 	m_CameraBack.Init();
-	DXGame::SVector3 Eye(0.0f, 0.0f, 2.0f);
+	DXGame::SVector3 Eye(0.0f, 0.0f, -4.0f);
 	DXGame::SVector3 At(0.0f, 0.0f, 0.0f);
 	DXGame::SVector3 Up(0.0f, 1.0f, 0.0f);
 	m_CameraBack.CreateViewMatrix(Eye, At, Up);
 	m_CameraBack.CreateProjMatrix(m_rcClientRect);
 
 	m_CameraSide.Init();
-	Eye = DXGame::SVector3(2.0f, 0.0f, -0.3f);
+	Eye = DXGame::SVector3(4.0f, 0.0f, 0.0f);
 	m_CameraSide.CreateViewMatrix(Eye, At, Up);
 	m_CameraSide.CreateProjMatrix(m_rcClientRect);
 
-	m_pMainCamera = &m_CameraBack;
-	m_DebugString = L"BackCamera";
+	m_CameraUp.Init();
+	Eye = DXGame::SVector3(0.0001f, 2.0f, 0.0f);
+	m_CameraUp.CreateViewMatrix(Eye, At, Up);
+	m_CameraUp.CreateProjMatrix(m_rcClientRect);
+
+	m_pMainCamera = &m_CameraUp;
+	m_DebugString = L"UpCamera";
+
+	D3DXMatrixScaling(&m_matObjWorld, (212 - 247), (282 - 328), 1.0f);
+	D3DXMatrixIdentity(&m_matObjWorld);
 	return true;
 }
 bool Sample::Frame()
@@ -63,15 +87,45 @@ bool Sample::Frame()
 	{
 		m_pMainCamera->Backward();
 	}
+	if (I_InputManager.KeyBoardState(DIK_D) == KEY_HOLD)
+	{
+		m_pMainCamera->RightRotation();
+	}
+	if (I_InputManager.KeyBoardState(DIK_A) == KEY_HOLD)
+	{
+		m_pMainCamera->LeftRotation();
+	}
+
 	m_pMainCamera->Frame();
 	TestObject.Frame();
+	m_TestDir.Frame();
+	m_Plane.Frame();
 	return true;
 }
 bool Sample::Render()
 {
-	
-	TestObject.SetMatrix(nullptr, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
+	D3DXMatrixIdentity(&m_matObjWorld);
+
+	TestObject.SetMatrix(&m_matObjWorld, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
 	TestObject.Render(m_pImmediateContext);
+	
+	m_matObjWorld._42 = 1.0f;
+
+	m_Plane.SetMatrix(&m_matObjWorld, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
+	m_Plane.Render(m_pImmediateContext);
+
+	D3DXMATRIX mat;
+	D3DXMatrixIdentity(&mat);
+	m_TestDir.SetMatrix(&mat, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
+	
+	m_TestDir.SetVector(D3DXVECTOR3(0.0f, 0.0f, 0.0f), XDir, D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_TestDir.Render(m_pImmediateContext);
+	
+	m_TestDir.SetVector(D3DXVECTOR3(0.0f, 0.0f, 0.0f), YDir, D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f));
+	m_TestDir.Render(m_pImmediateContext);
+
+	m_TestDir.SetVector(D3DXVECTOR3(0.0f, 0.0f, 0.0f), ZDir, D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f));
+	m_TestDir.Render(m_pImmediateContext);
 
 	RECT rc;
 	rc.left = 0;
@@ -84,7 +138,6 @@ bool Sample::Render()
 bool Sample::Release()
 {
 	TestObject.Release();
-	ReportLiveObjects();
 	return true;
 }
 Sample::Sample()

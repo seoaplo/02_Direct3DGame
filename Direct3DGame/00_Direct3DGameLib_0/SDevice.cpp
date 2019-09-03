@@ -175,7 +175,14 @@ HRESULT SDevice::SetViewPort()
 
 	return hr;
 }
-
+HRESULT SDevice::DeleteDxResource()
+{
+	return S_OK;
+}
+HRESULT SDevice::CreateDxResource()
+{
+	return S_OK;
+}
 #pragma endregion
 
 bool SDevice::CleanupDevice()
@@ -183,6 +190,12 @@ bool SDevice::CleanupDevice()
 	// 초기 풀스크린 윈도우에서 응용프로그램이 닫히는 경우에는 윈도우 전환 후에
 	// 객체들을 소멸해야 한다.(메모리 누수를 막을 수 있다.)
 	m_pDxgiSwapChain->SetFullscreenState(false, nullptr);
+
+
+	if (FAILED(DeleteDxResource()))
+	{
+		return false;
+	}
 
 	if (m_pImmediateContext)
 	{
@@ -227,6 +240,11 @@ HRESULT	SDevice::ReSizeDevice(UINT iWidth, UINT iHeight)
 
 	HRESULT hr = S_OK;
 
+	if (FAILED(hr = DeleteDxResource()))
+	{
+		return hr;
+	}
+
 	//=============================================================
 	// 렌더타겟과 깊이스텐실 버퍼를 해제한다.
 	//=============================================================
@@ -255,13 +273,104 @@ HRESULT	SDevice::ReSizeDevice(UINT iWidth, UINT iHeight)
 		return hr;
 	}
 
+	if (FAILED(hr = CreateDxResource()))
+	{
+		return hr;
+	}
 	return hr;
 
 }
 
+HRESULT SDevice::UpdateDepthStencilView(ID3D11Device* pDevice, UINT Width, UINT Height)
+{
+	HRESULT hr;
+	if (m_pDepthStencilView != nullptr)
+	{
+		m_pDepthStencilView->Release();
+	}
 
+	m_ViewPort.Width = Width;
+	m_ViewPort.Height = Height;
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDSTexture = nullptr;
+	D3D11_TEXTURE2D_DESC DescDepth;
+	DescDepth.Width = Width;
+	DescDepth.Height = Height;
+	DescDepth.MipLevels = 1;
+	DescDepth.ArraySize = 1;
+	DescDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	DescDepth.SampleDesc.Count = 1;
+	DescDepth.SampleDesc.Quality = 0;
+	DescDepth.Usage = D3D11_USAGE_DEFAULT;
+
+	// 백 버퍼 깊이 및 스텐실 버퍼 생성
+	if (DescDepth.Format == DXGI_FORMAT_D24_UNORM_S8_UINT)
+		DescDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	else // 깊이맵 전용 깊이맵 생성
+		DescDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	DescDepth.CPUAccessFlags = 0;
+	DescDepth.MiscFlags = 0;
+	if (FAILED(hr = pDevice->CreateTexture2D(&DescDepth, NULL, &pDSTexture)))
+	{
+		return hr;
+	}
+
+	///// 쉐이더 리소스 생성 : 깊이 맵 쉐도우에서 사용한다. ///
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+	ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+
+	switch (DescDepth.Format)
+	{
+	case DXGI_FORMAT_R32_TYPELESS:
+		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+		break;
+	case DXGI_FORMAT_D24_UNORM_S8_UINT:
+		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		break;
+	}
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Texture2D.MipSlice = 0;
+	//pDevice->CreateDepthStencilView(m_pTexture, &dsvDesc, &m_pDSV);
+	//D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
+	//ZeroMemory(&dsvd, sizeof(dsvd));
+	//dsvd.Format = DescDepth.Format;
+	//dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	//dsvd.Texture2D.MipSlice = 0;
+
+	if (FAILED(hr = pDevice->CreateDepthStencilView(pDSTexture.Get(), &dsvDesc, &m_pDepthStencilView)))
+	{
+		return hr;
+	}
+
+	// 깊이맵 일 경우만 생성한다.
+	if (DescDepth.Format == DXGI_FORMAT_R32_TYPELESS)
+	{
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.MipLevels = 1;
+		if (m_pDsvSRV != nullptr) m_pDsvSRV->Release();
+		pDevice->CreateShaderResourceView(pDSTexture.Get(), &srvDesc, &m_pDsvSRV);
+	}
+	m_pDepthStencilView->GetDesc(&m_DepthStencilDesc);
+	return hr;
+}
 SDevice::SDevice()
 {
+	m_DriverType = D3D_DRIVER_TYPE_NULL;
+	m_FeatureLevel = D3D_FEATURE_LEVEL_11_0;
+
+	m_pD3DDevice = nullptr;
+	m_pImmediateContext = nullptr;
+	m_pRenderTargetView = nullptr;
+	m_pDxgiSwapChain = nullptr;
+	m_pDxgiFactory = nullptr;
+	m_pDepthStencilView = nullptr;
+	m_pDsvSRV = nullptr;
+	ZeroMemory(&m_ViewPort, sizeof(m_ViewPort));
 }
 
 
@@ -275,6 +384,7 @@ SDevice::~SDevice()
 	m_pRenderTargetView = nullptr;
 	m_pDxgiSwapChain = nullptr;
 	m_pDxgiFactory = nullptr;
-
+	m_pDepthStencilView = nullptr;
+	m_pDsvSRV = nullptr;
 	ZeroMemory(&m_ViewPort, sizeof(m_ViewPort));
 }

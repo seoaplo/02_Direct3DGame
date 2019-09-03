@@ -120,23 +120,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SBox.cpp" />
     <ClCompile Include="SCamera.cpp" />
+    <ClCompile Include="SDirection.cpp" />
     <ClCompile Include="SDXPlaneObject.cpp" />
     <ClCompile Include="SMatrix.cpp" />
     <ClCompile Include="SVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
+    <ClInclude Include="SBox.h" />
     <ClInclude Include="SCamera.h" />
+    <ClInclude Include="SDirection.h" />
     <ClInclude Include="SDXPlaneObject.h" />
     <ClInclude Include="SMatrix.h" />
     <ClInclude Include="SVector.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\shader\09_Shape\pixel.hlsl">
+    <FxCompile Include="..\..\shader\09_Shape\Box.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="..\..\shader\09_Shape\vertex.hlsl">
+    <FxCompile Include="..\..\shader\09_Shape\Line.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\09_Shape\Plane.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
 #include "SDxBasic.h"
 #include "SUtils.h"
+#include "SDXState.h"
 
 class SDevice
 {
@@ -9,21 +10,23 @@ public:
 	//==============================================================================================
 	// DirectX Interface Pointer
 	//==============================================================================================
-	ID3D11Device*			m_pD3DDevice;				// DirectX Interface Device ver.11	( Resource )
-	ID3D11DeviceContext*	m_pImmediateContext;		// DirectX Interface DeviceContext ver.11 ( Rendering )
-	ID3D11RenderTargetView*	m_pRenderTargetView;		// DirectX Interface RenderTargetView ver.11	( Camera )
-
-	IDXGIFactory*			m_pDxgiFactory;				// DirectX Interface Factory ( Create Interface )
-	IDXGISwapChain*			m_pDxgiSwapChain;			// DirectX interface SwapChain ( Buffers )
+	ID3D11Device*				m_pD3DDevice;				// DirectX Interface Device ver.11	( Resource )
+	ID3D11DeviceContext*		m_pImmediateContext;		// DirectX Interface DeviceContext ver.11 ( Rendering )
+	ID3D11RenderTargetView*		m_pRenderTargetView;		// DirectX Interface RenderTargetView ver.11	( Camera )
+	ID3D11DepthStencilView*		m_pDepthStencilView;		// DirectX Interface DepthStencilViel ver.11 ( Depth )
+	ID3D11ShaderResourceView*	m_pDsvSRV;					// DirectX interface ShaderResourceView with DepthStencil
+	IDXGIFactory*				m_pDxgiFactory;				// DirectX Interface Factory ( Create Interface )
+	IDXGISwapChain*				m_pDxgiSwapChain;			// DirectX interface SwapChain ( Buffers )
 	
 	//==============================================================================================
 	// DirectX Enum or Structure
 	//==============================================================================================
-	D3D_DRIVER_TYPE			m_DriverType;				// Device Type
-	D3D_FEATURE_LEVEL		m_FeatureLevel;				// Device Feature Level
-	D3D11_VIEWPORT			m_ViewPort;					// ViewPort
-	BOOL					m_IsFullSceenMode;			// FullScreen Flag
-	DXGI_SWAP_CHAIN_DESC	m_SwapChainDesc;
+	D3D_DRIVER_TYPE							m_DriverType;				// Device Type
+	D3D_FEATURE_LEVEL						m_FeatureLevel;				// Device Feature Level
+	D3D11_VIEWPORT							m_ViewPort;					// ViewPort
+	BOOL									m_IsFullSceenMode;			// FullScreen Flag
+	DXGI_SWAP_CHAIN_DESC					m_SwapChainDesc;
+	D3D11_DEPTH_STENCIL_VIEW_DESC			m_DepthStencilDesc;
 public:
 	//==============================================================================================
 	// Getter and Setter Functions
@@ -52,9 +55,13 @@ public:
 	//==============================================================================================
 	// Setting RenderTargetView and ViewPort
 	//==============================================================================================
-	HRESULT		SetRenderTargetView();	// Create RanderTargetView
-	HRESULT		SetViewPort();			// ViewPort Binding
+	virtual		HRESULT		SetRenderTargetView();				// Create RanderTargetView
+	virtual		HRESULT		SetViewPort();						// ViewPort Binding
+	virtual		HRESULT		DeleteDxResource();		
+	virtual		HRESULT		CreateDxResource();
 
+public:
+	HRESULT		UpdateDepthStencilView(ID3D11Device* pDevice, UINT Width, UINT Height);
 public:
 	HRESULT		ReSizeDevice(UINT iWidth, UINT iHeight);	// Resize Device
 	bool		CleanupDevice();		// Release this
