@@ -149,7 +149,7 @@ HRESULT SDevice::SetRenderTargetView()
 	}
 
 	// ÄÁÅØ½ºÆ®¿¡ ·»´õ Å¸°Ù ºä¸¦ ¼³Á¤ÇÑ´Ù.
-	m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, nullptr);
+	m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 	return hr;
 }
 
@@ -334,12 +334,6 @@ HRESULT SDevice::UpdateDepthStencilView(ID3D11Device* pDevice, UINT Width, UINT 
 	}
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Texture2D.MipSlice = 0;
-	//pDevice->CreateDepthStencilView(m_pTexture, &dsvDesc, &m_pDSV);
-	//D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
-	//ZeroMemory(&dsvd, sizeof(dsvd));
-	//dsvd.Format = DescDepth.Format;
-	//dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	//dsvd.Texture2D.MipSlice = 0;
 
 	if (FAILED(hr = pDevice->CreateDepthStencilView(pDSTexture.Get(), &dsvDesc, &m_pDepthStencilView)))
 	{
@@ -356,6 +350,8 @@ HRESULT SDevice::UpdateDepthStencilView(ID3D11Device* pDevice, UINT Width, UINT 
 		pDevice->CreateShaderResourceView(pDSTexture.Get(), &srvDesc, &m_pDsvSRV);
 	}
 	m_pDepthStencilView->GetDesc(&m_DepthStencilDesc);
+	m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
+
 	return hr;
 }
 SDevice::SDevice()

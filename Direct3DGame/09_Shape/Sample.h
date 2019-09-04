@@ -1,17 +1,14 @@
 #pragma once
 
 #include "S3DGameLib.h"
-#include "SDXPlaneObject.h"
 #include "SCamera.h"
-#include "SBox.h"
-#include "SDirection.h"
 
 class Sample : public SCore
 {
 public:
 	SBox				TestObject;
 	SDirection			m_TestDir;
-	SDXPlaneObject		m_Plane;
+	SPlaneObject		m_Plane;
 
 	D3DXVECTOR3 XDir;
 	D3DXVECTOR3 YDir;

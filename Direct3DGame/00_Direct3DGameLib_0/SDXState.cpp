@@ -1,5 +1,45 @@
 #include "SDxState.h"
 
+T_STR DebugRasterizerState[] =
+{
+	_T("RSBackCullSolid"),
+	_T("RSNoneCullSolid"),
+	_T("RSFrontCullSolid"),
+	_T("RSWireFrame"),
+};
+
+T_STR DebugBlendState[] =
+{
+	_T("AlphaBlend"),
+	_T("NoAlphaBlend"),
+	_T("BSColorOne"),
+	_T("BSOneOne"),
+	_T("BSOneZero"),
+	_T("BSAlphaOne"),
+	_T("BSMaxOneOne"),
+};		
+
+T_STR DebugSamplerState[] =
+{
+	_T("SSWrapLinear"),
+	_T("SSWrapPoint"),
+	_T("SSMirrorLinear"),
+	_T("SSMirrorPoint"),
+	_T("SSClampLinear"),
+	_T("SSClampPoint"),
+	_T("SSShadowMap"),
+};
+
+T_STR DebugDepthStencilState[] =
+{
+	_T("DSSDepthEnable"),
+	_T("DSSDepthDisable"),
+	_T("DSSDepthEnableNoWrite"),
+	_T("DSSDepthDisableNoWrite"),
+	_T("DSSDepthStencilAdd"),
+	_T("DSSDepthAlways"),
+};
+
 namespace DXGame
 {
 	ID3D11RasterizerState* SDxState::g_pRSWireFrame = 0;
@@ -36,6 +76,11 @@ namespace DXGame
 	ID3D11BlendState*	  SDxState::g_pBSAlphaOne = 0;
 	ID3D11BlendState*	  SDxState::g_pBSMaxOneOne = 0;
 	ID3D11BlendState*	  SDxState::g_pBS[7] = { 0, };
+
+	T_STR SDxState::RSDebugString;
+	T_STR SDxState::BSDebugString;
+	T_STR SDxState::SSDebugString;
+	T_STR SDxState::DSSDebugString;
 
 	HRESULT SDxState::SetState(ID3D11Device*	pd3dDevice)
 	{
@@ -110,6 +155,15 @@ namespace DXGame
 		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 		pd3dDevice->CreateBlendState(&blendDesc, &SDxState::g_pBSMaxOneOne);
 
+		g_pBS[0] = g_pAlphaBlend;
+		g_pBS[1] = g_pNoAlphaBlend;
+		g_pBS[2] = g_pBSColorOne;
+		g_pBS[3] = g_pBSOneOne;
+		g_pBS[4] = g_pBSOneZero;
+		g_pBS[5] = g_pBSAlphaOne;
+		g_pBS[5] = g_pBSMaxOneOne;
+
+
 		//레스터라이즈 상태 객체 생성
 		D3D11_RASTERIZER_DESC rsDesc;
 		ZeroMemory(&rsDesc, sizeof(rsDesc));
@@ -147,10 +201,11 @@ namespace DXGame
 		rsDesc.SlopeScaledDepthBias = 1.0f;
 		if (FAILED(hr = pd3dDevice->CreateRasterizerState(&rsDesc, &SDxState::g_pRSSlopeScaledDepthBias)))
 			return hr;
-
+		
 		g_pRS[0] = g_pRSNoneCullSolid;
 		g_pRS[1] = g_pRSFrontCullSolid;
 		g_pRS[2] = g_pRSBackCullSolid;
+		g_pRS[3] = g_pRSWireFrame;
 
 		ID3D11SamplerState* pSamplerState = nullptr;
 		D3D11_SAMPLER_DESC sd;
@@ -311,6 +366,14 @@ namespace DXGame
 		{
 			return hr;
 		}
+
+		g_pDSS[0] = g_pDSSDepthEnable;
+		g_pDSS[1] = g_pDSSDepthDisable;
+		g_pDSS[2] = g_pDSSDepthEnableNoWrite;
+		g_pDSS[3] = g_pDSSDepthDisableNoWrite;
+		g_pDSS[4] = g_pDSSDepthStencilAdd;
+		g_pDSS[5] = g_pDSSDepthAlways;
+
 		return hr;
 	}
 
@@ -350,6 +413,43 @@ namespace DXGame
 
 
 		return true;
+	}
+
+	void SDxState::SetRasterizerState(ID3D11DeviceContext*   pContext, UINT StateNum)
+	{
+		assert(pContext);
+		if (StateNum > DebugRSSetNum) return;
+
+		pContext->RSSetState(SDxState::g_pRS[StateNum]);
+		RSDebugString = DebugRasterizerState[StateNum];
+	}
+	void SDxState::SetDepthStencilState(ID3D11DeviceContext*   pContext, UINT StateNum,
+		UINT iRef)
+	{
+		assert(pContext);
+		if (StateNum > DebugDSSSetNum) return;
+		pContext->OMSetDepthStencilState(SDxState::g_pDSS[StateNum], iRef);
+		DSSDebugString = DebugDepthStencilState[StateNum];
+
+	};
+	void SDxState::SetBlendState(ID3D11DeviceContext*   pContext,
+		UINT StateNum,
+		const FLOAT fBlendFactor[],
+		UINT iMask)
+	{
+		assert(pContext);
+		if (StateNum > DebugBSSetNum) return;
+		pContext->OMSetBlendState(SDxState::g_pBS[StateNum], fBlendFactor, iMask);
+		BSDebugString = DebugBlendState[StateNum];
+	}
+
+	void SDxState::SetSamplerState(ID3D11DeviceContext*   pContext, UINT StateNum,
+		UINT iSlot, UINT iArray)
+	{
+		assert(pContext);
+		if (StateNum > DebugSSSetNum) return;
+		pContext->PSSetSamplers(iSlot, iArray, &SDxState::g_pSS[StateNum]);
+		SSDebugString = DebugSamplerState[StateNum];
 	}
 
 	SDxState::SDxState()

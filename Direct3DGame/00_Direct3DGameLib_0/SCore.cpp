@@ -4,6 +4,7 @@ using namespace DXGame;
 
 SCore::SCore()
 {
+
 }
 
 SCore::~SCore()
@@ -33,12 +34,20 @@ bool	SCore::CoreInit()
 	if (!I_InputManager.Init())
 		return false;
 
+	SDxState::SetState(m_pD3DDevice);
+
 	CreateDxResource();
 
 
 	if (!PreInit())	return false;
 	if (!Init())	return false;
 	if (!PostInit())	return false;
+
+	m_RSDebugNum = 0;
+	m_BSDebugNum = 0;
+	m_SSDebugNum = 0;
+	m_DSSDebugNum = 0;
+	m_bDebugState = false;
 
 	return true;
 }
@@ -52,11 +61,9 @@ bool	SCore::CoreFrame()
 		return false;
 	if (!I_InputManager.Frame())
 		return false;
-	SDxState::SetState(m_pD3DDevice);
-	ApplyRS(m_pImmediateContext, SDxState::g_pRSBackCullSolid);
-	ApplySS(m_pImmediateContext, SDxState::g_pSSClampPoint);
-	ApplyBS(m_pImmediateContext, SDxState::g_pAlphaBlend);
-	ApplyDSS(m_pImmediateContext, SDxState::g_pDSSDepthEnable);
+
+	ProcDebug();
+
 	if (!PreFrame())	return false;
 	if (!Frame())	return false;
 	if (!PostFrame())	return false;
@@ -65,6 +72,19 @@ bool	SCore::CoreFrame()
 }
 bool	SCore::CoreRender()
 {
+	float Color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, Color);
+
+	m_pImmediateContext->ClearDepthStencilView(
+		m_pDepthStencilView,
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+		1.0f, 0);
+
+	SDxState::SetRasterizerState(m_pImmediateContext, m_RSDebugNum);
+	SDxState::SetBlendState(m_pImmediateContext, m_BSDebugNum);
+	SDxState::SetSamplerState(m_pImmediateContext, m_SSDebugNum);
+	SDxState::SetDepthStencilState(m_pImmediateContext, m_DSSDebugNum);
+
 	if(!PreRender())	return false;
 	if (!Render())	return false;
 
@@ -78,8 +98,8 @@ bool	SCore::CoreRender()
 		return false;
 	if (!PostRender())	return false;
 
-	float Color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, Color);
+	DrawDebug();
+	m_pDxgiSwapChain->Present(0, 0);
 
 	return true;
 }
@@ -141,8 +161,6 @@ bool SCore::PostInit(){ return true; }
 bool SCore::PostFrame(){ return true; }
 bool SCore::PostRender()
 {
-
-	m_pDxgiSwapChain->Present(0, 0);
 	return true; 
 }
 bool SCore::PostRelease(){ return true; }
@@ -150,6 +168,7 @@ bool SCore::PostRelease(){ return true; }
 
 HRESULT SCore::CreateDxResource()
 {
+
 	IDXGISurface1*		pBackBuffer = NULL;
 	HRESULT hr = GetSwapChain()->GetBuffer(0, __uuidof(IDXGISurface), (LPVOID*)&pBackBuffer);
 	I_DirectWrite.Set(m_hWnd, m_nWindowWidth, m_nWindowHeight, pBackBuffer);
@@ -178,6 +197,76 @@ HRESULT SCore::CreateResource()
 HRESULT SCore::DeleteResource()
 {
 	return S_OK;
+}
+
+bool SCore::DrawDebug()
+{
+	// FPS 출력
+	TCHAR pBuffer[256];
+	memset(pBuffer, 0, sizeof(TCHAR) * 256);
+	_stprintf_s(pBuffer, _T("FPS:%d"), I_Timer.GetFPS());
+
+	RECT rc1 = { 0,0, m_nWindowWidth, m_nWindowHeight };
+	I_DirectWrite.DrawText(rc1, pBuffer, D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.5));
+
+	//-----------------------------------------------------------------------
+	// 적용된 RasterizerState 타입 표시
+	//-----------------------------------------------------------------------	
+	RECT rc;
+	rc.top = 30;
+	rc.bottom = m_nWindowWidth;
+	rc.left = 0;
+	rc.right = m_nWindowHeight;
+	I_DirectWrite.DrawText(rc, SDxState::RSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
+
+	//-----------------------------------------------------------------------
+	// 적용된 SamplerState 타입 표시
+	//-----------------------------------------------------------------------	
+	rc.top = 50;
+	rc.bottom = m_nWindowWidth;
+	rc.left = 0;
+	rc.right = m_nWindowHeight;
+	I_DirectWrite.DrawText(rc, SDxState::SSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
+
+	//-----------------------------------------------------------------------
+	// 적용된 DepthStencilState 타입 표시
+	//-----------------------------------------------------------------------	
+	rc.top = 70;
+	rc.bottom = m_nWindowWidth;
+	rc.left = 0;
+	rc.right = m_nWindowHeight;
+	I_DirectWrite.DrawText(rc, SDxState::DSSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
+
+	//-----------------------------------------------------------------------
+	// 적용된 BlendState 타입 표시
+	//-----------------------------------------------------------------------	
+	rc.top = 90;
+	rc.bottom = m_nWindowWidth;
+	rc.left = 0;
+	rc.right = m_nWindowHeight;
+	I_DirectWrite.DrawText(rc, SDxState::BSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
+
+	return true;
+}
+bool SCore::ProcDebug()
+{
+	if (I_InputManager.KeyBoardState(DIK_F1) == KEY_PUSH)
+	{
+		m_RSDebugNum = (m_RSDebugNum + 1) % DebugRSSetNum;
+	}
+	if (I_InputManager.KeyBoardState(DIK_F2) == KEY_PUSH)
+	{
+		m_BSDebugNum = (m_BSDebugNum + 1) % DebugBSSetNum;
+	}
+	if (I_InputManager.KeyBoardState(DIK_F3) == KEY_PUSH)
+	{
+		m_SSDebugNum = (m_SSDebugNum + 1) % DebugSSSetNum;
+	}
+	if (I_InputManager.KeyBoardState(DIK_F4) == KEY_PUSH)
+	{
+		m_DSSDebugNum = (m_DSSDebugNum + 1) % DebugDSSSetNum;
+	}
+	return true;
 }
 int SCore::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {

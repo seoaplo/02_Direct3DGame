@@ -8,20 +8,14 @@
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="SCamera.cpp" />
-    <ClCompile Include="SDXPlaneObject.cpp" />
     <ClCompile Include="SMatrix.cpp" />
     <ClCompile Include="SVector.cpp" />
-    <ClCompile Include="SBox.cpp" />
-    <ClCompile Include="SDirection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
     <ClInclude Include="SCamera.h" />
-    <ClInclude Include="SDXPlaneObject.h" />
     <ClInclude Include="SMatrix.h" />
     <ClInclude Include="SVector.h" />
-    <ClInclude Include="SBox.h" />
-    <ClInclude Include="SDirection.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\shader\09_Shape\Line.hlsl">

@@ -104,13 +104,17 @@ bool Sample::Frame()
 }
 bool Sample::Render()
 {
+	//DXGame::ApplyDSS(m_pImmediateContext, DXGame::SDxState::g_pDSSDepthEnableNoWrite, 0xFF);
+	//m_pImmediateContext->OMSetDepthStencilState(DXGame::SDxState::g_pDSSDepthEnable, 0xFF);
+	//DXGame::ApplyRS(m_pImmediateContext, DXGame::SDxState::g_pRSNoneCullSolid);
+
 	D3DXMatrixIdentity(&m_matObjWorld);
 
 	TestObject.SetMatrix(&m_matObjWorld, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
 	TestObject.Render(m_pImmediateContext);
 	
-	m_matObjWorld._42 = 1.0f;
-
+	D3DXMatrixIdentity(&m_matObjWorld);
+	m_matObjWorld._43 = 2.0f;
 	m_Plane.SetMatrix(&m_matObjWorld, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
 	m_Plane.Render(m_pImmediateContext);
 
@@ -129,9 +133,9 @@ bool Sample::Render()
 
 	RECT rc;
 	rc.left = 0;
-	rc.top = 0;
-	rc.right = 200;
-	rc.bottom = 40;
+	rc.top = 110;
+	rc.right = m_nWindowWidth;
+	rc.bottom = m_nWindowHeight;
 	I_DirectWrite.DrawText(rc, m_DebugString.c_str());
 	return true;
 }

@@ -2,6 +2,52 @@
 #include "SDxBasic.h"
 #include "SUtils.h"
 
+enum RSSetState
+{
+	DebugRSBackCullSolid,
+	DebugRSNoneCullSolid,
+	DebugRSFrontCullSolid,
+	DebugRSWireFrame,
+	DebugRSSetNum,
+};
+
+enum BSSetState
+{
+	DebugAlphaBlend,
+	DebugNoAlphaBlend,
+	DebugBSColorOne,
+	DebugBSOneOne,
+	DebugBSOneZero,
+	DebugBSAlphaOne,
+	DebugBSMaxOneOne,
+	DebugBSSetNum,
+};
+
+enum SSSetState
+{
+	DebugSSWrapLinear,
+	DebugSSWrapPoint,
+	DebugSSMirrorLinear,
+	DebugSSMirrorPoint,
+	DebugSSClampLinear,
+	DebugSSClampPoint,
+	DebugSSShadowMap,
+	DebugSSSetNum,
+};
+
+enum DSSSetState
+{
+	DebugDSSDepthEnable,
+	DebugDSSDepthDisable,
+	DebugDSSDepthEnableNoWrite,
+	DebugDSSDepthDisableNoWrite,
+	DebugDSSDepthStencilAdd,
+	DebugDSSDepthAlways,
+	DebugDSSSetNum,
+};
+
+
+
 namespace DXGame
 {
 	class SDxState
@@ -42,42 +88,29 @@ namespace DXGame
 		static  ID3D11DepthStencilState*	g_pDSSDepthAlways;
 		static  ID3D11DepthStencilState*	g_pDSS[6];
 
+		static T_STR RSDebugString;
+		static T_STR BSDebugString;
+		static T_STR SSDebugString;
+		static T_STR DSSDebugString;
+
 		static HRESULT SetState(ID3D11Device*	pd3dDevice);
 		static bool  Release();
+
+		static void SetRasterizerState(ID3D11DeviceContext*   pContext, UINT StateNum);
+
+		static void SetDepthStencilState(ID3D11DeviceContext*   pContext, UINT StateNum,
+			UINT iRef = 0xFF);
+
+		static void SetBlendState(ID3D11DeviceContext*   pContext,
+			UINT StateNum,
+			const FLOAT fBlendFactor[] = 0,
+			UINT iMask = 0xffffffff);
+
+		static void SetSamplerState(ID3D11DeviceContext*   pContext, UINT StateNum, UINT iSlot = 0, UINT iArray = 1);
+
 
 	public:
 		SDxState();
 		~SDxState();
 	};
-
-	static void ApplyRS(ID3D11DeviceContext*   pContext,
-		ID3D11RasterizerState* pState)
-	{
-		assert(pContext);
-		pContext->RSSetState(pState);
-	}
-	static void ApplyDSS(ID3D11DeviceContext*   pContext,
-		ID3D11DepthStencilState*	pDepthStencilState,
-		UINT iRef = 0x01)
-	{
-		assert(pContext);
-		pContext->OMSetDepthStencilState(pDepthStencilState, iRef);
-
-	};
-	static void ApplyBS(ID3D11DeviceContext*   pContext,
-		ID3D11BlendState*      pBlendState,
-		const FLOAT fBlendFactor[] = 0,
-		UINT iMask = 0xffffffff)
-	{
-		assert(pContext);
-		pContext->OMSetBlendState(pBlendState, fBlendFactor, iMask);
-	}
-
-	static void ApplySS(ID3D11DeviceContext*   pContext, ID3D11SamplerState*      pSamplerState,
-		UINT iSlot = 0, UINT iArray = 1)
-	{
-		assert(pContext);
-		pContext->PSSetSamplers(iSlot, iArray, &pSamplerState);
-	}
-
 }

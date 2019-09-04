@@ -9,6 +9,15 @@
 class SCore	: public SWindow
 {
 public:
+	UINT	m_RSDebugNum;
+	UINT	m_BSDebugNum;
+	UINT	m_SSDebugNum;
+	UINT	m_DSSDebugNum;
+	
+	bool	m_bDebugState;
+	virtual bool		ProcDebug();
+	virtual bool		DrawDebug();
+public:
 	// CoreFrameWork
 	bool	CoreInit();
 	bool	CoreFrame();

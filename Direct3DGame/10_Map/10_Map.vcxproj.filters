@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{03c31dc2-7d63-429c-8fbd-6242bc73bbc7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SCamera.cpp" />
+    <ClCompile Include="SMatrix.cpp" />
+    <ClCompile Include="SVector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SCamera.h" />
+    <ClInclude Include="SMatrix.h" />
+    <ClInclude Include="SVector.h" />
+  </ItemGroup>
+</Project>
