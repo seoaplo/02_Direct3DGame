@@ -8,13 +8,9 @@
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="SCamera.cpp" />
-    <ClCompile Include="SMatrix.cpp" />
-    <ClCompile Include="SVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
     <ClInclude Include="SCamera.h" />
-    <ClInclude Include="SMatrix.h" />
-    <ClInclude Include="SVector.h" />
   </ItemGroup>
 </Project>

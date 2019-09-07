@@ -4,65 +4,72 @@ bool	SCamera::Init()
 {
 	return true;
 }
-void	SCamera::CreateViewMatrix(DXGame::SVector3 p, DXGame::SVector3 t, DXGame::SVector3 u)
+D3DXMATRIX SCamera::SetViewMatrix(D3DXVECTOR3 p, D3DXVECTOR3 t, D3DXVECTOR3 u)
 {
 	m_vPos = p;
 	m_vTarget = t;
 	m_vUp = u;
 
-	m_matView.ViewLookAt(p, t, u);
+	D3DXMatrixLookAtLH(&m_matView, &m_vPos, &m_vTarget, &m_vUp);
 
-	m_vLook		= DXGame::SVector3(m_matView._13, m_matView._23, m_matView._33);
-	m_vUp		= DXGame::SVector3(m_matView._12, m_matView._22, m_matView._32);
-	m_vRight	= DXGame::SVector3(m_matView._11, m_matView._21, m_matView._31);
-}
-void	SCamera::CreateProjMatrix(RECT ClientRect)
-{
-	D3DXMATRIX matProj;
-	D3DXMatrixPerspectiveFovLH(
-		&matProj, D3DX_PI / 2,
-		(float)ClientRect.right / (float)ClientRect.bottom,
-		1.0f,
-		100.0f);
+	m_vLook		= D3DXVECTOR3(m_matView._13, m_matView._23, m_matView._33);
+	m_vUp		= D3DXVECTOR3(m_matView._12, m_matView._22, m_matView._32);
+	m_vRight	= D3DXVECTOR3(m_matView._11, m_matView._21, m_matView._31);
 
-	m_matProj.PerspectiveFovLH(1.0f,
-		100.0f,
-		D3DX_PI / 2,
-		(float)ClientRect.right / (float)ClientRect.bottom);
+	return m_matView;
+}
+D3DXMATRIX SCamera::SetObjectView(D3DXVECTOR3 vMax, D3DXVECTOR3 vMin)
+{
+	D3DXVECTOR3 vTarget = (vMax + vMin) * 0.5f;
+	float fRadius = D3DXVec3Length(&(vMax - vMin)) * 0.5f;
 
-}
-void	SCamera::Forward()
-{
-	m_vPos = m_vPos + m_vLook * I_Timer.GetSPF() * 20.0f;
-}
-void	SCamera::Backward()
-{
-	m_vPos = m_vPos - m_vLook * I_Timer.GetSPF() * 20.0f;
-}
-void	SCamera::RightRotation()
-{
+	D3DXVECTOR3 vPos = (m_vLook * (fRadius * 2)) * -1.0f;
 
-	m_vPos = m_vPos + m_vRight * I_Timer.GetSPF() * 20.0f;
+	D3DXMatrixLookAtLH(&m_matView, &vPos, &vTarget, &D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 
+	m_vPos = vPos;
+	m_vTarget = vTarget;
+
+	return m_matView;
 }
-void	SCamera::LeftRotation()
+D3DXMATRIX SCamera::SetProjMatrix(float fFov, float fAspect, float fNearPlane, float fFarPlane)
 {
-	m_vPos = m_vPos - m_vRight * I_Timer.GetSPF() * 20.0f;
+	m_fFov = fFov;
+	m_fAspect = fAspect;
+	m_fNearPlane = fNearPlane;
+	m_fFarPlane = fFarPlane;
+
+	D3DXMatrixPerspectiveFovLH(	&m_matProj, m_fFov, m_fAspect, m_fNearPlane, m_fFarPlane);
+	
+	return m_matProj;
+}
+void	SCamera::MoveLook(float fValue)
+{
+	m_vPos += m_vLook  * fValue;
+}
+void	SCamera::MoveSide(float fValue)
+{
+	m_vPos += m_vRight * fValue;
+}
+void	SCamera::MoveUp(float fValue)
+{
+	m_vPos += m_vUp * fValue;
 }
 bool	SCamera::Frame()
 {
-	CreateViewMatrix(m_vPos, m_vTarget, m_vUp);
+	SetViewMatrix(m_vPos, m_vTarget, m_vUp);
 	return true;
 }
 
 SCamera::SCamera()
 {
-	m_matWorld.Identity();
-	m_matView.Identity();
-	m_matProj.Identity();
-	m_vPos = DXGame::SVector3(0.0f, 0.0f, -10.0f);
-	m_vTarget = DXGame::SVector3(0.0f, 0.0f, 0.0f);
-	m_vUp = DXGame::SVector3(0.0f, 1.0f, 0.0f);
+	D3DXMatrixIdentity(&m_matWorld);
+	D3DXMatrixIdentity(&m_matView);
+	D3DXMatrixIdentity(&m_matProj);
+
+	m_vLook = D3DXVECTOR3(0.0f, 0.0f, -10.0f);
+	m_vUp = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_vRight = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }
 
 

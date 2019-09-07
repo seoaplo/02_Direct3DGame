@@ -46,7 +46,7 @@ public:
 		ID3D11DeviceContext*	pImmediateContext,
 		D3DXVECTOR3 vPos, RECT rcClient)
 	{
-		m_pd3dDevice = pDevice;
+		m_pDevice = pDevice;
 		m_pContext = pImmediateContext;
 
 		g_rtClient = rcClient;

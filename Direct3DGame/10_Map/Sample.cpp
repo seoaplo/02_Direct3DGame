@@ -18,132 +18,242 @@ bool Sample::Init()
 	HRESULT hr;
 	D3DXVECTOR3 Vector;
 
-	TestObject.Set(GetDevice(), m_pImmediateContext, Vector, m_rcClientRect);
+	// Direction Setting
+	m_Direction.Set(GetDevice(), m_pImmediateContext, m_rcClientRect);
+	m_Direction.Load(GetDevice());
 
-	BOX_VERTEX_LIST vertices;
-
-	if (TestObject.Load(GetDevice(), L"../../data/Image/checker_with_numbers.bmp", vertices) == false)
-	{
-		return false;
-	}
-	m_TestDir.Set(GetDevice(), m_pImmediateContext, Vector, Vector, m_rcClientRect);
-	m_TestDir.Load(GetDevice());
-
+	// Plane Setting
 	PLANE_VERTEX_LIST planevertices;
-
 	m_Plane.Set(GetDevice(), m_pImmediateContext, Vector, m_rcClientRect);
 	m_Plane.Load(GetDevice(), L"../../data/Image/Attacker3.bmp", planevertices);
 
-	D3DXMatrixIdentity(&m_matObjWorld);
-	XDir = D3DXVECTOR3(1000.0f, 0.0f, 0.0f);
-	YDir = D3DXVECTOR3(0.0f, 1000.0f, 0.0f);
-	ZDir = D3DXVECTOR3(0.0f, 0.0f, 1000.0f);
+	// Box Setting
+	BOX_VERTEX_LIST vertices;
+	if (m_Box.Load(GetDevice(), L"../../data/Image/checker_with_numbers.bmp", vertices) == false)
+	{
+		return false;
+	}
 
-	m_CameraBack.Init();
-	DXGame::SVector3 Eye(0.0f, 0.0f, -4.0f);
-	DXGame::SVector3 At(0.0f, 0.0f, 0.0f);
-	DXGame::SVector3 Up(0.0f, 1.0f, 0.0f);
-	m_CameraBack.CreateViewMatrix(Eye, At, Up);
-	m_CameraBack.CreateProjMatrix(m_rcClientRect);
+	D3DXMatrixIdentity(&m_World[0]);
+	D3DXMatrixIdentity(&m_World[1]);
+	D3DXVECTOR3 vTargetPosition(0.0f, 0.0f, 1.0f);
+	D3DXVECTOR3 vUpVector(0.0f, 1.0f, 0.0f);
+	D3DXVECTOR3 vCameraPosition(0.0f, 10.0f, -1.0f);
 
-	m_CameraSide.Init();
-	Eye = DXGame::SVector3(4.0f, 0.0f, 0.0f);
-	m_CameraSide.CreateViewMatrix(Eye, At, Up);
-	m_CameraSide.CreateProjMatrix(m_rcClientRect);
+	// Top g_matView
+	m_Camera[0].SetViewMatrix(vCameraPosition, vTargetPosition, vUpVector);
+	// Front g_matView
+	vCameraPosition = D3DXVECTOR3(0.0f, 0.0f, -10.0f);
+	m_Camera[1].SetViewMatrix(vCameraPosition, vTargetPosition, vUpVector);
+	// Side g_matView
+	vCameraPosition = D3DXVECTOR3(10.0f, 0.0f, 0.0f);
+	m_Camera[2].SetViewMatrix(vCameraPosition, vTargetPosition, vUpVector);
+	// User g_matView
+	vCameraPosition = D3DXVECTOR3(10.0f, 10.0f, -10.0f);
+	m_Camera[3].SetViewMatrix(vCameraPosition, vTargetPosition, vUpVector);
 
-	m_CameraUp.Init();
-	Eye = DXGame::SVector3(0.0001f, 2.0f, 0.0f);
-	m_CameraUp.CreateViewMatrix(Eye, At, Up);
-	m_CameraUp.CreateProjMatrix(m_rcClientRect);
+	for (int iCamera = 0; iCamera < 4; iCamera++)
+	{
+		m_ViewPort[iCamera].m_vp.Width = m_nWindowWidth / 2;
+		m_ViewPort[iCamera].m_vp.Height = m_nWindowHeight / 2;
+		m_Camera[iCamera].SetProjMatrix(D3DX_PI * 0.25,
+										(float)m_ViewPort[iCamera].m_vp.Width /
+										(float)m_ViewPort[iCamera].m_vp.Height,
+										1.0f,
+										100.0f);
+	}
 
-	m_pMainCamera = &m_CameraUp;
-	m_DebugString = L"UpCamera";
+	D3DXVECTOR3 vMax = D3DXVECTOR3(-10000.0f, -10000.0f, -10000.0f);
+	D3DXVECTOR3 vMin = D3DXVECTOR3(10000.0f, 10000.0f, 10000.0f);
 
-	D3DXMatrixScaling(&m_matObjWorld, (212 - 247), (282 - 328), 1.0f);
-	D3DXMatrixIdentity(&m_matObjWorld);
+	for (int iVer = 0; iVer < 8; iVer++)
+	{
+		if (m_Box.m_BoxVertexList[iVer].p.x > vMax.x) vMax.x = m_Box.m_BoxVertexList[iVer].p.x;
+		if (m_Box.m_BoxVertexList[iVer].p.y > vMax.y) vMax.y = m_Box.m_BoxVertexList[iVer].p.y;
+		if (m_Box.m_BoxVertexList[iVer].p.z > vMax.z) vMax.z = m_Box.m_BoxVertexList[iVer].p.z;
+
+		if (m_Box.m_BoxVertexList[iVer].p.x < vMin.x) vMin.x = m_Box.m_BoxVertexList[iVer].p.x;
+		if (m_Box.m_BoxVertexList[iVer].p.y < vMin.y) vMin.y = m_Box.m_BoxVertexList[iVer].p.y;
+		if (m_Box.m_BoxVertexList[iVer].p.z < vMin.z) vMin.z = m_Box.m_BoxVertexList[iVer].p.z;
+	}
+
+	m_Camera[0].SetObjectView(vMax, vMin);
+	m_Camera[1].SetObjectView(vMax, vMin);
+	m_Camera[2].SetObjectView(vMax, vMin);
+	m_Camera[3].SetObjectView(vMax, vMin);
+
+	D3DXMATRIX matRotX, matScale;
+	D3DXMatrixIdentity(&matRotX);
+	D3DXMatrixIdentity(&matScale);
+	D3DXMatrixRotationX(&matRotX, D3DXToRadian(90));
+	D3DXMatrixScaling(&matScale, 2.0f, 2.0f, 2.0f);
+	D3DXMatrixMultiply(&m_World[1], &matScale, &matRotX);
+
 	return true;
 }
 bool Sample::Frame()
 {
-	if (I_InputManager.m_pMouseInput->ButtonCheck(0) == KEY_PUSH)
-	{
-		if (m_pMainCamera == &m_CameraBack)
-		{
-			m_pMainCamera = &m_CameraSide;
-			m_DebugString = L"SideCamera";
-		}
-		else
-		{
-			m_pMainCamera = &m_CameraBack;
-			m_DebugString = L"BackCamera";
-		}
-	}
+	float t = I_Timer.GetElapsedTime() * D3DX_PI;
 
 	if (I_InputManager.KeyBoardState(DIK_W) == KEY_HOLD)
 	{
-		m_pMainCamera->Forward();
+		m_fPitch += I_Timer.GetSPF();
 	}
 	if (I_InputManager.KeyBoardState(DIK_S) == KEY_HOLD)
 	{
-		m_pMainCamera->Backward();
+		m_fPitch -= I_Timer.GetSPF();
 	}
 	if (I_InputManager.KeyBoardState(DIK_D) == KEY_HOLD)
 	{
-		m_pMainCamera->RightRotation();
+		m_fYaw += I_Timer.GetSPF();
 	}
 	if (I_InputManager.KeyBoardState(DIK_A) == KEY_HOLD)
 	{
-		m_pMainCamera->LeftRotation();
+		m_fYaw -= I_Timer.GetSPF();
+	}
+	if (I_InputManager.KeyBoardState(DIK_Q) == KEY_HOLD)
+	{
+		m_fRoll += I_Timer.GetSPF();
+	}
+	if (I_InputManager.KeyBoardState(DIK_E) == KEY_HOLD)
+	{
+		m_fRoll += I_Timer.GetSPF();
 	}
 
-	m_pMainCamera->Frame();
-	TestObject.Frame();
-	m_TestDir.Frame();
+	D3DXMATRIX matRot;
+	D3DXMatrixRotationYawPitchRoll(&m_World[0], m_fYaw, m_fPitch, m_fRoll);
+
+	m_Box.Frame();
+	m_Direction.Frame();
 	m_Plane.Frame();
+
 	return true;
 }
 bool Sample::Render()
 {
-	//DXGame::ApplyDSS(m_pImmediateContext, DXGame::SDxState::g_pDSSDepthEnableNoWrite, 0xFF);
-	//m_pImmediateContext->OMSetDepthStencilState(DXGame::SDxState::g_pDSSDepthEnable, 0xFF);
-	//DXGame::ApplyRS(m_pImmediateContext, DXGame::SDxState::g_pRSNoneCullSolid);
+	HRESULT hr;
 
-	D3DXMatrixIdentity(&m_matObjWorld);
+	D3D11_VIEWPORT vpOld[D3D11_VIEWPORT_AND_SCISSORRECT_MAX_INDEX];
+	UINT nViewPorts = 1;
 
-	TestObject.SetMatrix(&m_matObjWorld, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
-	TestObject.Render(m_pImmediateContext);
-	
-	D3DXMatrixIdentity(&m_matObjWorld);
-	m_matObjWorld._43 = 2.0f;
-	m_Plane.SetMatrix(&m_matObjWorld, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
-	m_Plane.Render(m_pImmediateContext);
 
 	D3DXMATRIX mat;
 	D3DXMatrixIdentity(&mat);
-	m_TestDir.SetMatrix(&mat, (D3DXMATRIX*)&m_pMainCamera->m_matView, (D3DXMATRIX*)&m_pMainCamera->m_matProj);
-	
-	m_TestDir.SetVector(D3DXVECTOR3(0.0f, 0.0f, 0.0f), XDir, D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f));
-	m_TestDir.Render(m_pImmediateContext);
-	
-	m_TestDir.SetVector(D3DXVECTOR3(0.0f, 0.0f, 0.0f), YDir, D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f));
-	m_TestDir.Render(m_pImmediateContext);
 
-	m_TestDir.SetVector(D3DXVECTOR3(0.0f, 0.0f, 0.0f), ZDir, D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f));
-	m_TestDir.Render(m_pImmediateContext);
+	m_pImmediateContext->RSGetViewports(&nViewPorts, vpOld);
 
-	RECT rc;
-	rc.left = 0;
-	rc.top = 110;
-	rc.right = m_nWindowWidth;
-	rc.bottom = m_nWindowHeight;
-	I_DirectWrite.DrawText(rc, m_DebugString.c_str());
+	//-----------------------------------------------------------------------
+	// 상단 뷰포트
+	//-----------------------------------------------------------------------	
+	for (int iVp = 0; iVp < 2; iVp++)
+	{
+		m_ViewPort[iVp].Apply(m_pImmediateContext, GetRenderTargetView(), GetDepthStencilView());
+		m_Box.SetMatrix(&m_World[0], m_Camera[iVp].GetViewMatrix(), m_Camera[iVp].GetProjMatrix());
+		m_Box.Render(m_pImmediateContext);
+
+		m_Plane.SetMatrix(&m_World[1], m_Camera[iVp].GetViewMatrix(), m_Camera[iVp].GetProjMatrix());
+		m_Plane.Render(m_pImmediateContext);
+	}
+	//-----------------------------------------------------------------------
+	// 하단 뷰포트
+	//-----------------------------------------------------------------------
+	for (int iVp = 2; iVp < 4; iVp++)
+	{
+		m_ViewPort[iVp].Apply(m_pImmediateContext, GetRenderTargetView(), GetDepthStencilView());
+		m_Box.SetMatrix(&m_World[0], m_Camera[iVp].GetViewMatrix(), m_Camera[iVp].GetProjMatrix());
+		m_Box.Render(m_pImmediateContext);
+
+		m_Plane.SetMatrix(&m_World[1], m_Camera[iVp].GetViewMatrix(), m_Camera[iVp].GetProjMatrix());
+		m_Plane.Render(m_pImmediateContext);
+	}
+	//-----------------------------------------------------------------------
+	// 기본 뷰포트 정보로 복원
+	//-----------------------------------------------------------------------
+	m_pImmediateContext->RSSetViewports(nViewPorts, vpOld);
+
+	m_pImmediateContext->RSGetViewports(&nViewPorts, vpOld);
+	//-----------------------------------------------------------------------
+	// Debug Direction
+	//-----------------------------------------------------------------------
+	DXGame::SDxState::SetDepthStencilState(m_pImmediateContext, DebugDSSDepthDisable);
+	m_ViewPort[0].Apply(m_pImmediateContext, GetRenderTargetView(), GetDepthStencilView());
+	m_Direction.SetMatrix(nullptr, m_Camera[0].GetViewMatrix(), m_Camera[0].GetProjMatrix());
+	m_Direction.Render(m_pImmediateContext);
+
+	m_ViewPort[1].Apply(m_pImmediateContext, GetRenderTargetView(), GetDepthStencilView());
+	m_Direction.SetMatrix(nullptr, m_Camera[1].GetViewMatrix(), m_Camera[1].GetProjMatrix());
+	m_Direction.Render(m_pImmediateContext);
+
+	m_ViewPort[2].Apply(m_pImmediateContext, GetRenderTargetView(), GetDepthStencilView());
+	m_Direction.SetMatrix(nullptr, m_Camera[2].GetViewMatrix(), m_Camera[2].GetProjMatrix());
+	m_Direction.Render(m_pImmediateContext);
+
+	m_ViewPort[3].Apply(m_pImmediateContext, GetRenderTargetView(), GetDepthStencilView());
+	m_Direction.SetMatrix(nullptr, m_Camera[3].GetViewMatrix(), m_Camera[3].GetProjMatrix());
+	m_Direction.Render(m_pImmediateContext);
+
+	DXGame::SDxState::SetDepthStencilState(m_pImmediateContext, DebugDSSDepthEnable);
+
+	m_pImmediateContext->RSSetViewports(nViewPorts, vpOld);
+
+	//-----------------------------------------------------------------------
+	// 뷰포트 번호 출력
+	//-----------------------------------------------------------------------
+	for (int iVp = 0; iVp < 4; iVp++)
+	{
+		RECT rc;
+		rc.left = m_ViewPort[iVp].m_vp.TopLeftX + m_ViewPort[iVp].m_vp.Width*0.5f;
+		rc.top = m_ViewPort[iVp].m_vp.TopLeftY;
+		rc.right = m_ViewPort[iVp].m_vp.Width + rc.left;
+		rc.bottom = m_ViewPort[iVp].m_vp.Height + rc.top;
+
+		// wchar_t* _itow( int value, wchar_t* sr, int radix )	// 숫자형식을 유니코드 문자열로 바꾼다.
+		// int _wtoi( const wchar_t* str );						// 유티코드 문자열을 숫자형식으로 바꾼다.
+		T_STR str = CameraViewStyle[iVp];
+		TCHAR strNumber[32];
+		str += _itow_s(iVp, strNumber, 10);// _wtoi
+		I_DirectWrite.DrawText(rc, const_cast<TCHAR*>(str.c_str()));
+	}
+
 	return true;
 }
 bool Sample::Release()
 {
-	TestObject.Release();
+	m_Box.Release();
+	m_Plane.Release();
+	m_Direction.Release();
 	return true;
 }
+HRESULT Sample::CreateResource()
+{
+	HRESULT hr;
+	if (FAILED(hr = ScreenViewPort(m_SwapChainDesc.BufferDesc.Width, m_SwapChainDesc.BufferDesc.Height)))
+	{
+		return hr;
+	}
+
+	return S_OK;
+}
+HRESULT Sample::DeleteResource()
+{
+	HRESULT hr = S_OK;
+	return S_OK;
+}
+HRESULT Sample::ScreenViewPort(UINT iWidth, UINT iHeight)
+{
+	HRESULT hr = S_OK;
+
+	UINT iRectWidth = iWidth / 2;
+	UINT iRectHeight = iHeight / 2;
+
+	m_ViewPort[0].Set(GetDevice(), 0, 0, iRectWidth, iRectHeight, 0.0f, 1.0f);
+	m_ViewPort[1].Set(GetDevice(), iRectWidth, 0, iRectWidth, iRectHeight, 0.0f, 1.0f);
+	m_ViewPort[2].Set(GetDevice(), 0, iRectHeight, iRectWidth, iRectHeight, 0.0f, 1.0f);
+	m_ViewPort[3].Set(GetDevice(), iRectWidth, iRectHeight, iRectWidth, iRectHeight, 0.0f, 1.0f);
+
+	return hr;
+}
+
 Sample::Sample()
 {
 }

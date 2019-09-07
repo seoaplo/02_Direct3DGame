@@ -25,6 +25,7 @@
     <ClInclude Include="SDirectWrite.h" />
     <ClInclude Include="SDxBasic.h" />
     <ClInclude Include="SDxHelperEX.h" />
+    <ClInclude Include="SDxRT.h" />
     <ClInclude Include="SDXShape.h" />
     <ClInclude Include="SDXState.h" />
     <ClInclude Include="SInputManager.h" />
@@ -47,6 +48,7 @@
     <ClCompile Include="SDevice.cpp" />
     <ClCompile Include="SDirectWrite.cpp" />
     <ClCompile Include="SDxHelperEX.cpp" />
+    <ClCompile Include="SDxRT.cpp" />
     <ClCompile Include="SDXShape.cpp" />
     <ClCompile Include="SDXState.cpp" />
     <ClCompile Include="SInputManager.cpp" />

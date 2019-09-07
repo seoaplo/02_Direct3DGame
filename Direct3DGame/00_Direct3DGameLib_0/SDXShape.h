@@ -205,15 +205,14 @@ struct BOX_VERTEX_LIST
 };
 
 
-class SDirection : public SModel
+class SLine : public SModel
 {
 public:
 	D3DXVECTOR3 m_vPos;
 	D3DXVECTOR3 m_vDir;
 	D3DXVECTOR4 m_vColor;
 
-	RECT		g_rtClient;
-	vector<UINT>			m_iTextureList;
+	RECT				g_rtClient;
 public:
 	bool Init()												override;
 	bool Render(ID3D11DeviceContext*	pContext)			override;
@@ -248,15 +247,17 @@ public:
 		m_vColor = vColor;
 	}
 public:
-	SDirection();
-	~SDirection();
+	SLine();
+	~SLine();
 };
 
-class SPlaneObject : public SModel
+class SPlane : public SModel
 {
 public:
 	RECT		g_rtClient;
-	vector<UINT>			m_iTextureList;
+	PLANE_VERTEX_LIST	m_PlaneVertexList;
+
+	std::vector<UINT> m_iTextureList;
 public:
 	bool Init()												override;
 	bool Render(ID3D11DeviceContext*	pContext)			override;
@@ -286,8 +287,8 @@ public:
 		g_rtClient = rcClient;
 	}
 public:
-	SPlaneObject();
-	~SPlaneObject();
+	SPlane();
+	~SPlane();
 };
 
 class SBox : public SModel
@@ -295,7 +296,8 @@ class SBox : public SModel
 public:
 	RECT		g_rtClient;
 	D3DXVECTOR3 vPos;
-	vector<UINT>			m_iTextureList;
+	BOX_VERTEX_LIST	m_BoxVertexList;
+	std::vector<UINT> m_iTextureList;
 public:
 	bool Init()												override;
 	bool Render(ID3D11DeviceContext*	pContext)			override;
@@ -324,4 +326,41 @@ public:
 public:
 	SBox();
 	~SBox();
+};
+
+class SDirection : public SModel
+{
+public:
+	D3DXVECTOR3 m_vPos;
+	D3DXVECTOR3 m_vDir;
+
+	RECT				g_rtClient;
+public:
+	bool Init()												override;
+	bool Render(ID3D11DeviceContext*	pContext)			override;
+	bool Frame()											override;
+	bool Release()											override;
+public:
+	bool CreateVertexBuffer(void* pData, int iNumCount, int iSize);
+	bool LoadShaderAndInputlayout(const CHAR* pVertexShader, const CHAR* pPixelShader);
+	bool CreateIndexBuffer(void* pData, int iNumCount, int iSize);
+	bool CreateConstantBuffer(
+		void* pData,
+		int iNumVertex,
+		int iSize,
+		bool bDynamic = false);
+
+	bool LoadSRV(T_STR name, int iIndex = 0);
+	bool Load(ID3D11Device* pDevice);
+public:
+	void	Set(ID3D11Device*			pDevice,
+		ID3D11DeviceContext*	pImmediateContext, RECT rcClient)
+	{
+		m_pDevice = pDevice;
+		m_pContext = pImmediateContext;
+		g_rtClient = rcClient;
+	}
+public:
+	SDirection();
+	~SDirection();
 };

@@ -2,19 +2,16 @@
 #include "SDxBasic.h"
 #include "SUtils.h"
 #include "SDXState.h"
-
+#include "SDxRT.h"
 class SDevice
 {
 public:
-	
+	DXGame::SDxRT				m_DefaultRT;
 	//==============================================================================================
 	// DirectX Interface Pointer
 	//==============================================================================================
-	ID3D11Device*				m_pD3DDevice;				// DirectX Interface Device ver.11	( Resource )
+	ID3D11Device*				m_pDevice;					// DirectX Interface Device ver.11	( Resource )
 	ID3D11DeviceContext*		m_pImmediateContext;		// DirectX Interface DeviceContext ver.11 ( Rendering )
-	ID3D11RenderTargetView*		m_pRenderTargetView;		// DirectX Interface RenderTargetView ver.11	( Camera )
-	ID3D11DepthStencilView*		m_pDepthStencilView;		// DirectX Interface DepthStencilViel ver.11 ( Depth )
-	ID3D11ShaderResourceView*	m_pDsvSRV;					// DirectX interface ShaderResourceView with DepthStencil
 	IDXGIFactory*				m_pDxgiFactory;				// DirectX Interface Factory ( Create Interface )
 	IDXGISwapChain*				m_pDxgiSwapChain;			// DirectX interface SwapChain ( Buffers )
 	
@@ -23,19 +20,20 @@ public:
 	//==============================================================================================
 	D3D_DRIVER_TYPE							m_DriverType;				// Device Type
 	D3D_FEATURE_LEVEL						m_FeatureLevel;				// Device Feature Level
-	D3D11_VIEWPORT							m_ViewPort;					// ViewPort
-	BOOL									m_IsFullSceenMode;			// FullScreen Flag
 	DXGI_SWAP_CHAIN_DESC					m_SwapChainDesc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC			m_DepthStencilDesc;
+	BOOL									m_IsFullSceenMode;			// FullScreen Flag
 public:
 	//==============================================================================================
 	// Getter and Setter Functions
 	//==============================================================================================
 	BOOL					GetFullScreenModeFlag() { assert(m_IsFullSceenMode); return m_IsFullSceenMode; }
 	void					SetFullScreenModeFlag(BOOL bFlag){  m_IsFullSceenMode = bFlag; }
-	ID3D11Device*			GetDevice() { assert(m_pD3DDevice); return m_pD3DDevice;}
+	ID3D11Device*			GetDevice() { assert(m_pDevice); return m_pDevice;}
 	ID3D11DeviceContext*	GetContext(){ assert(m_pImmediateContext); return m_pImmediateContext; }
-	ID3D11RenderTargetView*	GetRenderTargetView(){ assert(m_pRenderTargetView); return m_pRenderTargetView; }
+	ID3D11RenderTargetView*	    GetRenderTargetView() { return  m_DefaultRT.m_pRenderTargetView.Get(); }
+	ID3D11RenderTargetView**	GetRenderTargetViewAddress() { return  m_DefaultRT.m_pRenderTargetView.GetAddressOf(); }
+	ID3D11DepthStencilView*		GetDepthStencilView() { return m_DefaultRT.m_pDepthStencilView.Get(); }
+	ID3D11DepthStencilView**	GetDepthStencilViewAddress() { return  m_DefaultRT.m_pDepthStencilView.GetAddressOf(); }
 	IDXGIFactory*			GetFactory() { assert(m_pDxgiFactory); return m_pDxgiFactory; }
 	IDXGISwapChain*			GetSwapChain() { assert(m_pDxgiSwapChain); return m_pDxgiSwapChain ; }
 
@@ -60,8 +58,6 @@ public:
 	virtual		HRESULT		DeleteDxResource();		
 	virtual		HRESULT		CreateDxResource();
 
-public:
-	HRESULT		UpdateDepthStencilView(ID3D11Device* pDevice, UINT Width, UINT Height);
 public:
 	HRESULT		ReSizeDevice(UINT iWidth, UINT iHeight);	// Resize Device
 	bool		CleanupDevice();		// Release this

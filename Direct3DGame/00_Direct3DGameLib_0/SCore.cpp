@@ -19,7 +19,7 @@ bool	SCore::CoreInit()
 		MessageBox(0, L"Create Device ½ÇÆÐ", L"Fatal error", MB_OK);
 		return false;
 	}
-	SDxState::SetState(m_pD3DDevice);
+	SDxState::SetState(m_pDevice);
 
 	if (!I_Timer.Init())
 		return false;
@@ -34,7 +34,7 @@ bool	SCore::CoreInit()
 	if (!I_InputManager.Init())
 		return false;
 
-	SDxState::SetState(m_pD3DDevice);
+	SDxState::SetState(m_pDevice);
 
 	CreateDxResource();
 
@@ -73,12 +73,13 @@ bool	SCore::CoreFrame()
 bool	SCore::CoreRender()
 {
 	float Color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, Color);
-
+	m_pImmediateContext->ClearRenderTargetView(GetRenderTargetView(), Color);
 	m_pImmediateContext->ClearDepthStencilView(
-		m_pDepthStencilView,
+		m_DefaultRT.m_pDepthStencilView.Get(),
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		1.0f, 0);
+	m_pImmediateContext->OMSetRenderTargets(1, GetRenderTargetViewAddress(), m_DefaultRT.m_pDepthStencilView.Get());
+	m_pImmediateContext->RSSetViewports(1, &m_DefaultRT.m_vp);
 
 	SDxState::SetRasterizerState(m_pImmediateContext, m_RSDebugNum);
 	SDxState::SetBlendState(m_pImmediateContext, m_BSDebugNum);
@@ -174,15 +175,11 @@ HRESULT SCore::CreateDxResource()
 	I_DirectWrite.Set(m_hWnd, m_nWindowWidth, m_nWindowHeight, pBackBuffer);
 	if (pBackBuffer)	pBackBuffer->Release();
 
-	if (FAILED(hr = GetSwapChain()->GetDesc(&m_SwapChainDesc)))
-	{
-		return hr;
-	}
+	hr = GetSwapChain()->GetDesc(&m_SwapChainDesc);
+	HRESULT_FAILED_RETURN(hr);
 
-	if (FAILED(hr = UpdateDepthStencilView(m_pD3DDevice, m_SwapChainDesc.BufferDesc.Width, m_SwapChainDesc.BufferDesc.Height)))
-	{
-		return hr;
-	}
+	hr = m_DefaultRT.UpdateDepthStencilView(m_pDevice, m_SwapChainDesc.BufferDesc.Width, m_SwapChainDesc.BufferDesc.Height);
+	HRESULT_FAILED_RETURN(hr);
 	return CreateResource();
 }
 HRESULT SCore::DeleteDxResource()

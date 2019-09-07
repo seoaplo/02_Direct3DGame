@@ -50,7 +50,7 @@ bool SDXPlaneObject::Load(ID3D11Device* pDevice, std::wstring filename)
 
 	Init();
 
-	m_iTextureList.push_back(I_TextureManager.Load(m_pd3dDevice, L"../../data/Image/Attacker3.png"));
+	m_iTextureList.push_back(I_TextureManager.Load(m_pDevice, L"../../data/Image/Attacker3.png"));
 
 	m_dxobj.g_pTextureSRV= I_TextureManager.GetPtr(m_iTextureList[0])->m_pSRV;
 
@@ -99,7 +99,7 @@ bool SDXPlaneObject::CreateIndexBuffer(
 {
 	m_dxobj.m_iNumIndex = iNumCount;
 	m_dxobj.g_pIndexBuffer.Attach(
-		DXGame::CreateIndexBuffer(m_pd3dDevice,
+		DXGame::CreateIndexBuffer(m_pDevice,
 			pData, iNumCount, iSize)
 	);
 	if (m_dxobj.g_pIndexBuffer.Get() == nullptr)
@@ -112,7 +112,7 @@ bool SDXPlaneObject::CreateConstantBuffer(
 	bool bDynamic)
 {
 	m_dxobj.g_pConstantBuffer.Attach(
-		DXGame::CreateConstantBuffer(m_pd3dDevice,
+		DXGame::CreateConstantBuffer(m_pDevice,
 			pData, iNumCount, iSize, bDynamic)
 	);
 	if (m_dxobj.g_pConstantBuffer.Get() == nullptr)
@@ -125,7 +125,7 @@ bool SDXPlaneObject::CreateVertexBuffer(
 	m_dxobj.m_iVertexSize = iSize;
 	m_dxobj.m_iNumVertex = iNumCount;
 	m_dxobj.g_pVertexBuffer.Attach(
-		DXGame::CreateVertexBuffer(m_pd3dDevice,
+		DXGame::CreateVertexBuffer(m_pDevice,
 			pData, iNumCount, iSize)
 	);
 	if (m_dxobj.g_pVertexBuffer.Get() == nullptr)
@@ -138,12 +138,12 @@ bool SDXPlaneObject::LoadShaderAndInputlayout(
 {
 	HRESULT hr;
 	m_dxobj.g_pVertexShader.Attach(
-		DXGame::LoadVertexShaderFile(m_pd3dDevice,
+		DXGame::LoadVertexShaderFile(m_pDevice,
 			L"../../shader/08_Camera/vertex.hlsl",
 			m_dxobj.g_pVSBlob.GetAddressOf(),
 			(char*)pVertexShader));
 	m_dxobj.g_pPixelShader.Attach(
-		DXGame::LoadPixelShaderFile(m_pd3dDevice,
+		DXGame::LoadPixelShaderFile(m_pDevice,
 			L"../../shader/08_Camera/pixel.hlsl"));
 	//input layout
 	//정점버퍼의 데이터를 정점 쉐이더의 인자값으로 설정
@@ -156,7 +156,7 @@ bool SDXPlaneObject::LoadShaderAndInputlayout(
 	};
 	int iNumElement = sizeof(layout) / sizeof(layout[0]);
 	m_dxobj.g_pInputlayout.Attach(
-		DXGame::CreateInputlayout(m_pd3dDevice,
+		DXGame::CreateInputlayout(m_pDevice,
 			m_dxobj.g_pVSBlob->GetBufferSize(),
 			m_dxobj.g_pVSBlob->GetBufferPointer(),
 			layout, iNumElement));
@@ -166,7 +166,7 @@ bool SDXPlaneObject::LoadShaderAndInputlayout(
 bool SDXPlaneObject::LoadSRV(T_STR name, int iIndex)
 {
 	/*xTexture tex;
-	tex.Load(m_pd3dDevice, name.c_str());
+	tex.Load(m_pDevice, name.c_str());
 	m_Tex.push_back(tex);*/
 	return true;
 }

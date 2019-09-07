@@ -25,6 +25,21 @@
     <Filter Include="DXGame">
       <UniqueIdentifier>{f12af06e-833d-45d0-955a-d57da4e1f0d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DXGame\Camera">
+      <UniqueIdentifier>{3784e3e0-4a69-4ffe-a173-99ec5b4ea17c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DXGame\DXHelper">
+      <UniqueIdentifier>{19cc770b-10c5-433e-b152-e91ac1567d13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DXGame\Shape">
+      <UniqueIdentifier>{5acd6c32-b417-4643-8482-5352cfecb2ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DXGame\Texture">
+      <UniqueIdentifier>{64c40ad8-2108-4c16-8f5e-ab787eabd432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DXGame\Object">
+      <UniqueIdentifier>{00b85ba3-69e3-4498-97d1-e80535b6c523}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SCore.h">
@@ -72,21 +87,28 @@
     <ClInclude Include="S3DGameLib.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="SDxHelperEX.h">
-      <Filter>DXGame</Filter>
+    <ClInclude Include="SObjStd.h" />
+    <ClInclude Include="SDXState.h">
+      <Filter>DXGame\DXHelper</Filter>
     </ClInclude>
-    <ClInclude Include="STexture.h">
-      <Filter>DXGame</Filter>
+    <ClInclude Include="SDXShape.h">
+      <Filter>DXGame\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="SDxHelperEX.h">
+      <Filter>DXGame\DXHelper</Filter>
     </ClInclude>
     <ClInclude Include="STextureManager.h">
-      <Filter>DXGame</Filter>
+      <Filter>DXGame\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="SDXState.h">
-      <Filter>DXGame</Filter>
+    <ClInclude Include="STexture.h">
+      <Filter>DXGame\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="SModel.h" />
-    <ClInclude Include="SObjStd.h" />
-    <ClInclude Include="SDXShape.h" />
+    <ClInclude Include="SModel.h">
+      <Filter>DXGame\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="SDxRT.h">
+      <Filter>DXGame\DXHelper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SCore.cpp">
@@ -122,19 +144,26 @@
     <ClCompile Include="STimer.cpp">
       <Filter>SCore\Manager\Timer</Filter>
     </ClCompile>
+    <ClCompile Include="SDXState.cpp">
+      <Filter>DXGame\DXHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="SDXShape.cpp">
+      <Filter>DXGame\Shape</Filter>
+    </ClCompile>
     <ClCompile Include="SDxHelperEX.cpp">
-      <Filter>DXGame</Filter>
+      <Filter>DXGame\DXHelper</Filter>
     </ClCompile>
     <ClCompile Include="STexture.cpp">
-      <Filter>DXGame</Filter>
+      <Filter>DXGame\Texture</Filter>
     </ClCompile>
     <ClCompile Include="STextureManager.cpp">
-      <Filter>DXGame</Filter>
+      <Filter>DXGame\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="SDXState.cpp">
-      <Filter>DXGame</Filter>
+    <ClCompile Include="SModel.cpp">
+      <Filter>DXGame\Object</Filter>
     </ClCompile>
-    <ClCompile Include="SModel.cpp" />
-    <ClCompile Include="SDXShape.cpp" />
+    <ClCompile Include="SDxRT.cpp">
+      <Filter>DXGame\DXHelper</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
