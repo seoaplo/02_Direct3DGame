@@ -110,3 +110,4 @@ typedef	list< HANDLE >::iterator	HANDLE_LIST_ITOR;
 #define KEY_HOLD 2
 #define KEY_UP 3
 #define KEY_ERROR 4
+

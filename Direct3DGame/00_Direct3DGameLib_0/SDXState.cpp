@@ -2,9 +2,9 @@
 
 T_STR DebugRasterizerState[] =
 {
-	_T("RSBackCullSolid"),
 	_T("RSNoneCullSolid"),
 	_T("RSFrontCullSolid"),
+	_T("RSBackCullSolid"),
 	_T("RSWireFrame"),
 };
 

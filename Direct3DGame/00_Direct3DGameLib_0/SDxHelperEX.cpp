@@ -85,7 +85,7 @@ namespace DXGame
 	ID3D11VertexShader*	LoadVertexShaderFile(ID3D11Device* pd3dDevice,
 		const void* pShaderFileData,
 		ID3DBlob**	ppBlobOut,
-		char*	pFunctionName,
+		const char*	pFunctionName,
 		bool	bBinary)
 	{
 		HRESULT hr = S_OK;
@@ -135,7 +135,7 @@ namespace DXGame
 
 	ID3D11PixelShader*	LoadPixelShaderFile(ID3D11Device* pd3dDevice,
 		const void* pShaderFileData,
-		char *pFunctionName,
+		const char *pFunctionName,
 		bool bBinary, ID3DBlob** pRetBlob)
 	{
 		HRESULT hr = S_OK;
@@ -188,7 +188,7 @@ namespace DXGame
 	ID3D11GeometryShader*	LoadGeometryShaderFile(ID3D11Device* pd3dDevice,
 		const void* pShaderFileData,
 		ID3DBlob**	ppBlobOut,
-		char*	pFunctionName,
+		const char*	pFunctionName,
 		bool	bBinary)
 	{
 		HRESULT hr = S_OK;
@@ -240,7 +240,7 @@ namespace DXGame
 
 	ID3D11HullShader*	LoadHullShaderFile(ID3D11Device* pd3dDevice,
 		const void* pLoadShaderFile,
-		ID3DBlob** ppBlobOut, char* pFunctionName
+		ID3DBlob** ppBlobOut, const char* pFunctionName
 		, bool bBinary)
 	{
 		HRESULT hr = S_OK;
@@ -293,7 +293,7 @@ namespace DXGame
 	ID3D11DomainShader*	LoadDomainShaderFile(ID3D11Device* pd3dDevice,
 		const void* pShaderFileData,
 		ID3DBlob**	ppBlobOut,
-		char*	pFunctionName,
+		const char*	pFunctionName,
 		bool	bBinary)
 	{
 		HRESULT hr = S_OK;
@@ -346,7 +346,7 @@ namespace DXGame
 	ID3D11ComputeShader*	LoadComputeShaderFile(ID3D11Device* pd3dDevice,
 		const void* pShaderFileData,
 		ID3DBlob**	ppBlobOut,
-		char*	pFunctionName,
+		const char*	pFunctionName,
 		bool	bBinary)
 	{
 		HRESULT hr = S_OK;

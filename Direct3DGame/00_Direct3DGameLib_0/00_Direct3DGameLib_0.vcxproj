@@ -63,6 +63,17 @@
     <ClCompile Include="Swindow.cpp" />
     <ClCompile Include="STexture.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\shader\Shape\Box.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\Shape\Line.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\Shape\Plane.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{080D867D-4E8D-484E-9FB4-BDD5BF00E6DD}</ProjectGuid>

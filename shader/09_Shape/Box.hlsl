@@ -42,6 +42,6 @@ VS_OUTPUT VS(VS_INPUT input)
 float4 PS(VS_OUTPUT input) : SV_TARGET
 {
 	float4 color =
-	g_txDiffuse.Sample(s0 , input.t);// *input.c;
+	g_txDiffuse.Sample(s0 , input.t) *input.c;
 	return color;
 }

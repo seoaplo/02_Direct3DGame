@@ -40,6 +40,9 @@
     <Filter Include="DXGame\Object">
       <UniqueIdentifier>{00b85ba3-69e3-4498-97d1-e80535b6c523}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{07f6c496-83b2-4332-8497-fcee7f91482f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SCore.h">
@@ -87,7 +90,6 @@
     <ClInclude Include="S3DGameLib.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="SObjStd.h" />
     <ClInclude Include="SDXState.h">
       <Filter>DXGame\DXHelper</Filter>
     </ClInclude>
@@ -108,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="SDxRT.h">
       <Filter>DXGame\DXHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="SObjStd.h">
+      <Filter>DXGame\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -165,5 +170,16 @@
     <ClCompile Include="SDxRT.cpp">
       <Filter>DXGame\DXHelper</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\shader\Shape\Line.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\Shape\Plane.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\Shape\Box.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

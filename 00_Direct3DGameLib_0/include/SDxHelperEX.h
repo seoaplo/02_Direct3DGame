@@ -15,12 +15,12 @@ namespace DXGame
 	// Load Shader
 	//==============================================================================================================
 	HRESULT CompileShaderFromFile(const WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlopOut);
-	ID3D11VertexShader*		LoadVertexShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, char* pFuntioncName = 0, bool bBinary = false);
-	ID3D11PixelShader*		LoadPixelShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, char* pFuntionName = 0, bool bBinary = false, ID3DBlob** pRetBlob = nullptr);
-	ID3D11GeometryShader*	LoadGeometryShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, char* pFuntioncName = 0, bool bBinary = false);
-	ID3D11HullShader*		LoadHullShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, char* pFuntioncName = 0, bool bBinary = false);
-	ID3D11DomainShader*		LoadDomainShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, char* pFuntioncName = 0, bool bBinary = false);
-	ID3D11ComputeShader*	LoadComputeShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, char* pFuntioncName = 0, bool bBinary = false);
+	ID3D11VertexShader*		LoadVertexShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, const char* pFuntioncName = 0, bool bBinary = false);
+	ID3D11PixelShader*		LoadPixelShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, const char* pFuntionName = 0, bool bBinary = false, ID3DBlob** pRetBlob = nullptr);
+	ID3D11GeometryShader*	LoadGeometryShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, const  char* pFuntioncName = 0, bool bBinary = false);
+	ID3D11HullShader*		LoadHullShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, const  char* pFuntioncName = 0, bool bBinary = false);
+	ID3D11DomainShader*		LoadDomainShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, const  char* pFuntioncName = 0, bool bBinary = false);
+	ID3D11ComputeShader*	LoadComputeShaderFile(ID3D11Device* pd3dDevice, const void* pLoadShaderFile, ID3DBlob** ppBlobOut = nullptr, const  char* pFuntioncName = 0, bool bBinary = false);
 
 
 	//==============================================================================================================

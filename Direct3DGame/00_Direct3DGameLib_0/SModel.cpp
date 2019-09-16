@@ -1,15 +1,17 @@
 #include "SModel.h"
+DXGame::SDxHelperEX& SModel::GetDxObjHelper() { return m_dxobj; }
 
 bool SModel::Convert(ID3D11Device* pDevice) {
 	return true;
 };
-bool SModel::Load(ID3D11Device* pDevice, const TCHAR* szLoadName, const TCHAR* pLoadShaderFile, bool bThread)
+bool SModel::Load(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* szLoadName, const TCHAR* pLoadShaderFile, bool bThread)
 {
 	return Convert(pDevice);
 };
 bool SModel::Create(ID3D11Device* pDevice,
-	const TCHAR* pLoadShaderFile,
-	const TCHAR* pLoadTextureString)
+	ID3D11DeviceContext* pContext,
+	const TCHAR* pLoadTextureString,
+	const TCHAR* pLoadShaderFile)
 {
 
 	if (pDevice == nullptr)
@@ -19,7 +21,7 @@ bool SModel::Create(ID3D11Device* pDevice,
 	}
 
 	m_pDevice = pDevice;
-
+	m_pContext = pContext;
 	if (FAILED(LoadShaderFile(pDevice, pLoadShaderFile)))
 	{
 		MessageBox(0, _T("LoadShaderFile ½ÇÆÐ"), _T("Fatal error"), MB_OK);
@@ -75,20 +77,22 @@ bool SModel::Create(ID3D11Device* pDevice,
 }
 HRESULT SModel::LoadTextures(ID3D11Device* pDevice, const TCHAR* pLoadTextureString)
 {
+	
 	HRESULT hr = S_OK;
+	if (pLoadTextureString == nullptr) return hr;
 	int iTextureID = I_TextureManager.Load(pDevice, pLoadTextureString);
 	m_dxobj.g_pTextureSRV.Attach(I_TextureManager.GetPtr(iTextureID)->m_pSRV);
 
 	return hr;
 }
-HRESULT SModel::LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pShaderFile)
+HRESULT SModel::LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pLoadShaderFile)
 {
-	m_dxobj.g_pVertexShader.Attach(DXGame::LoadVertexShaderFile(pDevice, pShaderFile, m_dxobj.g_pVSBlob.GetAddressOf()));
-	m_dxobj.g_pPixelShader.Attach(DXGame::LoadPixelShaderFile(pDevice, pShaderFile));
-	m_dxobj.g_pGeometryShader.Attach(DXGame::LoadGeometryShaderFile(pDevice, pShaderFile, m_dxobj.g_pGSBlob.GetAddressOf()));
-	m_dxobj.g_pHullShader.Attach(DXGame::LoadHullShaderFile(pDevice, pShaderFile, m_dxobj.g_pHSBlob.GetAddressOf()));
-	m_dxobj.g_pDomainShader.Attach(DXGame::LoadDomainShaderFile(pDevice, pShaderFile, m_dxobj.g_pDSBlob.GetAddressOf()));
-	m_dxobj.g_pComputeShader.Attach(DXGame::LoadComputeShaderFile(pDevice, pShaderFile, m_dxobj.g_pCSBlob.GetAddressOf()));
+	m_dxobj.g_pVertexShader.Attach(DXGame::LoadVertexShaderFile(pDevice, pLoadShaderFile, m_dxobj.g_pVSBlob.GetAddressOf()));
+	m_dxobj.g_pPixelShader.Attach(DXGame::LoadPixelShaderFile(pDevice, pLoadShaderFile));
+	m_dxobj.g_pGeometryShader.Attach(DXGame::LoadGeometryShaderFile(pDevice, pLoadShaderFile, m_dxobj.g_pGSBlob.GetAddressOf()));
+	m_dxobj.g_pHullShader.Attach(DXGame::LoadHullShaderFile(pDevice, pLoadShaderFile, m_dxobj.g_pHSBlob.GetAddressOf()));
+	m_dxobj.g_pDomainShader.Attach(DXGame::LoadDomainShaderFile(pDevice, pLoadShaderFile, m_dxobj.g_pDSBlob.GetAddressOf()));
+	m_dxobj.g_pComputeShader.Attach(DXGame::LoadComputeShaderFile(pDevice, pLoadShaderFile, m_dxobj.g_pCSBlob.GetAddressOf()));
 	return S_OK;
 }
 bool	SModel::CreateVertexData()
@@ -108,7 +112,7 @@ HRESULT SModel::CreateVertexBuffer()
 	m_dxobj.g_pVertexBuffer.Attach(DXGame::CreateVertexBuffer(m_pDevice,
 		pData,
 		m_dxobj.m_iNumVertex,
-		m_dxobj.m_iVertexSize, true));
+		m_dxobj.m_iVertexSize));
 	return S_OK;
 }
 HRESULT	SModel::CreateIndexBuffer()

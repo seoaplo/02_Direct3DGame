@@ -137,7 +137,6 @@ bool Sample::Frame()
 		m_fCameraPitch += I_Timer.GetSPF() * I_InputManager.m_pMouseInput->MouseLocation().y;
 	}
 	m_MainCamera.Update(D3DXVECTOR4(m_fCameraPitch, m_fCameraYaw, m_fCameraRoll, m_fRadius));
-
 	m_MainCamera.Frame();
 	m_Camera[0].Frame();
 	m_Camera[1].Frame();

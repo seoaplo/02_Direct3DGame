@@ -4,17 +4,17 @@
 
 enum RSSetState
 {
-	DebugRSBackCullSolid,
 	DebugRSNoneCullSolid,
 	DebugRSFrontCullSolid,
+	DebugRSBackCullSolid,
 	DebugRSWireFrame,
 	DebugRSSetNum,
 };
 
 enum BSSetState
 {
-	DebugAlphaBlend,
-	DebugNoAlphaBlend,
+	DebugBSAlphaBlend,
+	DebugBSNoAlphaBlend,
 	DebugBSColorOne,
 	DebugBSOneOne,
 	DebugBSOneZero,
