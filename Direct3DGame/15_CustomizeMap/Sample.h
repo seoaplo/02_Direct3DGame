@@ -4,16 +4,7 @@
 #include "SCamera.h"
 #include "SModelViewCamera.h"
 #include "SMiniMap.h"
-//--------------------------------------------------------------------------------------
-// CameraViewStyle
-//--------------------------------------------------------------------------------------
-T_STR CameraViewStyle[] =
-{
-	_T("Top g_matView"),
-	_T("Front g_matView"),
-	_T("Side g_matView"),
-	_T("User g_matView"),
-};
+#include "SMap.h"
 
 
 class Sample : public SCore
@@ -22,30 +13,11 @@ public:
 	//===================================================================
 	// 각종 지원 객체
 	//===================================================================
+	SMap			m_CustomMap;
 	SCamera			m_MainCamera;
-	SDXShape*		m_pBoxShape;
-	SMiniMap		m_MiniMap;
-	Microsoft::WRL::ComPtr< ID3D11PixelShader > m_pPixelShader;
+	SLine			m_LineDraw;
+	//SMiniMap		m_MiniMap;
 public:
-	//===================================================================
-	// Matrix
-	//===================================================================
-	D3DXMATRIX		m_matBoxWorld;
-	D3DXVECTOR3		m_vBoxPosition[100];
-	D3DXVECTOR4		m_vBoxColor[100];
-	//===================================================================
-	// 뷰포트 설정
-	//===================================================================
-	DXGame::SDxRT	m_MiniMapVP;
-	//===================================================================
-	// 카메라 회전 정보
-	//===================================================================
-	float m_fCameraYaw;
-	float m_fCameraPitch;
-	float m_fCameraRoll;
-	float m_fRadius;
-public:
-	HRESULT	ScreenViewPort(UINT iWidth, UINT iHeight);
 	//====================================================================
 	// 재정의 함수
 	//====================================================================

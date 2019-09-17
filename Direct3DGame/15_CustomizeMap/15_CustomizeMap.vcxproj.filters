@@ -17,6 +17,7 @@
     <ClCompile Include="SModelViewCamera.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
+    <ClCompile Include="SMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
@@ -35,6 +36,7 @@
     <ClInclude Include="SModelViewCamera.h">
       <Filter>Camera</Filter>
     </ClInclude>
+    <ClInclude Include="SMap.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Camera">

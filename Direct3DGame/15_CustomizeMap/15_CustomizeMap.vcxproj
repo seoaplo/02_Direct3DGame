@@ -123,6 +123,7 @@
     <ClCompile Include="SArcBall.cpp" />
     <ClCompile Include="SCamera.cpp" />
     <ClCompile Include="SFrustum.cpp" />
+    <ClCompile Include="SMap.cpp" />
     <ClCompile Include="SMiniMap.cpp" />
     <ClCompile Include="SModelViewCamera.cpp" />
   </ItemGroup>
@@ -131,6 +132,7 @@
     <ClInclude Include="SArcBall.h" />
     <ClInclude Include="SCamera.h" />
     <ClInclude Include="SFrustum.h" />
+    <ClInclude Include="SMap.h" />
     <ClInclude Include="SMiniMap.h" />
     <ClInclude Include="SModelViewCamera.h" />
   </ItemGroup>
