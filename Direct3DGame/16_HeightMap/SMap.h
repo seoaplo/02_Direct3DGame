@@ -19,7 +19,7 @@ class SMap : public SModel
 {
 public:
 	SMapDesc				m_MapDesc;
-	vector<PNCT_VERTEX>		m_VertexList;
+	vector<PNCT_VERTEX>		m_VertexList;		// 버텍스 리스트
 	DWORD					m_dwShaderIndex;
 	int						m_iNumVertices;		// 버텍스 갯수
 	int						m_iNumFace;			// 페이스 갯수
@@ -82,6 +82,6 @@ public:
 	virtual float		Lerp(float fStart, float fEnd, float fTangent);
 public:
 	SMap();
-	~SMap();
+	virtual ~SMap();
 };
 

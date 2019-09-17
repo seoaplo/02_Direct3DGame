@@ -4,7 +4,7 @@
 #include "SCamera.h"
 #include "SModelViewCamera.h"
 #include "SMiniMap.h"
-#include "SMap.h"
+#include "SHeightMap.h"
 
 
 class Sample : public SCore
@@ -13,10 +13,9 @@ public:
 	//===================================================================
 	// 각종 지원 객체
 	//===================================================================
-	SMap			m_CustomMap;
+	SHeightMap		m_HeightMap;
 	SCamera			m_MainCamera;
 	SLine			m_LineDraw;
-	//SMiniMap		m_MiniMap;
 public:
 	//====================================================================
 	// 재정의 함수
@@ -25,7 +24,7 @@ public:
 	bool	Frame();
 	bool	Render();
 	bool	Release();
-
+	bool	DrawDebug();
 	//--------------------------------------------------------------------------------------
 	// 변경된 클라이언트 영역를 재설정을 위한 소멸 및 생성
 	//--------------------------------------------------------------------------------------

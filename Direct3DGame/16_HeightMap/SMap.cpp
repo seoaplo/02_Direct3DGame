@@ -108,6 +108,8 @@ float SMap::Lerp(float fStart, float fEnd, float fTangent)
 D3DXVECTOR3 SMap::ComputeFaceNormal(DWORD dwIndex0, DWORD dwIndex1, DWORD dwIndex2)
 {
 	D3DXVECTOR3 vNormal;
+	// 노말 벡터를 얻기 위해 얻는 삼각형의 엣지벡터
+	// DirectX는 왼손 좌표계를 사용하기 때문에 시계방향으로 외적을 진행하여야 한다.
 	D3DXVECTOR3 v0 = m_VertexList[dwIndex1].p - m_VertexList[dwIndex0].p;
 	D3DXVECTOR3 v1 = m_VertexList[dwIndex2].p - m_VertexList[dwIndex0].p;
 
@@ -149,8 +151,10 @@ bool SMap::CreateVertexData()
 {
 	m_VertexList.resize(m_iNumVertices);
 
+	// Map의 원점이 되는 정점
 	int iHalfCols = m_iNumCols / 2;
 	int iHalfRows = m_iNumRows / 2;
+	// 정점과 정점 사이의 텍스쳐 좌표 증가값
 	float ftxOffsetU = 1.0f / (m_iNumCols - 1);
 	float ftxOffsetV = 1.0f / (m_iNumRows - 1);
 
@@ -178,8 +182,8 @@ bool SMap::CreateIndexData()
 	{
 		for (int iCol = 0; iCol < m_iNumSellCols; iCol++)
 		{
-			//0 1 4
-			//2  35
+			//0 1	  4
+			//2		3 5
 			int iNextRow = iRow + 1;
 			int iNextCol = iCol + 1;
 			m_IndexList[iCurIndex + 0] = iRow * m_iNumCols + iCol;
@@ -317,9 +321,9 @@ void SMap::InitFaceNormals()
 {
 	m_pFaceNormals = new D3DXVECTOR3[m_iNumFace];
 
-	for (int i = 0; i < m_iNumFace; i++)
+	for (int iCount = 0; iCount < m_iNumFace; iCount++)
 	{
-		m_pFaceNormals[i] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		m_pFaceNormals[iCount] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	}
 }
 bool SMap::Load(SMapDesc& MapDesc)
@@ -337,19 +341,19 @@ bool SMap::Load(SMapDesc& MapDesc)
 	return true;
 }
 //==================================================================================
-// Create face normals for the mesh
+// 각 페이스가 가지고 있는 노말 벡터를 구하는 함수
 //==================================================================================
 void SMap::CalcFaceNormals()
 {
-	// Loop over how many faces there are
-	int j = 0;
-	for (int i = 0; i < m_iNumFace * 3; i += 3)
+	// 모든 페이스를 순환한다.
+	int iFaceNomalNum = 0;
+	for (int iIndexCount = 0; iIndexCount < m_iNumFace * 3; iIndexCount += 3)
 	{
-		DWORD i0 = m_IndexList[i];
-		DWORD i1 = m_IndexList[i + 1];
-		DWORD i2 = m_IndexList[i + 2];
-		m_pFaceNormals[j] = ComputeFaceNormal(i0, i1, i2);
-		j++;
+		DWORD i0 = m_IndexList[iIndexCount];
+		DWORD i1 = m_IndexList[iIndexCount + 1];
+		DWORD i2 = m_IndexList[iIndexCount + 2];
+		m_pFaceNormals[iFaceNomalNum] = ComputeFaceNormal(i0, i1, i2);
+		iFaceNomalNum++;
 	}
 }
 //==================================================================================
@@ -357,8 +361,6 @@ void SMap::CalcFaceNormals()
 //==================================================================================
 void SMap::GenNormalLookupTable()
 {
-	// We're going to create a table that lists, for each verte, the
-	// triangles which that vertex is a part of.
 
 	if (m_pNormalLookupTable != nullptr)
 	{
@@ -366,80 +368,76 @@ void SMap::GenNormalLookupTable()
 		m_pNormalLookupTable = nullptr;
 	}
 
-	// Each vertex may be a part of up to 6 triangles in the grid, so
-	// create a buffer to hold a pointer to the normal of each neighbor.
+	// 1개의 정점을 공유하는 페이스들은 최대 6개를 공유할 수 있다.
+	// 버퍼 사이즈는 각 정점의 갯수에 6을 곱한만큼의 크기로 만들어야
+	// 각 정점에 인접하는 페이스를 저장할 수 있다.
 	int buffersize = m_iNumRows * m_iNumCols * 6;
 
 	m_pNormalLookupTable = (int*)malloc(sizeof(void*) * buffersize);
-	for (int i = 0; i < buffersize; i++)
-		m_pNormalLookupTable[i] = -1;
 
-	// Now that the table is initialized, populate it with the triangle data.
+	// 해당되지 않는 페이스는 -1로 표기할 것이기 때문에 -1로 초기화 시킨다.
+	memset(m_pNormalLookupTable, -1, sizeof(void*) * buffersize);
 
-	// for each triangle
-	//	 for each vertex in that triangle
-	//		Append the triangle number to lookuptable[vertex]
-	for (int i = 0; i < m_iNumFace; i++)
+	
+	// 페이스의 개수 * 해당 페이스의 정점 * 정점에 인접하는 페이스의 개수
+	for (int iFaceCount = 0; iFaceCount < m_iNumFace; iFaceCount++)
 	{
-		for (int j = 0; j < 3; j++)
+		for (int iFaceVertex = 0; iFaceVertex < 3; iFaceVertex++)
 		{
-			// find the next empty slot in the vertex's lookup table "slot"
-			for (int k = 0; k < 6; k++)
+			for (int iVetexFace = 0; iVetexFace < 6; iVetexFace++)
 			{
-				int vertex = m_IndexList[i * 3 + j];
-				if (m_pNormalLookupTable[vertex * 6 + k] == -1)
+				int vertex = m_IndexList[iFaceCount * 3 + iFaceVertex];
+				if (m_pNormalLookupTable[vertex * 6 + iVetexFace] == -1)
+				// 해당 정점에 인접한 페이스에 값이 들어가 있지 않을 경우
 				{
-					m_pNormalLookupTable[vertex * 6 + k] = i;
+					m_pNormalLookupTable[vertex * 6 + iVetexFace] = iFaceCount;
 					break;
 				}
 			}
-		} // for each vertex that is part of the current triangle
-	} // for each triangle
+		}
+	}
 }
 //==================================================================================
 // Compute vertex normals from the fast normal lookup table
 //==================================================================================
 void SMap::CalcPerVertexNormalsFastLookup()
 {
-	// First, calculate the face normals for each triangle.
+	// 각 페이스의 노말 벡터를 구한다.
 	CalcFaceNormals();
 
-	// for each vertex, sum the normals indexed by the normal lookup table.
-	int j = 0;
-	for (int i = 0; i < m_iNumVertices; i++)
+	int iVertexFaceNum = 0;
+	// 정점들을 순환한다.
+	for (int iVertexNum = 0; iVertexNum < m_iNumVertices; iVertexNum++)
 	{
+		// 평균 노말을 구하기 위한 벡터
 		D3DXVECTOR3 avgNormal;
 		avgNormal = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-		// Find all the triangles that this vertex is a part of.
-		for (j = 0; j < 6; j++)
+		// 각 정점에 인접한 페이스의 노말 벡터를 확인한다.
+		for (iVertexFaceNum = 0; iVertexFaceNum < 6; iVertexFaceNum++)
 		{
-			int trilIndex;
-			trilIndex = m_pNormalLookupTable[i * 6 + j];
+			int iTriangleIndex;
+			iTriangleIndex = m_pNormalLookupTable[iVertexNum * 6 + iVertexFaceNum];
 
 			// If the triangle index is valid, get the normal and average it in.
-			if (trilIndex < -2)
+			if (iTriangleIndex != -1)
 			{
-				int kkk = 10;
-			}
-			if (trilIndex != -1)
-			{
-				avgNormal += m_pFaceNormals[trilIndex];
+				avgNormal += m_pFaceNormals[iTriangleIndex];
 			}
 			else
 				break;
 		}
-		// Complete the averaging step by dividing & normalizing
-		_ASSERT(j > 0);
-		avgNormal.x /= (float)j;
-		avgNormal.y /= (float)j;
-		avgNormal.z /= (float)j;
+		// 정점에 인접한 페이스 개수 만큼 나누어 정점 노말을 구한다.
+		_ASSERT(iVertexFaceNum > 0);
+		avgNormal.x /= (float)iVertexFaceNum;
+		avgNormal.y /= (float)iVertexFaceNum;
+		avgNormal.z /= (float)iVertexFaceNum;
 		D3DXVec3Normalize(&avgNormal, &avgNormal);
 
-		// Set the vertex normal to this new normal.
-		m_VertexList[i].n.x = avgNormal.x;
-		m_VertexList[i].n.y = avgNormal.y;
-		m_VertexList[i].n.z = avgNormal.z;
+		// 해당 정점의 노말 벡터를 업데이트 시킨다.
+		m_VertexList[iVertexNum].n.x = avgNormal.x;
+		m_VertexList[iVertexNum].n.y = avgNormal.y;
+		m_VertexList[iVertexNum].n.z = avgNormal.z;
 	}
 	//==================================================================================
 	// 페이스 노말 계산 및  이웃 페이스 인덱스 저장하여 정점 노말 계산
