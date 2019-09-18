@@ -55,6 +55,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chap.07_Light", "Chap.07_Li
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "17_DiffuseLight", "17_DiffuseLight\17_DiffuseLight.vcxproj", "{C44D566F-9B31-44B8-9377-0C10B6A4C22C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "18_SpecularLight", "18_SpecularLight\18_SpecularLight.vcxproj", "{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -207,6 +209,14 @@ Global
 		{C44D566F-9B31-44B8-9377-0C10B6A4C22C}.Release|x64.Build.0 = Release|x64
 		{C44D566F-9B31-44B8-9377-0C10B6A4C22C}.Release|x86.ActiveCfg = Release|Win32
 		{C44D566F-9B31-44B8-9377-0C10B6A4C22C}.Release|x86.Build.0 = Release|Win32
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Debug|x64.ActiveCfg = Debug|x64
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Debug|x64.Build.0 = Debug|x64
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Debug|x86.ActiveCfg = Debug|Win32
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Debug|x86.Build.0 = Debug|Win32
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Release|x64.ActiveCfg = Release|x64
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Release|x64.Build.0 = Release|x64
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Release|x86.ActiveCfg = Release|Win32
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -230,6 +240,7 @@ Global
 		{74218413-DA8C-418E-A244-C1B1F1ED71F7} = {F1A014BC-BE55-4607-82B6-0EF81997B0BA}
 		{666D6BA3-0383-41C2-9A65-DB849D558BFA} = {F1A014BC-BE55-4607-82B6-0EF81997B0BA}
 		{C44D566F-9B31-44B8-9377-0C10B6A4C22C} = {06A9AA0B-40E6-4076-B65A-A89278D01E42}
+		{4A7C3955-4F1B-4125-B1FF-AB8FA0B6A18D} = {06A9AA0B-40E6-4076-B65A-A89278D01E42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5997D6DC-CC20-4651-B48F-A01720716417}

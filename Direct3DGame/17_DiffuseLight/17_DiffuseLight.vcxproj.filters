@@ -23,6 +23,8 @@
     <ClInclude Include="SHeightMap.h">
       <Filter>Map</Filter>
     </ClInclude>
+    <ClInclude Include="SBoxObj.h" />
+    <ClInclude Include="SDxSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
@@ -47,6 +49,8 @@
     <ClCompile Include="SMap.cpp">
       <Filter>Map</Filter>
     </ClCompile>
+    <ClCompile Include="SBoxObj.cpp" />
+    <ClCompile Include="SDxSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Camera">
@@ -55,5 +59,16 @@
     <Filter Include="Map">
       <UniqueIdentifier>{08158206-b0dd-4b42-9dcc-387140fda05d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{34f782f7-f572-41f7-9cc3-4b215e2820ea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\shader\17_DuffuseLight\BoxSO.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\17_DuffuseLight\DiffuseLight.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

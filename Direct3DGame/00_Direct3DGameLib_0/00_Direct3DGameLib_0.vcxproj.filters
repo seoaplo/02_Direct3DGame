@@ -114,6 +114,12 @@
     <ClInclude Include="SObjStd.h">
       <Filter>DXGame\Object</Filter>
     </ClInclude>
+    <ClInclude Include="SBoxObj.h">
+      <Filter>DXGame\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="SDxSO.h">
+      <Filter>DXGame\DXHelper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SCore.cpp">
@@ -170,16 +176,11 @@
     <ClCompile Include="SDxRT.cpp">
       <Filter>DXGame\DXHelper</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\..\shader\Shape\Line.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\shader\Shape\Plane.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\shader\Shape\Box.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
+    <ClCompile Include="SBoxObj.cpp">
+      <Filter>DXGame\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="SDxSO.cpp">
+      <Filter>DXGame\DXHelper</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

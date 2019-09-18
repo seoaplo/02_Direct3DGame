@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="S3DGameLib.h" />
+    <ClInclude Include="SBoxObj.h" />
     <ClInclude Include="SCore.h" />
     <ClInclude Include="SDevice.h" />
     <ClInclude Include="SDirectWrite.h" />
@@ -27,6 +28,7 @@
     <ClInclude Include="SDxHelperEX.h" />
     <ClInclude Include="SDxRT.h" />
     <ClInclude Include="SDXShape.h" />
+    <ClInclude Include="SDxSO.h" />
     <ClInclude Include="SDXState.h" />
     <ClInclude Include="SInputManager.h" />
     <ClInclude Include="SKeyInput.h" />
@@ -44,12 +46,14 @@
     <ClInclude Include="STexture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SBoxObj.cpp" />
     <ClCompile Include="SCore.cpp" />
     <ClCompile Include="SDevice.cpp" />
     <ClCompile Include="SDirectWrite.cpp" />
     <ClCompile Include="SDxHelperEX.cpp" />
     <ClCompile Include="SDxRT.cpp" />
     <ClCompile Include="SDXShape.cpp" />
+    <ClCompile Include="SDxSO.cpp" />
     <ClCompile Include="SDXState.cpp" />
     <ClCompile Include="SInputManager.cpp" />
     <ClCompile Include="SKeyInput.cpp" />
@@ -62,17 +66,6 @@
     <ClCompile Include="STimer.cpp" />
     <ClCompile Include="Swindow.cpp" />
     <ClCompile Include="STexture.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\..\shader\Shape\Box.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="..\..\shader\Shape\Line.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="..\..\shader\Shape\Plane.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

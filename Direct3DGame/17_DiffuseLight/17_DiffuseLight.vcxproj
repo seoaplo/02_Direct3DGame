@@ -121,7 +121,9 @@
   <ItemGroup>
     <ClInclude Include="Sample.h" />
     <ClInclude Include="SArcBall.h" />
+    <ClInclude Include="SBoxObj.h" />
     <ClInclude Include="SCamera.h" />
+    <ClInclude Include="SDxSO.h" />
     <ClInclude Include="SFrustum.h" />
     <ClInclude Include="SHeightMap.h" />
     <ClInclude Include="SMap.h" />
@@ -131,12 +133,22 @@
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="SArcBall.cpp" />
+    <ClCompile Include="SBoxObj.cpp" />
     <ClCompile Include="SCamera.cpp" />
+    <ClCompile Include="SDxSO.cpp" />
     <ClCompile Include="SFrustum.cpp" />
     <ClCompile Include="SHeightMap.cpp" />
     <ClCompile Include="SMap.cpp" />
     <ClCompile Include="SMiniMap.cpp" />
     <ClCompile Include="SModelViewCamera.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\shader\17_DuffuseLight\BoxSO.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\17_DuffuseLight\DiffuseLight.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
