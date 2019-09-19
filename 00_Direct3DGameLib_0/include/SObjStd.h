@@ -153,6 +153,32 @@ struct PNCT_VERTEX
 	}
 };
 
+struct PNCT2_VERTEX
+{
+	D3DXVECTOR3		p;
+	D3DXVECTOR3		n;
+	D3DXVECTOR4		c;
+	D3DXVECTOR2     t;
+	D3DXVECTOR3		vTangent;
+	bool operator == (const PNCT2_VERTEX & Vertex)
+	{
+		if (p == Vertex.p  && n == Vertex.n && 	c == Vertex.c   &&	vTangent == Vertex.vTangent)
+		{
+			return true;
+		}
+		return  false;
+	}
+	PNCT2_VERTEX() {}
+	PNCT2_VERTEX(D3DXVECTOR3		vp,
+		D3DXVECTOR3		vn,
+		D3DXVECTOR4		vc,
+		D3DXVECTOR2     vt,
+		D3DXVECTOR3		tangent)
+	{
+		p = vp, n = vn, c = vc, t = vt, vTangent = tangent;
+	}
+};
+
 struct VS_CONSTANT_BUFFER
 {
 	D3DXMATRIX matWorld;// c0						

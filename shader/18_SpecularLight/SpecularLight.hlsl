@@ -78,25 +78,25 @@ float4 Specular(float3 vNormal)
 	return specular;
 }
 
-//float4 Rim(VS_OUTPUT vIn)
-//{
-//	float fRimLightcolor = smoothstep(1.0f - vIn.v.w, 1.0f, 1.0f - max(0, dot(vIn.n, vIn.v.xyz)));
-//	float4 vFinalColor = float4(fRimLightcolor, fRimLightcolor, fRimLightcolor, 1.0f);
-//	return vFinalColor;
-//}
-//float Geom(VS_OUTPUT vIn)
-//{
-//	float3 vReflect = normalize(-g_vLightDir + -g_EyeDir);
-//	float fDot = pow(saturate(dot(vIn.n, vReflect)), 1);
-//
-//	float NdotL = saturate(dot(vIn.n, -g_vLightDir));
-//	float NdotH = saturate(dot(vIn.n, vReflect));
-//	float NdotV = saturate(dot(vIn.n, -g_vEyeDir));
-//	float VdotH = saturate(dot(-g_vEyeDir, vReflect));
-//
-//	float Geom = min(min(2 * (NdotH*NdotV / VdotH), 2 * (NdotH*NdotL / VdotH)), 1.0f) / max(0.1f, NdotV);
-//	return Geom;
-//}
+float4 Rim(VS_OUTPUT vIn)
+{
+	float fRimLightcolor = smoothstep(1.0f - vIn.Pos.w, 1.0f, 1.0f - max(0, dot(vIn.Nor, vIn.Pos.xyz)));
+	float4 vFinalColor = float4(fRimLightcolor, fRimLightcolor, fRimLightcolor, 1.0f);
+	return vFinalColor;
+}
+float Geom(VS_OUTPUT vIn)
+{
+	float3 vReflect = normalize(-g_vLightDir + -g_EyeDir);
+	float fDot = pow(saturate(dot(vIn.Nor, vReflect)), 1);
+
+	float NdotL = saturate(dot(vIn.Nor, -g_vLightDir));
+	float NdotH = saturate(dot(vIn.Nor, vReflect));
+	float NdotV = saturate(dot(vIn.Nor, -g_EyeDir));
+	float VdotH = saturate(dot(-g_EyeDir, vReflect));
+
+	float Geom = min(min(2 * (NdotH*NdotV / VdotH), 2 * (NdotH*NdotL / VdotH)), 1.0f) / max(0.1f, NdotV);
+	return Geom;
+}
 
 
 //==========================================================================================

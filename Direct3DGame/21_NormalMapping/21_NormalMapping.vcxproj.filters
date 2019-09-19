@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SHeightMap.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SModelViewCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SMap.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="SMiniMap.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="SNormalMap.cpp" />
+    <ClCompile Include="SSampleObj.cpp" />
+    <ClCompile Include="SLightObj.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SArcBall.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SHeightMap.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelViewCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SMap.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="SMiniMap.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="SNormalMap.h" />
+    <ClInclude Include="SSampleObj.h" />
+    <ClInclude Include="SLightObj.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{66f699b2-5092-4b00-9406-9a34479667d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{807943d6-1a38-43c5-8399-4d185bdcce85}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\shader\21_NormalMapping\NormalMap_0.hlsl" />
+  </ItemGroup>
+</Project>
