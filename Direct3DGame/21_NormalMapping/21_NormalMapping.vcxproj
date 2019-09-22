@@ -145,6 +145,12 @@
     <ClInclude Include="SSampleObj.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_1.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_2.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\..\shader\21_NormalMapping\NormalMap_0.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>

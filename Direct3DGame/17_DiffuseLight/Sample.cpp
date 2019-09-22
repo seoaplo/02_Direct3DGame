@@ -57,8 +57,10 @@ bool Sample::Init()
 	HRESULT hr;
 
 	m_cbLight.g_cAmbientMaterial = D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1);
-	m_cbLight.g_cDiffuseMaterial = D3DXVECTOR4(1, 1, 1, 1);
 	m_cbLight.g_cAmbientLightColor = D3DXVECTOR4(1, 1, 1, 1);
+
+	// Direction Light
+	m_cbLight.g_cDiffuseMaterial = D3DXVECTOR4(1, 1, 1, 1);
 	m_cbLight.g_cDiffuseLightColor = D3DXVECTOR4(1, 1, 1, 1);
 
 	m_pConstantBufferLight.Attach(DXGame::CreateConstantBuffer(

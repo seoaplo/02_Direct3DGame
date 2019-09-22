@@ -64,5 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\shader\21_NormalMapping\NormalMap_0.hlsl" />
+    <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_1.hlsl" />
+    <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_2.hlsl" />
   </ItemGroup>
 </Project>

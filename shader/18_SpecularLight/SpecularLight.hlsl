@@ -97,7 +97,22 @@ float Geom(VS_OUTPUT vIn)
 	float Geom = min(min(2 * (NdotH*NdotV / VdotH), 2 * (NdotH*NdotL / VdotH)), 1.0f) / max(0.1f, NdotV);
 	return Geom;
 }
-
+float4 Specular(float3 vNormal)
+{
+	// Specular Lighting
+	float fPower = 0.0f;
+#ifndef HALF_VECTOR
+	// 2 * dot(g_vLightDir, vNormal) * vNormal - g_vLightDir
+	float3 vReflection = reflect(g_vLightDir, vNormal);
+	fPower = pow(saturate(dot(vReflection, -g_vEyeDir)), g_fIntensity);
+#else
+	// 
+	float3 vHalf = normalize(-g_vLightDir + -g_vEyeDir);
+	fPower = pow(saturate(dot(vNormal, vHalf)), g_fIntensity);
+#endif
+	float4 specular = g_cSpecularMaterial * g_cSpecularLightColor * fPower;
+	return specular;
+}
 
 //==========================================================================================
 // Vertex Shader
@@ -122,7 +137,7 @@ VS_OUTPUT VS(VS_INPUT vIn)
 float4 PS(VS_OUTPUT vIn) : SV_Target
 {
 	float4 vTexColor = g_txDiffuse.Sample(g_samLinear, vIn.TexCoord);
-	float4 vFinalColor = vTexColor * Diffuse(vIn.Nor) * vIn.Color;
+	float4 vFinalColor = vTexColor * Diffuse(vIn.Nor) * Specular(vIn.Nor) vIn.Color;
 	vFinalColor.a = 1.0f;
 	return vFinalColor;
 }

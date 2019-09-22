@@ -15,7 +15,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 int Sample::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	if(m_pMainCamera == nullptr) return Message;
-	return m_pMainCamera->WndProc(hWnd, Message, wParam, lParam);
+		return m_pMainCamera->WndProc(hWnd, Message, wParam, lParam);
 }
 HRESULT Sample::CreateConstantBuffer()
 {
@@ -52,13 +52,53 @@ bool Sample::Init()
 
 	m_pBoxObj = make_shared<SSampleObj>();
 	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/test_normal_map.bmp");
-	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/NormalMap/HR.bmp", L"../../shader/21_NormalMapping/NormalMap_0.hlsl") == false)
+	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_1.hlsl") == false)
 	{
 		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
 		return 0;
 	}
 
+	/*m_pBoxObj = make_shared<SSampleObj>();
+	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/test_normal_map.bmp");
+	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/NormalMap/tileA.jpg", L"../../shader/21_NormalMapping/NormalMap_0.hlsl") == false)
+	{
+		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
+		return 0;
+	}*/
+
+	//--------------------------------------------------------------------------------------
+	// 박스 오브젝트를 구 오브젝트로 변환(기하 쉐이더 및 스트림 아웃 처리)
+	//--------------------------------------------------------------------------------------
+	if (FAILED(m_SphereObj.Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_2.hlsl")))
+	{
+		MessageBox(0, _T("m_SphereObj 실패"), _T("Fatal error"), MB_OK);
+		return 0;
+	}
+	m_SphereObj.SetSO(GetDevice(), GetContext());
+
+
+	// L"../../data/baseColor.jpg"
 	CreateConstantBuffer();
+
+	//--------------------------------------------------------------------------------------
+	// 높이맵 생성
+	//--------------------------------------------------------------------------------------
+	m_HeightMap.Init(GetDevice(), m_pImmediateContext);
+	if (m_HeightMap.CreateHeightMap(L"../../data/HEIGHT_CASTLE.bmp") == false)
+	{
+		return false;
+	}
+	//  L"../../data/cube/grassenvmap1024.dds"
+	// L"../../data/castle.jpg"
+	SMapDesc MapDesc = { m_HeightMap.m_iNumRows,
+							m_HeightMap.m_iNumCols,
+							1.0f, 1.0f,
+							L"../../data/castle.jpg",
+							L"../../shader/21_NormalMapping/NormalMap_0.hlsl" };
+	if (!m_HeightMap.Load(MapDesc))
+	{
+		return false;
+	}
 	//--------------------------------------------------------------------------------------
 	// 월드  행렬
 	//--------------------------------------------------------------------------------------
@@ -67,12 +107,15 @@ bool Sample::Init()
 	//--------------------------------------------------------------------------------------
 	// 카메라  행렬 
 	//--------------------------------------------------------------------------------------	
-	m_pMainCamera = make_shared<SModelViewCamera>();
-	m_pMainCamera->SetViewMatrix(D3DXVECTOR3(0.0f, 0.0f, -10.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	m_pMainCamera = make_shared<SCamera>();
 
 	float fAspectRatio = m_nWindowWidth / (FLOAT)m_nWindowHeight;
-	m_pMainCamera->SetProjMatrix(D3DX_PI / 4, fAspectRatio, 0.1f, 500.0f);
-	m_pMainCamera->SetWindow(m_nWindowWidth, m_nWindowHeight);
+	m_pMainCamera->SetViewMatrix(D3DXVECTOR3(0.0f, 0.0f, -10.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f,
+		m_SwapChainDesc.BufferDesc.Width / (float)(m_SwapChainDesc.BufferDesc.Height),
+		1.0f, 1000.0f);
+
+	m_pMainCamera->Init();
 
 	m_vInitLightPos = D3DXVECTOR3(100.0f, 100.0f, 0.0f);
 	return true;
@@ -83,8 +126,10 @@ bool Sample::Frame()
 
 	// 2초당 1회전( 1 초 * D3DX_PI = 3.14 )
 	float t = I_Timer.GetElapsedTime() * D3DX_PI;
-	m_pMainCamera->Update(I_Timer.GetSPF());
-	D3DXMatrixMultiply(&m_matWorld, &m_matInitWorld, &m_pMainCamera->_matWorld);
+	m_pMainCamera->Frame();
+	//D3DXMatrixMultiply(&m_matWorld, &m_matInitWorld, &m_pMainCamera->_matWorld);
+
+	D3DXMatrixIdentity(&m_matWorld);
 
 	//--------------------------------------------------------------------------------------
 	// 라이트 벡터 계산
@@ -108,25 +153,55 @@ bool Sample::Frame()
 		pConstData->vEyeDir = m_pMainCamera->_vLook;
 		m_pImmediateContext->Unmap(m_pConstantBuffer.Get(), 0);
 	}
+	m_HeightMap.Frame();
+	m_SphereObj.Frame();
+
 	return true;
 }
 bool Sample::Render()
 {
-	m_pBoxObj->SetMatrix(&m_pMainCamera-> _matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	if (I_InputManager.KeyBoardState(DIK_P))
+	{
+		
+	}
+	m_pBoxObj->SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	m_pBoxObj->PreRender(m_pImmediateContext);
 	m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
 	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 	m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
 	m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 	m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
 	m_pBoxObj->PostRender(m_pImmediateContext);
+	
 
-	RECT rc;
-	rc.left = m_nWindowWidth * 0.5f - 100;
-	rc.top = m_nWindowHeight - 100;
-	rc.right = 0;
-	rc.bottom = 0;
-
+	if (I_InputManager.KeyBoardState(DIK_O))
+	{
+		
+	}
+	
+	/*m_HeightMap.SetMatrix(&m_pMainCamera->_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	m_HeightMap.PreRender(m_pImmediateContext);
+	m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
+	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_HeightMap.PostRender(m_pImmediateContext);
+*/
+	/*m_SphereObj.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	m_SphereObj.PreRender(m_pImmediateContext);
+	m_pImmediateContext->PSSetShaderResources(0, 1, m_SphereObj._dxobj.g_pTextureSRV.GetAddressOf());
+	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_SphereObj.PostRender(m_pImmediateContext);*/
 	return true;
 }
 bool Sample::Release()

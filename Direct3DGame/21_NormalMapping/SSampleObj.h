@@ -1,10 +1,10 @@
 #pragma once
 #include "SNormalMap.h"
 
-class SSampleObj : public SDXShape
+class SSampleObj : public SBox
 {
 public:
-	vector<PNCT2_VERTEX>	m_VertexList;
+	//vector<PNCT2_VERTEX>	m_VertexList;
 	SNormalMap			m_NormalMap;
 	T_STR				m_strNormalMapName;
 	INT					m_itxNormalMap;
@@ -12,9 +12,9 @@ public:
 	D3DXMATRIX			m_matNormal;
 public:
 	bool				Render(ID3D11DeviceContext*  pContext);
-	bool				UpdateBuffer();
-	HRESULT				SetInputLayout();
-	HRESULT				CreateVertexBuffer();
+	//bool				UpdateBuffer();
+	//HRESULT				SetInputLayout();
+	//HRESULT				CreateVertexBuffer();
 	HRESULT				CreateIndexBuffer();
 	HRESULT				CreateResource();
 	HRESULT				LoadTextures(ID3D11Device* pDevice, const TCHAR* pLoadTextureString);

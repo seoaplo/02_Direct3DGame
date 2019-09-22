@@ -7,6 +7,7 @@
 #include "SHeightMap.h"
 #include "SSampleObj.h"
 #include "SLightObj.h"
+#include "SBoxObj.h"
 
 struct VS_CBChangesEveryFrame
 {
@@ -33,10 +34,12 @@ public:
 	//===================================================================
 	shared_ptr<SSampleObj>	m_pBoxObj;
 	SLightObj*				m_pSunLight;
-	shared_ptr<SModelViewCamera > m_pMainCamera;
+	shared_ptr<SCamera > m_pMainCamera;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>	m_pConstantBuffer;
 	VS_CBNeverChanges		m_cbNeverChanges;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>	m_pCBNeverChanges;
+	SHeightMap		m_HeightMap;
+	SBoxObj			m_SphereObj;
 	//--------------------------------------------------------------------------------------
 	// 라이트 관련 멤버
 	//--------------------------------------------------------------------------------------

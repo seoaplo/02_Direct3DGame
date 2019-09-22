@@ -151,11 +151,11 @@ bool	SCamera::Frame()
 		m_fPitchAngle	+= D3DXToRadian(I_InputManager.m_pMouseInput->MouseLocation().y * 0.1f);
 	}
 	// 카메라 이동 거리 = 속도 + (경과시간 * 휠 변위값)
-	float fValue = I_InputManager.m_pMouseInput->MouseLocation().x;
-	float fDistance = m_fSpeed * fValue * I_Timer.GetSPF();
-
 	if (I_InputManager.KeyBoardState(DIK_SPACE)) m_fSpeed += I_Timer.GetSPF() * 10.0f;
 	else										 m_fSpeed -= I_Timer.GetSPF() * 10.0f;
+
+	float fValue = I_InputManager.m_pMouseInput->MouseLocation().z;
+	float fDistance = m_fSpeed * fValue * I_Timer.GetSPF();
 
 	// 최소값으로 고정
 	if (m_fSpeed < 1.0f) m_fSpeed = 1.0f;
@@ -168,7 +168,6 @@ bool	SCamera::Frame()
 	if (I_InputManager.KeyBoardState(DIK_E)) MoveUp(-I_Timer.GetSPF() * 5.0f* m_fSpeed);
 
 	Update(D3DXVECTOR4(m_fPitchAngle, m_fYawAngle, m_fRollAngle, fDistance));
-	UpdateVector();
 
 	return true;
 }
