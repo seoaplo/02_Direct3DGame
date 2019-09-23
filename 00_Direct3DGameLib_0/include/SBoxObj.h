@@ -17,6 +17,7 @@ public:
 	HRESULT LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pShaderFile);
 	bool	SetSO(ID3D11Device* pDevice, ID3D11DeviceContext*  pContext);
 	bool	Render(ID3D11DeviceContext*  pContext);
+	bool	PostRender(ID3D11DeviceContext*  pContext);
 	bool	RenderMesh(ID3D11DeviceContext*  pContext, bool bFirstRender = true);
 public:
 	SBoxObj();

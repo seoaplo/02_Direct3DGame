@@ -60,7 +60,7 @@ namespace DXGame
 		// State Comptr
 		//==============================================================================================================
 		Microsoft::WRL::ComPtr<ID3D11InputLayout>				g_pInputlayout;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>		g_pTextureSRV;
+		ID3D11ShaderResourceView*								g_pTextureSRV;
 
 
 		//==============================================================================================================

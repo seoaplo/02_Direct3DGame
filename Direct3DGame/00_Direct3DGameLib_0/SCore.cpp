@@ -47,6 +47,8 @@ bool	SCore::CoreInit()
 	m_BSDebugNum = 0;
 	m_SSDebugNum = 0;
 	m_DSSDebugNum = 0;
+
+	m_Direction.Create(m_pDevice, m_pImmediateContext);
 	m_bDebugState = false;
 
 	return true;
@@ -63,6 +65,7 @@ bool	SCore::CoreFrame()
 		return false;
 
 	ProcDebug();
+	m_Direction.Frame();
 
 	if (!PreFrame())	return false;
 	if (!Frame())	return false;
@@ -110,6 +113,8 @@ bool	SCore::CoreRelease()
 	if (!PreRelease())	return false;
 	if (!Release())	return false;
 	if (!PostRelease())	return false;
+
+	m_Direction.Release();
 
 	if (!I_Timer.Release())
 		return false;
@@ -243,6 +248,7 @@ bool SCore::DrawDebug()
 	rc.right = m_nWindowHeight;
 	I_DirectWrite.DrawText(rc, SDxState::BSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
 
+	m_Direction.Render(m_pImmediateContext);
 	return true;
 }
 bool SCore::ProcDebug()

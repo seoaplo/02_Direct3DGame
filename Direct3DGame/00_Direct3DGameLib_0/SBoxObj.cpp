@@ -69,7 +69,7 @@ bool SBoxObj::RenderMesh(ID3D11DeviceContext*  pContext, bool bFirstRender)
 
 	if (bFirstRender)
 	{
-		PostRender(pContext);
+		SModel::PostRender(pContext);
 	}
 	else
 	{
@@ -81,9 +81,8 @@ bool SBoxObj::RenderMesh(ID3D11DeviceContext*  pContext, bool bFirstRender)
 	}
 	return true;
 }
-bool SBoxObj::Render(ID3D11DeviceContext*  pContext)
+bool SBoxObj::PostRender(ID3D11DeviceContext*  pContext)
 {
-	PreRender(pContext);
 	pContext->UpdateSubresource(m_dxobj.g_pConstantBuffer.Get(), 0, NULL, &m_cbData, 0, 0);
 	ID3D11Buffer* pVB[1] = { m_RenderSO.m_pDrawFrom.Get() };
 	UINT Strides[1] = { sizeof(PNCT_VERTEX) };
@@ -91,6 +90,12 @@ bool SBoxObj::Render(ID3D11DeviceContext*  pContext)
 	pContext->IASetVertexBuffers(0, 1, pVB, Strides, Offsets);
 	pContext->GSSetShader(NULL, NULL, 0);
 	pContext->DrawAuto();
+	return true;
+}
+bool SBoxObj::Render(ID3D11DeviceContext*  pContext)
+{
+	PreRender(pContext);
+	PostRender(pContext);
 	return true;
 }
 

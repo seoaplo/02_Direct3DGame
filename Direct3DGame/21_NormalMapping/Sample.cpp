@@ -52,7 +52,7 @@ bool Sample::Init()
 
 	m_pBoxObj = make_shared<SSampleObj>();
 	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/test_normal_map.bmp");
-	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_1.hlsl") == false)
+	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_2.hlsl") == false)
 	{
 		MessageBox(0, _T("m_pBoxObj ½ÇÆÐ"), _T("Fatal error"), MB_OK);
 		return 0;
@@ -160,48 +160,47 @@ bool Sample::Frame()
 }
 bool Sample::Render()
 {
+	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	if (I_InputManager.KeyBoardState(DIK_P))
 	{
-		
+		m_pBoxObj->SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+		m_pBoxObj->PreRender(m_pImmediateContext);
+		m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
+		m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+		m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+		m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+		m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+		m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+		m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+		m_pBoxObj->PostRender(m_pImmediateContext);
+
 	}
-	m_pBoxObj->SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-	m_pBoxObj->PreRender(m_pImmediateContext);
-	m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
-	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-	m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-	m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-	m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_pBoxObj->PostRender(m_pImmediateContext);
 	
 
 	if (I_InputManager.KeyBoardState(DIK_O))
 	{
-		
+		m_HeightMap.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+		m_HeightMap.PreRender(m_pImmediateContext);
+		m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
+		m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+		m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+		m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+		m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+		m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+		m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+		m_HeightMap.PostRender(m_pImmediateContext);
 	}
 	
-	/*m_HeightMap.SetMatrix(&m_pMainCamera->_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-	m_HeightMap.PreRender(m_pImmediateContext);
-	m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
-	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-	m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-	m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-	m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_HeightMap.PostRender(m_pImmediateContext);
-*/
-	/*m_SphereObj.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	
+
+	m_SphereObj.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	m_SphereObj.PreRender(m_pImmediateContext);
-	m_pImmediateContext->PSSetShaderResources(0, 1, m_SphereObj._dxobj.g_pTextureSRV.GetAddressOf());
+	m_pImmediateContext->PSSetShaderResources(0, 1, &m_SphereObj._dxobj.g_pTextureSRV);
 	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 	m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-	m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
 	m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 	m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_SphereObj.PostRender(m_pImmediateContext);*/
+	m_SphereObj.PostRender(m_pImmediateContext);
 	return true;
 }
 bool Sample::Release()

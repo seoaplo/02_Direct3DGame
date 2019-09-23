@@ -36,7 +36,7 @@ cbuffer cbObjectNeverChanges: register(b2)
 
 struct PNCT_VS_INPUT
 {
-    float4 vPos			: POSITION;
+    float3 vPos			: POSITION;
     float3 vNormal		: NORMAL;
     float4 vColor		: COLOR0;
     float2 vTexCoord	: TEXCOORD0;  
@@ -74,8 +74,8 @@ struct PCT4_PS_INPUT
 PNCT_VS_OUTPUT VS(PNCT_VS_INPUT input )
 {
 	PNCT_VS_OUTPUT output = (PNCT_VS_OUTPUT)0;
-	output.vLocalPos	= input.vPos;
-	output.vWorldPos	= mul( input.vPos,  g_matWorld );
+	output.vLocalPos	= float4(input.vPos, 1.0f);
+	output.vWorldPos	= mul(output.vLocalPos,  g_matWorld );
     float4 vViewPos		= mul(output.vWorldPos, g_matView );
     output.vPos			= mul( vViewPos, g_matProj );
     
@@ -172,7 +172,7 @@ void GS(triangle PNCT_VS_OUTPUT input[3], inout TriangleStream<PCT4_PS_INPUT> Tr
 		int i0 = iCount % 3;
 		int i1 = (iCount + 1) % 3;
 		int i2 = (iCount + 2) % 3;
-		vTangent = float4(CreateTangent(input[i0].vLocalPos, input[i1].vLocalPos, input[i2].vLocalPos,
+		vTangent = float4(CreateTangent(input[i0].vLocalPos.xyz, input[i1].vLocalPos.xyz, input[i2].vLocalPos.xyz,
 										input[i0].vTexCoord, input[i1].vTexCoord, input[i2].vTexCoord), 1.0f).xyz;
 
 		output.vNormal =	normalize(mul(input[iCount].vNormal, (float3x3)g_matNormal));

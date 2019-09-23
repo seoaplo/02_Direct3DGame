@@ -5,6 +5,7 @@
 #include "SInputManager.h"
 #include "Swindow.h"
 #include "SSoundManager.h"
+#include "SDXShape.h"
 
 class SCore	: public SWindow
 {
@@ -14,6 +15,8 @@ public:
 	UINT	m_SSDebugNum;
 	UINT	m_DSSDebugNum;
 	
+	
+	SDirection m_Direction;
 	bool	m_bDebugState;
 	virtual bool		ProcDebug();
 	virtual bool		DrawDebug();

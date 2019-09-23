@@ -35,7 +35,7 @@ cbuffer cbObjectNeverChanges: register(b2)
 
 struct PNCT_VS_INPUT
 {
-	float4 vPos			: POSITION;
+	float3 vPos			: POSITION;
 	float3 vNormal		: NORMAL;
 	float4 vColor		: COLOR0;
 	float2 vTexCoord	: TEXCOORD0;
@@ -61,7 +61,7 @@ struct PCT4_PS_INPUT
 PCT4_PS_INPUT VS(PNCT_VS_INPUT input)
 {
 	PCT4_PS_INPUT output = (PCT4_PS_INPUT)0;
-	output.vWorldPos = mul(input.vPos, g_matWorld);
+	output.vWorldPos = mul(float4(input.vPos, 1.0f), g_matWorld);
 	float4 vViewPos = mul(output.vWorldPos, g_matView);
 	output.vPos = mul(vViewPos, g_matProj);
 
@@ -85,28 +85,30 @@ PCT4_PS_INPUT VS(PNCT_VS_INPUT input)
 //--------------------------------------------------------------------------------------
 float4 PS(PCT4_PS_INPUT input) : SV_Target
 {
-	// 기본 텍스쳐 컬러 
-/*	float4 normal		=	g_txNormalMap.Sample( g_samLinear, input.vTexCoord );
-	float1 x			=	input.vTexCoord.x+normal.x*0.1f*cb_vLightVector.z;
-	float1 y			=	input.vTexCoord.y+normal.y*0.1f*cb_vLightVector.x;
-	float2 uv			=	float2(input.vTexCoord.y, y);
-*/
-
-// 디퓨즈 조명 
-float  fDot = saturate(dot(input.vNormal.xyz, -input.vLightDir));
-float3 LightColor = cb_DiffuseLightColor.rgb * fDot;
-
-// 스펙큘러 조명 
-float3 R = reflect(-input.vLightDir, input.vNormal);
-float3 SpecColor = cb_SpecularLightColor.rgb * pow(saturate(dot(R, input.vEye)), cb_SpecularPower);
-
-float4 DiffuseColor = g_txDiffuse.Sample(g_samLinear, R);
-//float3 SpecColor	=	cb_SpecularLightColor.rgb * pow( saturate(dot( input.vHalf, normal.xyz )), cb_SpecularPower );
-
-// 전체 컬러 조합  	
-//float4 vFinalColor = DiffuseColor * float4(LightColor + SpecColor, 1.0f);
-float4 vFinalColor = DiffuseColor;
-return DiffuseColor;
+		// 기본 텍스쳐 컬러 
+	/*	float4 normal		=	g_txNormalMap.Sample( g_samLinear, input.vTexCoord );
+		float1 x			=	input.vTexCoord.x+normal.x*0.1f*cb_vLightVector.z;
+		float1 y			=	input.vTexCoord.y+normal.y*0.1f*cb_vLightVector.x;
+		float2 uv			=	float2(input.vTexCoord.y, y);
+	*/
+	
+	// 디퓨즈 조명 
+	float  fDot = saturate(dot(input.vNormal.xyz, -input.vLightDir));
+	float3 LightColor = cb_DiffuseLightColor.rgb * fDot;
+	
+	input.vEye = normalize(input.vEye);
+	input.vNormal = normalize(input.vNormal);
+	// 스펙큘러 조명 
+	float3 R = reflect(-input.vEye, input.vNormal);
+	float3 SpecColor = cb_SpecularLightColor.rgb * pow(saturate(dot(R, input.vEye)), cb_SpecularPower);
+	
+	float4 DiffuseColor = g_txDiffuse.Sample(g_samLinear, R);
+	//float3 SpecColor	=	cb_SpecularLightColor.rgb * pow( saturate(dot( input.vHalf, normal.xyz )), cb_SpecularPower );
+	
+	// 전체 컬러 조합  	
+	//float4 vFinalColor = DiffuseColor * float4(LightColor + SpecColor, 1.0f);
+	float4 vFinalColor = DiffuseColor;
+	return DiffuseColor;
 }
 
 //--------------------------------------------------------------------------------------

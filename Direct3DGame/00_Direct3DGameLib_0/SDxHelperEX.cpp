@@ -652,7 +652,7 @@ namespace DXGame
 		pContext->GSSetShader(g_pGeometryShader.Get(), nullptr, 0);
 		pContext->HSSetShader(g_pHullShader.Get(), nullptr, 0);
 		pContext->DSSetShader(g_pDomainShader.Get(), nullptr, 0);
-		pContext->PSSetShaderResources(0, 1, g_pTextureSRV.GetAddressOf());
+		pContext->PSSetShaderResources(0, 1, &g_pTextureSRV);
 	}
 
 	void SDxHelperEX::PostRender(ID3D11DeviceContext* pContext, UINT iCount)

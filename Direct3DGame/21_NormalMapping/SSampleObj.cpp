@@ -25,7 +25,7 @@ void SSampleObj::SetMatrix(const D3DXMATRIX* pWorld, const D3DXMATRIX* pView, co
 HRESULT SSampleObj::LoadTextures(ID3D11Device* pDevice, const TCHAR* pLoadTextureString)
 {
 	HRESULT hr = S_OK;
-	m_dxobj.g_pTextureSRV.Attach(DXGame::CreateShaderResourceView(pDevice, pLoadTextureString));
+	m_dxobj.g_pTextureSRV = DXGame::CreateShaderResourceView(pDevice, pLoadTextureString);
 
 	m_itxNormalMap = I_TextureManager.Load(pDevice, const_cast<TCHAR*>(m_strNormalMapName.c_str()));
 	m_pNormalTexture = I_TextureManager.GetPtr(m_itxNormalMap);

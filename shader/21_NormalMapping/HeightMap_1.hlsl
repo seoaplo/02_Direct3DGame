@@ -205,7 +205,7 @@ cbuffer cbObjectNeverChanges: register(b2)
 
 struct PNCT_VS_INPUT
 {
-	float4 vPos			: POSITION;
+	float3 vPos			: POSITION;
 	float3 vNormal		: NORMAL;
 	float4 vColor		: COLOR0;
 	float2 vTexCoord	: TEXCOORD0;
@@ -243,8 +243,8 @@ struct PCT4_PS_INPUT
 PNCT_VS_OUTPUT VS(PNCT_VS_INPUT input)
 {
 	PNCT_VS_OUTPUT output = (PNCT_VS_OUTPUT)0;
-	output.vLocalPos = input.vPos;
-	output.vWorldPos = mul(input.vPos, g_matWorld);
+	output.vLocalPos = float4(input.vPos, 1.0f);
+	output.vWorldPos = mul(output.vLocalPos, g_matWorld);
 	float4 vViewPos = mul(output.vWorldPos, g_matView);
 	output.vPos = mul(vViewPos, g_matProj);
 
@@ -260,31 +260,40 @@ PNCT_VS_OUTPUT VS(PNCT_VS_INPUT input)
 //--------------------------------------------------------------------------------------
 float4 PS(PCT4_PS_INPUT input) : SV_Target
 {
-	normalize(input.vTangent);
-	normalize(input.vBiNormal);
-	normalize(input.vNormal);
-	normalize(input.vLightDir);
+	//normalize(input.vTangent);
+	//normalize(input.vBiNormal);
+	//normalize(input.vNormal);
+	//normalize(input.vLightDir);
 
-	/*float3x3 tanMat = { input.vTangent, input.vBiNormal, input.vNormal};
-	transpose(tanMat);*/
+	///*float3x3 tanMat = { input.vTangent, input.vBiNormal, input.vNormal};
+	//transpose(tanMat);*/
 
-	// 디퓨즈 조명 
+	//float3 normal = g_txNormalMap.Sample(g_samLinear, input.vTexCoord);
+	//	   normal = normalize((normal - 0.5f) * 2.0f);
+	//	   //normal		=	normalize(mul(tanMat, normal));
+
+	//float  fDot = saturate(dot(normal.xyz, input.vLightDir));
+	//float3 LightColor = cb_DiffuseLightColor.rgb * fDot;
+
+	//// 스펙큘러 조명 		
+	//float3 R = reflect(input.vEye, normal);
+	//float3 SpecColor = cb_SpecularLightColor.rgb * pow(saturate(dot(R, input.vEye)), cb_SpecularPower);
+
+	//float4 DiffuseColor = g_txDiffuse.Sample(g_samLinear, R);
+
+	//// 전체 컬러 조합  	
+	//float4 vFinalColor = DiffuseColor * float4(LightColor + SpecColor, 1.0f);
+	//return DiffuseColor;
+
 	float3 normal = g_txNormalMap.Sample(g_samLinear, input.vTexCoord);
 		   normal = normalize((normal - 0.5f) * 2.0f);
-		   //normal		=	normalize(mul(tanMat, normal));
 
-	float  fDot = saturate(dot(normal.xyz, input.vLightDir));
-	float3 LightColor = cb_DiffuseLightColor.rgb * fDot;
+	float3 R = reflect(input.vEye,- normal);
 
-	// 스펙큘러 조명 		
-	float3 R = reflect(-input.vLightDir, normal.xyz);
-	float3 SpecColor = cb_SpecularLightColor.rgb * pow(saturate(dot(R, input.vEye)), cb_SpecularPower);
+	float4 ReflectColor = g_txDiffuse.Sample(g_samLinear, R);
 
-	float4 DiffuseColor = g_txDiffuse.Sample(g_samLinear, R);
 
-	// 전체 컬러 조합  	
-	float4 vFinalColor = DiffuseColor * float4(LightColor + SpecColor, 1.0f);
-	return DiffuseColor;
+	return ReflectColor;
 }
 
 
@@ -337,7 +346,7 @@ void GS(triangle PNCT_VS_OUTPUT input[3], inout TriangleStream<PCT4_PS_INPUT> Tr
 		int i0 = iCount % 3;
 		int i1 = (iCount + 1) % 3;
 		int i2 = (iCount + 2) % 3;
-		vTangent = float4(CreateTangent(input[i0].vLocalPos, input[i1].vLocalPos, input[i2].vLocalPos,
+		vTangent = float4(CreateTangent(input[i0].vLocalPos.xyz, input[i1].vLocalPos.xyz, input[i2].vLocalPos.xyz,
 			input[i0].vTexCoord, input[i1].vTexCoord, input[i2].vTexCoord), 1.0f).xyz;
 
 		output.vNormal = normalize(mul(input[iCount].vNormal, (float3x3)g_matNormal));
@@ -347,6 +356,7 @@ void GS(triangle PNCT_VS_OUTPUT input[3], inout TriangleStream<PCT4_PS_INPUT> Tr
 
 		output.vTangent = normalize(mul(vTangent, (float3x3)g_matNormal));
 		output.vBiNormal = normalize(cross(output.vNormal, output.vTangent));
+		output.vNormal = normalize(cross( output.vTangent, output.vBiNormal));
 
 		float3x3 tanMat = { output.vTangent.x, output.vBiNormal.x, output.vNormal.x,
 							output.vTangent.y, output.vBiNormal.y, output.vNormal.y,
