@@ -130,6 +130,7 @@
     <ClCompile Include="SModelViewCamera.cpp" />
     <ClCompile Include="SNormalMap.cpp" />
     <ClCompile Include="SSampleObj.cpp" />
+    <ClCompile Include="SSkyObj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="SModelViewCamera.h" />
     <ClInclude Include="SNormalMap.h" />
     <ClInclude Include="SSampleObj.h" />
+    <ClInclude Include="SSkyObj.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_1.hlsl">
@@ -152,6 +154,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\..\shader\21_NormalMapping\NormalMap_0.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\..\shader\Shape\SkyObj.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>

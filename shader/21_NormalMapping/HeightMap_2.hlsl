@@ -97,9 +97,11 @@ float4 PS(PCT4_PS_INPUT input) : SV_Target
 	float3 LightColor = cb_DiffuseLightColor.rgb * fDot;
 	
 	input.vEye = normalize(input.vEye);
+	input.vNormal = mul(input.vNormal, (float3x3)g_matWorld);
 	input.vNormal = normalize(input.vNormal);
+
 	// Ω∫∆Â≈ß∑Ø ¡∂∏Ì 
-	float3 R = reflect(-input.vEye, input.vNormal);
+	float3 R = reflect(-input.vEye, input.vNormal).xyz;
 	float3 SpecColor = cb_SpecularLightColor.rgb * pow(saturate(dot(R, input.vEye)), cb_SpecularPower);
 	
 	float4 DiffuseColor = g_txDiffuse.Sample(g_samLinear, R);

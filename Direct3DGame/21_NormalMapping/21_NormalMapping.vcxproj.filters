@@ -26,6 +26,7 @@
     <ClCompile Include="SNormalMap.cpp" />
     <ClCompile Include="SSampleObj.cpp" />
     <ClCompile Include="SLightObj.cpp" />
+    <ClCompile Include="SSkyObj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
@@ -53,6 +54,7 @@
     <ClInclude Include="SNormalMap.h" />
     <ClInclude Include="SSampleObj.h" />
     <ClInclude Include="SLightObj.h" />
+    <ClInclude Include="SSkyObj.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Camera">
@@ -66,5 +68,6 @@
     <FxCompile Include="..\..\shader\21_NormalMapping\NormalMap_0.hlsl" />
     <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_1.hlsl" />
     <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_2.hlsl" />
+    <FxCompile Include="..\..\shader\Shape\SkyObj.hlsl" />
   </ItemGroup>
 </Project>

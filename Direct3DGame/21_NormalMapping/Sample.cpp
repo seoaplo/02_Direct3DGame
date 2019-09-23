@@ -76,6 +76,15 @@ bool Sample::Init()
 	}
 	m_SphereObj.SetSO(GetDevice(), GetContext());
 
+	//--------------------------------------------------------------------------------------
+	// 스카이 오브젝트 생성
+	//--------------------------------------------------------------------------------------
+	if (m_SkyObj.Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/Shape/SkyObj.hlsl") == false)
+	{
+		MessageBox(0, _T("m_pSkyObj->Create"), _T("Fatal error"), MB_OK);
+		return 0;
+	}
+	m_SkyObj.SetSO(GetDevice(), GetContext());
 
 	// L"../../data/baseColor.jpg"
 	CreateConstantBuffer();
@@ -104,6 +113,11 @@ bool Sample::Init()
 	//--------------------------------------------------------------------------------------
 	D3DXMATRIX matScale, matTrans;
 	D3DXMatrixScaling(&m_matInitWorld, 1.0f, 1.0f, 1.0f);
+
+	D3DXMatrixIdentity(&m_matSkyWorld);
+	m_matSkyWorld._11 = 10.0f;
+	m_matSkyWorld._22 = 10.0f;
+	m_matSkyWorld._33 = 10.0f;
 	//--------------------------------------------------------------------------------------
 	// 카메라  행렬 
 	//--------------------------------------------------------------------------------------	
@@ -160,7 +174,16 @@ bool Sample::Frame()
 }
 bool Sample::Render()
 {
+	//--------------------------------------------------------------------------------------
+	// Direction 오브젝트 랜더링
+	//--------------------------------------------------------------------------------------
 	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	//--------------------------------------------------------------------------------------
+	// 스카이 오브젝트 랜더링
+	//--------------------------------------------------------------------------------------
+	m_SkyObj.SetMatrix(&m_matSkyWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	m_SkyObj.Render(m_pImmediateContext);
+
 	if (I_InputManager.KeyBoardState(DIK_P))
 	{
 		m_pBoxObj->SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
@@ -193,7 +216,7 @@ bool Sample::Render()
 	
 	
 
-	m_SphereObj.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	m_SphereObj.SetMatrix(&m_matSkyWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	m_SphereObj.PreRender(m_pImmediateContext);
 	m_pImmediateContext->PSSetShaderResources(0, 1, &m_SphereObj._dxobj.g_pTextureSRV);
 	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());

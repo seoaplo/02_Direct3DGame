@@ -8,6 +8,7 @@
 #include "SSampleObj.h"
 #include "SLightObj.h"
 #include "SBoxObj.h"
+#include "SSkyObj.h"
 
 struct VS_CBChangesEveryFrame
 {
@@ -40,6 +41,8 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Buffer>	m_pCBNeverChanges;
 	SHeightMap		m_HeightMap;
 	SBoxObj			m_SphereObj;
+	SSkyObj				m_SkyObj;
+	D3DXMATRIX				m_matSkyWorld;
 	//--------------------------------------------------------------------------------------
 	// 라이트 관련 멤버
 	//--------------------------------------------------------------------------------------
