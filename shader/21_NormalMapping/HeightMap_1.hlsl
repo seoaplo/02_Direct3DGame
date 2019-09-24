@@ -265,8 +265,12 @@ float4 PS(PCT4_PS_INPUT input) : SV_Target
 	//normalize(input.vNormal);
 	//normalize(input.vLightDir);
 
-	///*float3x3 tanMat = { input.vTangent, input.vBiNormal, input.vNormal};
-	//transpose(tanMat);*/
+	/*float3x3 tanMat = { input.vTangent, input.vBiNormal, input.vNormal};
+	transpose(tanMat);*/
+
+	float3x3 tanMat = { input.vTangent.x, input.vBiNormal.x, input.vNormal.x,
+							input.vTangent.y, input.vBiNormal.y, input.vNormal.y,
+							input.vTangent.z, input.vBiNormal.z, input.vNormal.z };
 
 	//float3 normal = g_txNormalMap.Sample(g_samLinear, input.vTexCoord);
 	//	   normal = normalize((normal - 0.5f) * 2.0f);
@@ -287,9 +291,9 @@ float4 PS(PCT4_PS_INPUT input) : SV_Target
 
 	float3 normal = g_txNormalMap.Sample(g_samLinear, input.vTexCoord);
 		   normal = normalize((normal - 0.5f) * 2.0f);
-
-	float3 R = reflect(input.vEye,- normal);
-
+		 
+	float3 R = reflect(input.vEye, normal);
+	R = normalize(R);
 	float4 ReflectColor = g_txDiffuse.Sample(g_samLinear, R);
 
 

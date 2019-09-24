@@ -152,8 +152,8 @@ bool SMap::CreateVertexData()
 	m_VertexList.resize(m_iNumVertices);
 
 	// Map의 원점이 되는 정점
-	int iHalfCols = m_iNumCols / 2;
-	int iHalfRows = m_iNumRows / 2;
+	int iHalfCols = (m_iNumCols-1) / 2;
+	int iHalfRows = (m_iNumRows-1) / 2;
 	// 정점과 정점 사이의 텍스쳐 좌표 증가값
 	float ftxOffsetU = 1.0f / (m_iNumCols - 1);
 	float ftxOffsetV = 1.0f / (m_iNumRows - 1);

@@ -67,7 +67,7 @@
   <ItemGroup>
     <FxCompile Include="..\..\shader\21_NormalMapping\NormalMap_0.hlsl" />
     <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_1.hlsl" />
-    <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_2.hlsl" />
     <FxCompile Include="..\..\shader\Shape\SkyObj.hlsl" />
+    <FxCompile Include="..\..\shader\21_NormalMapping\EviromentMap_0.hlsl" />
   </ItemGroup>
 </Project>

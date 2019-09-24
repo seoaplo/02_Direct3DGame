@@ -150,7 +150,7 @@
     <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_1.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="..\..\shader\21_NormalMapping\HeightMap_2.hlsl">
+    <FxCompile Include="..\..\shader\21_NormalMapping\EviromentMap_0.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\..\shader\21_NormalMapping\NormalMap_0.hlsl">

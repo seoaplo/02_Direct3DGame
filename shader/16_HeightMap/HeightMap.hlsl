@@ -2,7 +2,7 @@
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
-TextureCube g_txDiffuse: register (t0);
+Texture2D g_txDiffuse: register (t0);
 SamplerState samLinear: register (s0);
 cbuffer cb0
 {

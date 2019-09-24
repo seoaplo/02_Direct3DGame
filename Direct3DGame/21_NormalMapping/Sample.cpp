@@ -50,26 +50,26 @@ bool Sample::Init()
 	m_pSunLight = I_Light.GetPtr(I_Light.Add(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), L"SBasisSunLight"));
 	if (!m_pSunLight->Init()) return false;
 
-	m_pBoxObj = make_shared<SSampleObj>();
-	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/test_normal_map.bmp");
-	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_2.hlsl") == false)
-	{
-		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
-		return 0;
-	}
-
 	/*m_pBoxObj = make_shared<SSampleObj>();
-	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/test_normal_map.bmp");
-	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/NormalMap/tileA.jpg", L"../../shader/21_NormalMapping/NormalMap_0.hlsl") == false)
+	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/rocks.jpg");
+	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_1.hlsl") == false)
 	{
 		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
 		return 0;
 	}*/
 
+	m_pBoxObj = make_shared<SSampleObj>();
+	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/stone_wall_normal_map.bmp");
+	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/NormalMap/tileA.jpg", L"../../shader/21_NormalMapping/NormalMap_0.hlsl") == false)
+	{
+		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
+		return 0;
+	}
+
 	//--------------------------------------------------------------------------------------
 	// 박스 오브젝트를 구 오브젝트로 변환(기하 쉐이더 및 스트림 아웃 처리)
 	//--------------------------------------------------------------------------------------
-	if (FAILED(m_SphereObj.Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_2.hlsl")))
+	if (FAILED(m_SphereObj.Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/EviromentMap_0.hlsl")))
 	{
 		MessageBox(0, _T("m_SphereObj 실패"), _T("Fatal error"), MB_OK);
 		return 0;
@@ -93,21 +93,23 @@ bool Sample::Init()
 	// 높이맵 생성
 	//--------------------------------------------------------------------------------------
 	m_HeightMap.Init(GetDevice(), m_pImmediateContext);
-	if (m_HeightMap.CreateHeightMap(L"../../data/HEIGHT_CASTLE.bmp") == false)
+	if (m_HeightMap.CreateHeightMap(L"../../data/map/HEIGHT_CASTLE.bmp") == false)
 	{
 		return false;
 	}
 	//  L"../../data/cube/grassenvmap1024.dds"
 	// L"../../data/castle.jpg"
+
 	SMapDesc MapDesc = { m_HeightMap.m_iNumRows,
 							m_HeightMap.m_iNumCols,
-							1.0f, 1.0f,
-							L"../../data/castle.jpg",
+							1.0f, 0.25f,
+							L"../../data/map/castle.jpg",
 							L"../../shader/21_NormalMapping/NormalMap_0.hlsl" };
 	if (!m_HeightMap.Load(MapDesc))
 	{
 		return false;
 	}
+
 	//--------------------------------------------------------------------------------------
 	// 월드  행렬
 	//--------------------------------------------------------------------------------------
@@ -167,6 +169,7 @@ bool Sample::Frame()
 		pConstData->vEyeDir = m_pMainCamera->_vLook;
 		m_pImmediateContext->Unmap(m_pConstantBuffer.Get(), 0);
 	}
+
 	m_HeightMap.Frame();
 	m_SphereObj.Frame();
 
@@ -186,16 +189,14 @@ bool Sample::Render()
 
 	if (I_InputManager.KeyBoardState(DIK_P))
 	{
-		m_pBoxObj->SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-		m_pBoxObj->PreRender(m_pImmediateContext);
-		m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
+		m_SphereObj.SetMatrix(&m_matSkyWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+		m_SphereObj.PreRender(m_pImmediateContext);
+		m_pImmediateContext->PSSetShaderResources(0, 1, &m_SphereObj._dxobj.g_pTextureSRV);
 		m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 		m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-		m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
-		m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
 		m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 		m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-		m_pBoxObj->PostRender(m_pImmediateContext);
+		m_SphereObj.PostRender(m_pImmediateContext);
 
 	}
 	
@@ -214,16 +215,18 @@ bool Sample::Render()
 		m_HeightMap.PostRender(m_pImmediateContext);
 	}
 	
-	
-
-	m_SphereObj.SetMatrix(&m_matSkyWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-	m_SphereObj.PreRender(m_pImmediateContext);
-	m_pImmediateContext->PSSetShaderResources(0, 1, &m_SphereObj._dxobj.g_pTextureSRV);
+	m_pBoxObj->SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	m_pBoxObj->PreRender(m_pImmediateContext);
+	m_pImmediateContext->PSSetShaderResources(1, 1, &m_pBoxObj->m_pNormalTexture->m_pSRV);
 	m_pImmediateContext->VSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 	m_pImmediateContext->VSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
+	m_pImmediateContext->GSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
 	m_pImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffer.GetAddressOf());
 	m_pImmediateContext->PSSetConstantBuffers(2, 1, m_pCBNeverChanges.GetAddressOf());
-	m_SphereObj.PostRender(m_pImmediateContext);
+	m_pBoxObj->PostRender(m_pImmediateContext);
+
+
 	return true;
 }
 bool Sample::Release()

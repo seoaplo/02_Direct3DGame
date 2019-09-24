@@ -102,7 +102,7 @@ float4 PS(PCT4_PS_INPUT input ) : SV_Target
 	transpose(tanMat);*/
 
 	// 디퓨즈 조명 
-	float3 normal		=	g_txNormalMap.Sample( g_samLinear, input.vTexCoord );
+	float3 normal		=	g_txNormalMap.Sample( g_samLinear, input.vTexCoord  * 10);
 		   normal		=	normalize( (normal - 0.5f) * 2.0f );
 		   //normal		=	normalize(mul(tanMat, normal));
 
@@ -179,6 +179,10 @@ void GS(triangle PNCT_VS_OUTPUT input[3], inout TriangleStream<PCT4_PS_INPUT> Tr
 		output.vEye =		normalize(cb_vEyePos - input[iCount].vWorldPos.xyz);
 		output.vLightDir =	normalize(cb_vLightVector.xyz - input[iCount].vWorldPos);
 		output.vHalf =		normalize(output.vLightDir + output.vEye);
+
+		output.vEye = normalize(mul(output.vEye, (float3x3)g_matNormal));
+		output.vLightDir = normalize(mul(output.vLightDir, (float3x3)g_matNormal));
+		output.vHalf = normalize(mul(output.vLightDir, (float3x3)g_matNormal));
 
 		output.vTangent = normalize(mul(vTangent, (float3x3)g_matNormal));
 		output.vBiNormal = normalize(cross(output.vNormal, output.vTangent));
