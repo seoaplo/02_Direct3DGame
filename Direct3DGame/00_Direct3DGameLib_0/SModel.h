@@ -7,6 +7,7 @@ class SModel
 protected:
 	ID3D11Device*							m_pDevice;
 	ID3D11DeviceContext*					m_pContext;
+
 	DXGame::SDxHelperEX						m_dxobj;
 
 	STexture*							m_pTexture;

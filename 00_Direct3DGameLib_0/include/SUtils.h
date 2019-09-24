@@ -103,6 +103,20 @@ typedef	list< HANDLE >::iterator	HANDLE_LIST_ITOR;
 #define HR_SUCCEDED_RETURN_BOOL(hr)	{ if (SUCCEDED(hr)) return true; }
 #endif
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// 디버그 메세지( 오류가 예상되는 곳에서 사용함 ) : 파일명과 라인 및 문자열이 출력되며 강제 종료됨.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifdef _DEBUG
+#define	DEBUGMSG(lpText)\
+	{\
+		TCHAR szBuffer[256];\
+		_stprintf_s(szBuffer, _T("[File: %s][Line: %d]\n[Note : %s]"), _CRT_WIDE(__FILE__), __LINE__, lpText);	\
+		MessageBox(NULL, szBuffer, _T("ERROR"), MB_ICONERROR);\
+		_ASSERT(1);}			
+#else
+#define DEBUGMSG(lpText)
+#endif
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #define KEY_FREE 0

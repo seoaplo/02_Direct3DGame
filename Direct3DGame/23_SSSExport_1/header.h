@@ -14,3 +14,5 @@
 //#include <phyexp.h>
 
 #include <windows.h>
+
+#define ALMOST_ZERO 0.0001

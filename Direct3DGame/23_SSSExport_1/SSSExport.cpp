@@ -8,9 +8,9 @@
 
 class SSSExport : public SceneExport
 {
+private:
+	SSSWriter	m_Wirter;
 public:
-	SSSExport() {};
-	~SSSExport() {};
 	int				ExtCount();
 	const MCHAR *	Ext(int n);					// Extension #n (i.e. "3DS")
 	const MCHAR *	LongDesc();					// Long ASCII description (i.e. "Autodesk 3D Studio File")
@@ -21,8 +21,10 @@ public:
 	const MCHAR *	OtherMessage2();			// Other message #2
 	unsigned int	Version();					// Version number * 100 (i.e. v3.01 = 301)
 	void			ShowAbout(HWND hWnd);		// Show DLL's "About..." box
-	int				DoExport(const MCHAR *name, ExpInterface *ei, Interface *i, BOOL suppressPrompts = FALSE, DWORD options = 0);	// Export file
-
+	int				DoExport(const MCHAR *name, ExpInterface *ei, Interface* pInterface, BOOL suppressPrompts = FALSE, DWORD options = 0);	// Export file
+public:
+	SSSExport() {};
+	~SSSExport() {};
 };
 class SSSExportClassDesc : public ClassDesc2
 {
@@ -32,7 +34,7 @@ public:
 	virtual const TCHAR *	ClassName() { return _T("SSSExport100"); }
 	virtual SClass_ID SuperClassID() { return SCENE_EXPORT_CLASS_ID; }
 	virtual Class_ID ClassID() { return SSSExport_CLASS_ID; }
-	virtual const TCHAR* Category() { return _T("kgcaExporter"); }
+	virtual const TCHAR* Category() { return _T("SSSExporter"); }
 
 	virtual const TCHAR* InternalName() { return _T("SSSExportClassDesc"); }	// returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE HInstance() { return hInstance; }					// returns owning module handle
@@ -85,11 +87,11 @@ void SSSExport::ShowAbout(HWND hWnd)
 {
 
 }
-int	SSSExport::DoExport(const MCHAR *name, ExpInterface *ei, Interface *i, BOOL suppressPrompts, DWORD options)
+int	SSSExport::DoExport(const MCHAR* name, ExpInterface *ei, Interface* pInterface, BOOL suppressPrompts, DWORD options)
 {
 	BOOL Ret = FALSE;
-
-
+	m_Wirter.Set(name, pInterface);
+	Ret = m_Wirter.Export();
 	return Ret;
 }
 
