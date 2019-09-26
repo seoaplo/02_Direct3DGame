@@ -268,7 +268,7 @@ float4 PS(PCT4_PS_INPUT input) : SV_Target
 	/*float3x3 tanMat = { input.vTangent, input.vBiNormal, input.vNormal};
 	transpose(tanMat);*/
 
-	float3x3 tanMat = { input.vTangent.x, input.vBiNormal.x, input.vNormal.x,
+	float3x3 tanMat = {		input.vTangent.x, input.vBiNormal.x, input.vNormal.x,
 							input.vTangent.y, input.vBiNormal.y, input.vNormal.y,
 							input.vTangent.z, input.vBiNormal.z, input.vNormal.z };
 

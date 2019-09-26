@@ -50,21 +50,21 @@ bool Sample::Init()
 	m_pSunLight = I_Light.GetPtr(I_Light.Add(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), L"SBasisSunLight"));
 	if (!m_pSunLight->Init()) return false;
 
-	/*m_pBoxObj = make_shared<SSampleObj>();
+	m_pBoxObj = make_shared<SSampleObj>();
 	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/rocks.jpg");
 	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_1.hlsl") == false)
 	{
 		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
 		return 0;
-	}*/
+	}
 
-	m_pBoxObj = make_shared<SSampleObj>();
+	/*m_pBoxObj = make_shared<SSampleObj>();
 	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/stone_wall_normal_map.bmp");
 	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/NormalMap/tileA.jpg", L"../../shader/21_NormalMapping/NormalMap_0.hlsl") == false)
 	{
 		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
 		return 0;
-	}
+	}*/
 
 	//--------------------------------------------------------------------------------------
 	// 박스 오브젝트를 구 오브젝트로 변환(기하 쉐이더 및 스트림 아웃 처리)

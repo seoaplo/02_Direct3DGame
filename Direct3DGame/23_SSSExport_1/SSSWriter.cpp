@@ -57,10 +57,7 @@ void SSSWriter::AddObject(INode* pNode)
 bool  SSSWriter::Export()
 {
 	FILE* pStream = nullptr;
-	std::wofstream ExportWrite;
-	ExportWrite.open(m_filename.c_str(), std::ios::out);
-
-	ExportWrite.pri
+	_wfopen_s(&pStream, m_filename.c_str(), _T("wb"));
 	_ftprintf(pStream, _T("%s %d"), _T("sssexporter100"),
 		m_ObjectList.size());
 	for (int iObj = 0; iObj < m_ObjectList.size(); iObj++)
