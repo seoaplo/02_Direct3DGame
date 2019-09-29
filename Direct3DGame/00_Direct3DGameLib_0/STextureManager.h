@@ -19,8 +19,9 @@ public:
 	bool		Apply(ID3D11DeviceContext* pContext,
 		UINT iKey,
 		UINT iSlot);
-public:
+private:
 	STextureManager();
+public:
 	~STextureManager();
 };
 

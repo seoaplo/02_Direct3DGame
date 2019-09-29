@@ -6,6 +6,7 @@ class SMesh : public SModel
 protected:
 	T_STR	m_FilePath;
 	T_STR	m_MeshDataName;
+	DXGame::SDxHelperEX	m_dxobj;
 public:
 	virtual bool Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* pMeshDataName, const TCHAR* pLoadShaderFile );
 	virtual bool Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,const TCHAR* pMeshDataName, const TCHAR* pLoadTextureString, const TCHAR* pLoadShaderFile);
