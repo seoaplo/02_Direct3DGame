@@ -44,8 +44,8 @@ int SSSFileLoader::Load(T_STR FilePath)
 		m_MeshList.push_back(SMesh());
 		m_MeshList[m_iMeshSize].iIndex = m_iMaterialSize;
 		m_iMaterialSize++;
-
 	}
+
 	bCheck = m_Paser.GetDataFromFileNext(Material);
 	if (bCheck == false) return -1;
 	// Material
