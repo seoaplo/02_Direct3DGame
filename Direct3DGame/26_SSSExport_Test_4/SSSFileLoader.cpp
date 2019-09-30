@@ -30,7 +30,7 @@ int SSSFileLoader::Load(T_STR FilePath)
 
 	bCheck = m_Paser.GetDataFromFile(Header);
 	if (bCheck == false) return -1;
-	else _stscanf_s(m_Paser.m_pBuffer, _T("%s%d%d"), String, MAX_PATH, &iObjectIndex, &iMaterialIndex);
+	else _stscanf_s(m_Paser.m_pBuffer, _T("%s%d%d"), String, MAX_PATH, &iMaterialIndex, &iObjectIndex);
 	ZeroMemory(&String, _countof(String));
 
 	for (int iMaterial = 0; iMaterial < iMaterialIndex; iMaterial++)
@@ -44,8 +44,8 @@ int SSSFileLoader::Load(T_STR FilePath)
 		m_MeshList.push_back(SMesh());
 		m_MeshList[m_iMeshSize].iIndex = m_iMaterialSize;
 		m_iMaterialSize++;
-
 	}
+
 	bCheck = m_Paser.GetDataFromFileNext(Material);
 	if (bCheck == false) return -1;
 	// Material
@@ -187,14 +187,7 @@ int SSSFileLoader::Load(T_STR FilePath)
 	{
 		m_ObjectList.push_back(SObject());
 		m_ObjectList[iObject].m_pMesh = &m_MeshList[iObject];
-		if (m_ObjectList[iObject].m_pMesh->iMtrlID < 0)
-		{
-			m_ObjectList[iObject].m_pMaterial = nullptr;
-		}
-		else
-		{
-			m_ObjectList[iObject].m_pMaterial = &m_MaterialList[m_ObjectList[iObject].m_pMesh->iMtrlID];
-		}
+		m_ObjectList[iObject].m_pMaterial = &m_MaterialList[m_ObjectList[iObject].m_pMesh->iMtrlID];
 
 		m_ObjectList[iObject].Create(m_pDevice, m_pContext, _T("Test.hlsl"));
 	}

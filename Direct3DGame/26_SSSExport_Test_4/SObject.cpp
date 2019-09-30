@@ -74,14 +74,7 @@ HRESULT SObject::LoadTextures(ID3D11Device* pDevice)
 	
 	for (int iSubMesh = 0; iSubMesh < m_pMesh->iSubMeshNum; iSubMesh++)
 	{
-		if (m_pMaterial == nullptr)
-		{
-			m_pMesh->m_dxobjList[iSubMesh].g_pTextureSRV = nullptr;
-		}
-		else
-		{
-			m_pMesh->m_dxobjList[iSubMesh].g_pTextureSRV = m_pMaterial->SubMaterial[iSubMesh].TextrueMapList[0].STexture->m_pSRV;
-		}
+		m_pMesh->m_dxobjList[iSubMesh].g_pTextureSRV = m_pMaterial->SubMaterial[iSubMesh].TextrueMapList[0].STexture->m_pSRV;
 	}
 
 	return hr;

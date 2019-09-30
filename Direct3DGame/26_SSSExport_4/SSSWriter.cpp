@@ -111,16 +111,9 @@ bool SSSWriter::Convert()
 		DumpMatrix3(sMesh.matWorld, &wtm);
 
 		sMesh.iMtrlID = FindMaterial(pNode);
-		if (sMesh.iMtrlID >= 0)
+		if (m_MtrlList[sMesh.iMtrlID].subMtrl.size() > 0)
 		{
-			if (m_MtrlList[sMesh.iMtrlID].subMtrl.size() > 0)
-			{
-				sMesh.iSubMesh = m_MtrlList[sMesh.iMtrlID].subMtrl.size();
-			}
-		}
-		else
-		{
-			sMesh.iSubMesh = 1;
+			sMesh.iSubMesh = m_MtrlList[sMesh.iMtrlID].subMtrl.size();
 		}
 		GetMesh(pNode, sMesh);
 
@@ -364,27 +357,15 @@ void SSSWriter::GetMesh(INode* pNode, SMesh& sMesh)
 			DumpPoint3(triList[iFace].v[v2].n, vn);
 
 			// sub material index
-			if (sMesh.iMtrlID > 0)
-			{
-				triList[iFace].iSubIndex =
-					mesh->faces[iFace].getMatID();
-				if (m_MtrlList[sMesh.iMtrlID].subMtrl.size() <= 0)
-				{
-					triList[iFace].iSubIndex = 0;
-				}
-
-				sMesh.bufferList[
-					triList[iFace].iSubIndex].push_back(
-						triList[iFace]);
-			}
-			else
+			triList[iFace].iSubIndex =
+				mesh->faces[iFace].getMatID();
+			if (m_MtrlList[sMesh.iMtrlID].subMtrl.size() <= 0)
 			{
 				triList[iFace].iSubIndex = 0;
-				sMesh.bufferList[
-					triList[iFace].iSubIndex].push_back(
-						triList[iFace]);
 			}
-			
+			sMesh.bufferList[
+				triList[iFace].iSubIndex].push_back(
+					triList[iFace]);
 		}
 
 		std::sort(triList.begin(), triList.end(), AscendingSort());
