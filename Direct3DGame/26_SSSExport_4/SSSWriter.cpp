@@ -353,12 +353,12 @@ void SSSWriter::GetMesh(INode* pNode, SMesh& sMesh)
 			Point3 vn = GetVertexNormal(mesh, iFace, rVertex);
 			DumpPoint3(triList[iFace].v[v0].n, vn);
 
-			vert = mesh->faces[iFace].getVert(v1);
+			vert = mesh->faces[iFace].getVert(v2);
 			rVertex = mesh->getRVertPtr(vert);
 			vn = GetVertexNormal(mesh, iFace, rVertex);
 			DumpPoint3(triList[iFace].v[v1].n, vn);
 
-			vert = mesh->faces[iFace].getVert(v2);
+			vert = mesh->faces[iFace].getVert(v1);
 			rVertex = mesh->getRVertPtr(vert);
 			vn = GetVertexNormal(mesh, iFace, rVertex);
 			DumpPoint3(triList[iFace].v[v2].n, vn);
