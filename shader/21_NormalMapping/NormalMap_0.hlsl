@@ -79,7 +79,9 @@ PNCT_VS_OUTPUT VS(PNCT_VS_INPUT input )
     float4 vViewPos		= mul(output.vWorldPos, g_matView );
     output.vPos			= mul( vViewPos, g_matProj );
     
-	output.vNormal		= input.vNormal;
+	matrix matWorldInverse = transpose(g_matWorld);
+
+	output.vNormal = input.vNormal;
     output.vTexCoord	= input.vTexCoord;
     output.vColor		= input.vColor;
 
@@ -102,7 +104,7 @@ float4 PS(PCT4_PS_INPUT input ) : SV_Target
 	transpose(tanMat);*/
 
 	// 디퓨즈 조명 
-	float3 normal		=	g_txNormalMap.Sample( g_samLinear, input.vTexCoord  * 10);
+	float3 normal		=	g_txNormalMap.Sample( g_samLinear, input.vTexCoord);
 		   normal		=	normalize( (normal - 0.5f) * 2.0f );
 		   //normal		=	normalize(mul(tanMat, normal));
 

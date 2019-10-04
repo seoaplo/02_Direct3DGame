@@ -61,7 +61,7 @@ bool SObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const
 		return false;
 	}
 
-	m_matWorld = m_pMesh->matWorld;
+	m_matWorld = m_pMesh->m_matWorld;
 
 	return Init();
 
@@ -74,7 +74,9 @@ HRESULT SObject::LoadTextures(ID3D11Device* pDevice)
 	
 	for (int iSubMesh = 0; iSubMesh < m_pMesh->iSubMeshNum; iSubMesh++)
 	{
-		if (m_pMaterial == nullptr)
+		if (m_pMaterial == nullptr 
+			|| m_pMaterial->SubMaterial.size() <= 0 
+			|| m_pMaterial->SubMaterial[iSubMesh].TextrueMapList.size() <= 0)
 		{
 			m_pMesh->m_dxobjList[iSubMesh].g_pTextureSRV = nullptr;
 		}
@@ -171,9 +173,135 @@ HRESULT SObject::SetInputLayout()
 	}
 	return hr;
 }
+bool SObject::GetAnimationTrack(
+	float fElapseTime,
+	std::vector<SAnimTrack>& trackList,
+	SAnimTrack& StartTrack,
+	SAnimTrack& EndTrack)
+{
+	for (auto& track : trackList)
+	{
+		if (track.i > fElapseTime)
+		{
+			EndTrack = track;
+			break;
+		}
+		StartTrack = track;
+	}
+	return true;
+}
+
+void SObject::Interpolate(
+	SMesh& sMesh,
+	D3DXMATRIX &matParent,
+	float fElapseTime)
+{
+	D3DXMATRIX matAnimScale, matAnimRot, matAnimPos;
+	matAnimScale = sMesh.m_matScl;
+	matAnimRot = sMesh.m_matRot;
+	matAnimPos = sMesh.m_matPos;
+
+	D3DXMatrixIdentity(&sMesh.m_matCalculation);
+
+	SAnimTrack StartTrack, EndTrack;
+	D3DXQUATERNION qRotatin;
+	D3DXVECTOR3 vTrans;
+	if (sMesh.m_RotAnimList.size())
+	{
+		if (GetAnimationTrack(
+			fElapseTime,
+			sMesh.m_RotAnimList,
+			StartTrack,
+			EndTrack))
+		{
+			float t = (fElapseTime - StartTrack.i) / (EndTrack.i - StartTrack.i);
+			D3DXQuaternionSlerp(&qRotatin,
+				&StartTrack.q,
+				&EndTrack.q, t);
+		}
+		D3DXMatrixRotationQuaternion(&matAnimRot, &qRotatin);
+	}
+	if (sMesh.m_ScaleAnimList.size())
+	{
+		if (GetAnimationTrack(
+			fElapseTime,
+			sMesh.m_ScaleAnimList,
+			StartTrack,
+			EndTrack))
+		{
+			float t = (fElapseTime - StartTrack.i) / (EndTrack.i - StartTrack.i);
+			D3DXQuaternionSlerp(&qRotatin,
+				&StartTrack.q,
+				&EndTrack.q, t);
+			D3DXVec3Lerp(&vTrans,
+				&StartTrack.p,
+				&EndTrack.p, t);
+		}
+		D3DXMATRIX matScaleVector;
+		D3DXMATRIX matScaleRotation, matScaleRotInverse;
+		D3DXMatrixScaling(&matScaleVector, vTrans.x, vTrans.y, vTrans.z);
+		D3DXMatrixRotationQuaternion(&matScaleRotation, &qRotatin);
+		D3DXMatrixInverse(&matScaleRotInverse, NULL, &matScaleRotation);
+		matAnimScale = matScaleRotInverse * matScaleVector * matScaleRotation;
+	}
+
+
+	if (sMesh.m_PosAnimList.size())
+	{
+		if (GetAnimationTrack(
+			fElapseTime, sMesh.m_PosAnimList, StartTrack, EndTrack))
+		{
+			float t = (fElapseTime - StartTrack.i) / (EndTrack.i - StartTrack.i);
+			D3DXVec3Lerp(&vTrans,
+				&StartTrack.p,
+				&EndTrack.p, t);
+		}
+		D3DXMatrixTranslation(&matAnimPos, vTrans.x,
+			vTrans.y, vTrans.z);
+	}
+
+	D3DXMATRIX matAnim;
+	matAnim = matAnimScale * matAnimRot;
+	matAnim._41 = matAnimPos._41;
+	matAnim._42 = matAnimPos._42;
+	matAnim._43 = matAnimPos._43;
+	sMesh.m_matCalculation = sMesh.m_matInvWorld * matAnim * matParent;
+}
 bool SObject::UpdateBuffer() { return true; }
 bool SObject::Init() { return true; }
-bool SObject::Frame() { return true; }
+bool SObject::Frame() 
+{
+	m_fElapseTime += 1.0f *  I_Timer.GetSPF() *
+		m_pMesh->m_Scene.iFrameSpeed *
+		m_pMesh->m_Scene.iTickPerFrame;
+
+	float fEndTime = m_pMesh->m_Scene.iLastFrame*
+		m_pMesh->m_Scene.iTickPerFrame;
+	if (m_fElapseTime >= fEndTime)
+	{
+		m_fElapseTime = 0.0f;
+	}
+	D3DXMATRIX matParent;
+	D3DXMatrixIdentity(&matParent);
+	for (int iObj = 0; iObj < m_pMesh->iSubMeshNum; iObj++)
+	{
+
+		if (m_pMesh->m_pParent)
+		{
+			Interpolate(*m_pMesh,
+				m_pMesh->m_pParent->m_matCalculation,
+				m_fElapseTime);
+		}
+		else
+		{
+			Interpolate(*m_pMesh,
+				matParent,
+				m_fElapseTime);
+		}
+	}
+
+	return true;
+}
 bool SObject::Release() { return true; }
 bool SObject::PreRender(ID3D11DeviceContext* pContext)
 {
@@ -218,8 +346,22 @@ bool SObject::Render(ID3D11DeviceContext* pContext)
 	{
 		DXGame::SDxHelperEX& dxobj = m_pMesh->m_dxobjList[iSubMesh];
 		dxobj.PreRender(pContext, dxobj.m_iVertexSize);
+
+		D3DXMatrixTranspose(&m_cbData.matWorld,
+			&m_pMesh->m_matCalculation);
+
+		float fTime = I_Timer.GetElapsedTime();
+		m_cbData.Color[0] = cosf(fTime);
+		m_cbData.Color[1] = sinf(fTime);
+		m_cbData.Color[2] = 1 - cosf(fTime);
+		m_cbData.Color[3] = 1.0f;
+		pContext->UpdateSubresource(
+			dxobj.g_pConstantBuffer.Get(),
+			0, NULL, &m_cbData, 0, 0);
+
 		dxobj.PostRender(pContext, dxobj.m_iNumIndex);
 	}
+
 	return true;
 }
 HRESULT SObject::CreateResource()

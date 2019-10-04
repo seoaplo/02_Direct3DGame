@@ -145,10 +145,20 @@ bool  SSSWriter::Export()
 	Convert();
 
 	m_pStream = nullptr;
+	// Header
+
+	m_Scene.iNumMaterials = m_MtrlList.size();
+	m_Scene.iNumObjects = m_sMeshList.size();
 	_wfopen_s(&m_pStream, m_filename.c_str(), _T("wb"));
-	_ftprintf_s(m_pStream, _T("%s"), _T("SSSExporter100"));
-	_ftprintf_s(m_pStream, _T("\n%s"), _T("#HEADER_INFO"));
-	_ftprintf_s(m_pStream, _T(" %d %d"), m_sMeshList.size(), m_MtrlList.size());
+	_ftprintf(m_pStream, _T("%s"), _T("SSSExporter100"));
+	_ftprintf(m_pStream, _T("\n%s %d %d %d %d %d %d"),
+		L"#HEADERINFO",
+		m_Scene.iFirstFrame,
+		m_Scene.iLastFrame,
+		m_Scene.iFrameSpeed,
+		m_Scene.iTickPerFrame,
+		m_Scene.iNumObjects,
+		m_Scene.iNumMaterials);
 
 	// root material
 	_ftprintf(m_pStream, _T("\n%s"), L"#MATERIAL_INFO");
@@ -534,18 +544,92 @@ int	SSSWriter::IsEqulVerteList(PNCT& vertex, vertexList& vList)
 
 void SSSWriter::GetAnimation(
 	INode* pNode,
-	SMesh& SMesh)
+	SMesh& sMesh)
 {
-	bool bPos = false;
-	bool bRot = false;
-	bool bScl = false;
-	if (CheckForAnimation(pNode, bPos, bRot, bScl))
+	sMesh.bAnimatin[0] = false;
+	sMesh.bAnimatin[1] = false;
+	sMesh.bAnimatin[2] = false;
+	//-------------------> 중요
+	TimeValue startFrame = m_Interval.Start();
+	// tm = selfTm * parentTm * Inverse(parentTm);
+	Matrix3 tm = pNode->GetNodeTM(startFrame)
+		* Inverse(pNode->GetParentTM(startFrame));
+	// 행렬 분해
+	AffineParts StartAP;
+	decomp_affine(tm, &StartAP);
+	// quaternion -> axis, angle 변환
+	Point3  Start_RotAxis;
+	float   Start_RotValue;
+	AngAxisFromQ(StartAP.q, &Start_RotValue, Start_RotAxis);
+	//<----------------------------
+	SAnimTrack StartAnim;
+	ZeroMemory(&StartAnim, sizeof(SAnimTrack));
+	StartAnim.i = startFrame;
+	StartAnim.p = StartAP.t;
+	StartAnim.q = StartAP.q;
+	sMesh.animPos.push_back(StartAnim);
+	sMesh.animRot.push_back(StartAnim);
+	StartAnim.p = StartAP.k;
+	StartAnim.q = StartAP.u;
+	sMesh.animScl.push_back(StartAnim);
+
+	TimeValue start =
+		m_Interval.Start() + GetTicksPerFrame();
+	TimeValue end = m_Interval.End();
+	// 시작+1프레임
+	for (TimeValue t = start; t <= end; t += GetTicksPerFrame())
 	{
-		// anim
-		if (bPos) { DumpPosSample(pNode, SMesh); }
-		if (bRot) { DumpRotSample(pNode, SMesh); }
-		if (bScl) { DumpSclSample(pNode, SMesh); }
+		Matrix3 tm = pNode->GetNodeTM(t)
+			* Inverse(pNode->GetParentTM(t));
+
+		AffineParts FrameAP;
+		decomp_affine(tm, &FrameAP);
+
+		SAnimTrack anim;
+		ZeroMemory(&anim, sizeof(SAnimTrack));
+		anim.i = t;
+		anim.p = FrameAP.t;
+		anim.q = FrameAP.q;
+		sMesh.animPos.push_back(anim);
+		sMesh.animRot.push_back(anim);
+		anim.p = FrameAP.k;
+		anim.q = FrameAP.u;
+		sMesh.animScl.push_back(anim);
+
+		Point3  Frame_RotAxis;
+		float   Frame_RotValue;
+		AngAxisFromQ(FrameAP.q, &Frame_RotValue, Frame_RotAxis);
+
+
+		if (!sMesh.bAnimatin[0]) {
+			if (!EqualPoint3(StartAP.t, FrameAP.t))
+			{
+				sMesh.bAnimatin[0] = true;
+			}
+		}
+
+		if (!sMesh.bAnimatin[1]) {
+			if (!EqualPoint3(Start_RotAxis, Frame_RotAxis))
+			{
+				sMesh.bAnimatin[1] = true;
+			}
+			else
+			{
+				if (Frame_RotValue != Frame_RotValue)
+				{
+					sMesh.bAnimatin[1] = true;
+				}
+			}
+		}
+
+		if (!sMesh.bAnimatin[2]) {
+			if (!EqualPoint3(StartAP.k, FrameAP.k))
+			{
+				sMesh.bAnimatin[2] = true;
+			}
+		}
 	}
+
 }
 bool SSSWriter::CheckForAnimation(INode* pNode,
 	bool&  bPos, bool& bRot, bool& bScl)
@@ -553,8 +637,6 @@ bool SSSWriter::CheckForAnimation(INode* pNode,
 {
 	//-------------------> 중요
 	TimeValue startFrame = m_Interval.Start();
-	// GetNodeTM은 부모의 행렬이 곱해진 행렬을 반환하기 때문에
-	// 부모행렬의 역행렬을 곱해줘야 온전한 자신의 월드 행렬을 얻을 수 있다.
 	// tm = selfTm * parentTm * Inverse(parentTm);
 	Matrix3 tm = pNode->GetNodeTM(startFrame)
 		* Inverse(pNode->GetParentTM(startFrame));
@@ -571,11 +653,11 @@ bool SSSWriter::CheckForAnimation(INode* pNode,
 		m_Interval.Start() + GetTicksPerFrame();
 	TimeValue end = m_Interval.End();
 	// 시작+1프레임
-	for (TimeValue itime = start; itime <= end;
-		itime += GetTicksPerFrame())
+	for (TimeValue t = start; t <= end;
+		t += GetTicksPerFrame())
 	{
-		Matrix3 tm = pNode->GetNodeTM(itime)
-			* Inverse(pNode->GetParentTM(itime));
+		Matrix3 tm = pNode->GetNodeTM(t)
+			* Inverse(pNode->GetParentTM(t));
 
 		AffineParts FrameAP;
 		decomp_affine(tm, &FrameAP);
@@ -616,45 +698,53 @@ bool SSSWriter::CheckForAnimation(INode* pNode,
 
 	return bPos || bRot || bScl;
 }
-void SSSWriter::ExportAnimation(SMesh& SMesh)
+void SSSWriter::ExportAnimation(SMesh& sMesh)
 {
 	_ftprintf(m_pStream, _T("\n%s %d %d %d"),
 		L"#AnimationData",
-		SMesh.animPos.size(),
-		SMesh.animRot.size(),
-		SMesh.animScl.size());
-
-	for (int iTrack = 0; iTrack < SMesh.animPos.size(); iTrack++)
+		(sMesh.bAnimatin[0]) ? sMesh.animPos.size() : 0,
+		(sMesh.bAnimatin[1]) ? sMesh.animRot.size() : 0,
+		(sMesh.bAnimatin[2]) ? sMesh.animScl.size() : 0);
+	if (sMesh.bAnimatin[0])
 	{
-		_ftprintf(m_pStream, _T("\n%d %d %10.4f %10.4f %10.4f"),
-			iTrack,
-			SMesh.animPos[iTrack].i,
-			SMesh.animPos[iTrack].p.x,
-			SMesh.animPos[iTrack].p.z,
-			SMesh.animPos[iTrack].p.y);
+		for (int iTrack = 0; iTrack < sMesh.animPos.size(); iTrack++)
+		{
+			_ftprintf(m_pStream, _T("\n%d %d %10.4f %10.4f %10.4f"),
+				iTrack,
+				sMesh.animPos[iTrack].i,
+				sMesh.animPos[iTrack].p.x,
+				sMesh.animPos[iTrack].p.z,
+				sMesh.animPos[iTrack].p.y);
+		}
 	}
-	for (int iTrack = 0; iTrack < SMesh.animRot.size(); iTrack++)
+	if (sMesh.bAnimatin[1])
 	{
-		_ftprintf(m_pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f"),
-			iTrack,
-			SMesh.animRot[iTrack].i,
-			SMesh.animRot[iTrack].q.x,
-			SMesh.animRot[iTrack].q.z,
-			SMesh.animRot[iTrack].q.y,
-			SMesh.animRot[iTrack].q.w);
+		for (int iTrack = 0; iTrack < sMesh.animRot.size(); iTrack++)
+		{
+			_ftprintf(m_pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f"),
+				iTrack,
+				sMesh.animRot[iTrack].i,
+				sMesh.animRot[iTrack].q.x,
+				sMesh.animRot[iTrack].q.z,
+				sMesh.animRot[iTrack].q.y,
+				sMesh.animRot[iTrack].q.w);
+		}
 	}
-	for (int iTrack = 0; iTrack < SMesh.animScl.size(); iTrack++)
+	if (sMesh.bAnimatin[2])
 	{
-		_ftprintf(m_pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
-			iTrack,
-			SMesh.animPos[iTrack].i,
-			SMesh.animPos[iTrack].p.x,
-			SMesh.animPos[iTrack].p.z,
-			SMesh.animPos[iTrack].p.y,
-			SMesh.animRot[iTrack].q.x,
-			SMesh.animRot[iTrack].q.z,
-			SMesh.animRot[iTrack].q.y,
-			SMesh.animRot[iTrack].q.w);
+		for (int iTrack = 0; iTrack < sMesh.animScl.size(); iTrack++)
+		{
+			_ftprintf(m_pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
+				iTrack,
+				sMesh.animScl[iTrack].i,
+				sMesh.animScl[iTrack].p.x,
+				sMesh.animScl[iTrack].p.z,
+				sMesh.animScl[iTrack].p.y,
+				sMesh.animScl[iTrack].q.x,
+				sMesh.animScl[iTrack].q.z,
+				sMesh.animScl[iTrack].q.y,
+				sMesh.animScl[iTrack].q.w);
+		}
 	}
 }
 

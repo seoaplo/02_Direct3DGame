@@ -46,5 +46,6 @@ VS_OUTPUT VS(VS_INPUT vIn)
 float4 PS(VS_OUTPUT vIn) : SV_Target
 {
 	float4 TextureColor =  g_txDiffuse.Sample(g_samLinear, vIn.t);
-	return TextureColor * float4(vIn.c.xyz, 1);
+	//return TextureColor * float4(vIn.c.xyz, 1);
+	return float4(vIn.c.xyz, 1);
 }

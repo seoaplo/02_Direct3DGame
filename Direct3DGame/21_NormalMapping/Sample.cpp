@@ -51,7 +51,7 @@ bool Sample::Init()
 	if (!m_pSunLight->Init()) return false;
 
 	m_pBoxObj = make_shared<SSampleObj>();
-	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/rocks.jpg");
+	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/test_normal_map.bmp");
 	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/cube/grassenvmap1024.dds", L"../../shader/21_NormalMapping/HeightMap_1.hlsl") == false)
 	{
 		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);
@@ -59,7 +59,7 @@ bool Sample::Init()
 	}
 
 	/*m_pBoxObj = make_shared<SSampleObj>();
-	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/stone_wall_normal_map.bmp");
+	m_pBoxObj->m_strNormalMapName = _T("../../data/NormalMap/test_normal_map.bmp");
 	if (m_pBoxObj->Create(GetDevice(), GetContext(), L"../../data/NormalMap/tileA.jpg", L"../../shader/21_NormalMapping/NormalMap_0.hlsl") == false)
 	{
 		MessageBox(0, _T("m_pBoxObj 실패"), _T("Fatal error"), MB_OK);

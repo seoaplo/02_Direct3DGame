@@ -32,18 +32,54 @@ public:
 	}
 };
 
+struct SAnimTrack
+{
+	int					i;
+	D3DXVECTOR3			p;
+	D3DXQUATERNION		q;
+};
+
+struct SScene
+{
+	int   iFirstFrame;  // 0
+	int   iLastFrame;   // 100
+	int   iFrameSpeed; // 1 Scecond = 30 Frame
+	int   iTickPerFrame; // 1 Frame = 160 Tick
+	int   iNumObjects;
+	int   iNumMaterials;
+};
+
 struct SMesh
 {
 	int		iIndex;
 	int     iMtrlID;
 	int     iSubMeshNum;
 	int		iTriangleNum;
-	T_STR    name;
-	T_STR    ParentName;
-	D3DXMATRIX matWorld;
+	T_STR   name;
+	T_STR   ParentName;
+	SMesh*	m_pParent;
+	D3DXMATRIX m_matWorld;
+	D3DXMATRIX m_matInvWorld;
+	D3DXMATRIX  m_matCalculation;
+
+	// 0 frame 분해된 에니메이션 트랙의 행렬
+	D3DXMATRIX m_matAnimSelf;
+	D3DXMATRIX m_matPos;
+	D3DXMATRIX m_matRot;
+	D3DXMATRIX m_matScl;
+	D3DXVECTOR3 m_vPosTrack;
+	D3DXVECTOR3 m_vScaleTrack;
+	D3DXQUATERNION m_qRotTrack;
+
+	SScene	m_Scene;
 	std::vector<std::vector<PNCT_VERTEX>>	m_VertexList;
 	std::vector<std::vector<DWORD>>			m_IndexList;
+	
 	std::vector<DXGame::SDxHelperEX>	m_dxobjList;
+
+	std::vector<SAnimTrack>   m_PosAnimList;
+	std::vector<SAnimTrack>   m_RotAnimList;
+	std::vector<SAnimTrack>   m_ScaleAnimList;
 public:
 	SMesh()
 	{

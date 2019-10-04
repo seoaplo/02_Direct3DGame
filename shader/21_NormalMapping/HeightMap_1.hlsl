@@ -248,7 +248,9 @@ PNCT_VS_OUTPUT VS(PNCT_VS_INPUT input)
 	float4 vViewPos = mul(output.vWorldPos, g_matView);
 	output.vPos = mul(vViewPos, g_matProj);
 
-	output.vNormal = input.vNormal;
+	matrix matWorldInverse = transpose(g_matWorld);
+
+	output.vNormal = normalize(mul(input.vNormal, (float3x3)matWorldInverse));
 	output.vTexCoord = input.vTexCoord;
 	output.vColor = input.vColor;
 

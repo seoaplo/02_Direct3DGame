@@ -72,7 +72,7 @@ struct SMesh
 	std::vector<vertexList>   vbList;
 	std::vector<IndexList>    ibList;
 
-	bool  bAnimatin;
+	bool  bAnimatin[3];
 	std::vector<SAnimTrack>   animPos;
 	std::vector<SAnimTrack>   animRot;
 	std::vector<SAnimTrack>   animScl;
@@ -101,6 +101,8 @@ struct SScene
 	int   iLastFrame;   // 100
 	int   iFrameSpeed; // 1 Scecond = 30 Frame
 	int   iTickPerFrame; // 1 Frame = 160 Tick
+	int   iNumObjects;
+	int   iNumMaterials;
 };
 
 class SSSWriter
@@ -139,8 +141,7 @@ public:
 		INode* pNode,
 		SMesh& tMesh);
 	void ExportAnimation(SMesh& tMesh);
-	bool CheckForAnimation(INode* pNode,
-		bool&  bPos, bool& bRot, bool& bScl);
+	bool CheckForAnimation(INode* pNode, bool&  bPos, bool& bRot, bool& bScl);
 	void DumpPosSample(INode* pNode, SMesh& pMesh);
 	void DumpRotSample(INode* pNode, SMesh& pMesh);
 	void DumpSclSample(INode* pNode, SMesh& pMesh);

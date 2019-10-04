@@ -1,12 +1,14 @@
 #pragma once
 #include "SModel.h"
 #include "SMesh.h"
+#include "STimer.h"
 
 class SObject : public SModel
 {
 public:
 	SMaterial*	m_pMaterial;
 	SMesh*		m_pMesh;
+	float m_fElapseTime;
 public:
 	virtual HRESULT				SetInputLayout();
 	bool Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* pLoadShaderFile);
@@ -42,6 +44,16 @@ public:
 	virtual bool				Draw(ID3D11DeviceContext* pContext, D3DXVECTOR3 vStart, D3DXVECTOR3 vPost, D3DXVECTOR4 dwColor);
 
 
+	bool GetAnimationTrack(
+		float fElapseTime,
+		std::vector<SAnimTrack>& trackList,
+		SAnimTrack& StartTrack,
+		SAnimTrack& EndTrack);
+
+	void Interpolate(
+		SMesh& sMesh,
+		D3DXMATRIX &matParent,
+		float fElapseTime);
 public:
 	SObject();
 	~SObject();
