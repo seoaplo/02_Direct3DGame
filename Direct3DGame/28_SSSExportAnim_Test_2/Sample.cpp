@@ -22,9 +22,13 @@ bool Sample::Init()
 {
 	int iKey;
 	I_SSSFileLoaderManeger.Init(GetDevice(), GetContext());
-	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestAnim2.SSS");
-	m_pObj = I_SSSFileLoaderManeger.GetPtr(iKey);
+	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestAnim3.SSS");
 
+	for (int i = 0; i < I_SSSFileLoaderManeger.GetSize(); i++)
+	{
+		m_ObjectList.push_back(I_SSSFileLoaderManeger.GetPtr(i));
+	}
+	
 
 	//--------------------------------------------------------------------------------------
 	// 월드  행렬
@@ -51,11 +55,13 @@ bool Sample::Frame()
 {
 
 	// 2초당 1회전( 1 초 * D3DX_PI = 3.14 )
-	float t = I_Timer.GetElapsedTime() * D3DX_PI;
-	m_pMainCamera->Frame();
-	D3DXMatrixIdentity(&m_matWorld);
 
-	m_pObj->Frame();
+	//m_pObj->Frame();
+	m_pMainCamera->Frame();
+	for (int i = 0; i < m_ObjectList.size(); i++)
+	{
+		m_ObjectList[i]->Frame();
+	}
 	return true;
 }
 bool Sample::Render()
@@ -64,73 +70,18 @@ bool Sample::Render()
 	// Direction 오브젝트 랜더링
 	//--------------------------------------------------------------------------------------
 	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-	m_pObj->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	//m_pObj->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 
-	m_pObj->Render(GetContext());
+	//m_pObj->Render(GetContext());
+	for (int i = 0; i < m_ObjectList.size(); i++)
+	{
+		m_ObjectList[i]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+		m_ObjectList[i]->Render(GetContext());
+	}
 	return true;
 }
 bool Sample::Release()
 {
-	return true;
-}
-bool Sample::ExportData(T_STR FilePath)
-{
-
-	FILE* pStream = nullptr;
-	_wfopen_s(&pStream, FilePath.c_str(), _T("rb"));
-
-	static TCHAR ExporterCheck[MAX_PATH];
-	static TCHAR CheckFile[MAX_PATH];
-	static TCHAR ObjectCheck[MAX_PATH];
-	static TCHAR ObjectNameCheck[MAX_PATH];
-	static TCHAR PNCT_LINE[MAX_PATH];
-
-	int iMaxObj = 0;
-
-	ZeroMemory(ExporterCheck, _countof(ExporterCheck));
-	ZeroMemory(CheckFile, _countof(CheckFile));
-	ZeroMemory(ObjectCheck, _countof(ObjectCheck));
-	ZeroMemory(PNCT_LINE, _countof(PNCT_LINE));
-
-	_ftscanf_s(pStream, _T("%s %d"), CheckFile, _countof(CheckFile),&iMaxObj);
-
-	T_STR FileCheck;
-	FileCheck = CheckFile;
-	if (wcscmp(FileCheck.data(), _T("sssexporter100")) != 0)
-	{
-		FileCheck = FilePath;
-		FileCheck += _T("은 SSS Export File이 아닙니다");
-		MessageBox(0, FileCheck.data(), _T("Fatal error"), MB_OK);
-		return false;
-	}
-
-	VertexList.resize(iMaxObj);
-	for (int iCount = 0; iCount < iMaxObj; iCount++)
-	{
-		int iMaxVertex;
-		_ftscanf_s(pStream, _T("%s %d"), ObjectNameCheck, _countof(ObjectNameCheck), &iMaxVertex);
-
-		VertexList[iCount].resize(iMaxVertex * 3);
-
-		for (int iVertex = 0; iVertex < iMaxVertex * 3; iVertex++)
-		{
-			PNCT_VERTEX pnct;
-			_ftscanf_s(pStream, _T("%f %f %f"), &pnct.p.x, &pnct.p.y, &pnct.p.z);
-
-			_ftscanf_s(pStream, _T("%f %f %f"),	&pnct.n.x, &pnct.n.y, &pnct.n.z);
-
-			_ftscanf_s(pStream, _T("%f %f %f %f"),	&pnct.c.x, &pnct.c.y, &pnct.c.z, &pnct.c.w);
-
-			_ftscanf_s(pStream, _T("%f %f"),
-				&pnct.t.x, &pnct.t.y);
-
-			VertexList[iCount][iVertex] = pnct;
-		}
-	}
-	fclose(pStream);
-
-
-
 	return true;
 }
 HRESULT Sample::CreateResource()

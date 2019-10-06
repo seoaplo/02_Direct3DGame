@@ -10,6 +10,7 @@ bool SObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const
 
 	m_pDevice = pDevice;
 	m_pContext = pContext;
+
 	if (FAILED(LoadShaderFile(pDevice, pLoadShaderFile)))
 	{
 		MessageBox(0, _T("LoadShaderFile ½ÇÆÐ"), _T("Fatal error"), MB_OK);
@@ -62,10 +63,7 @@ bool SObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const
 	}
 
 	m_matWorld = m_pMesh->m_matWorld;
-
 	return Init();
-
-	return true;
 }
 HRESULT SObject::LoadTextures(ID3D11Device* pDevice)
 {
@@ -74,14 +72,19 @@ HRESULT SObject::LoadTextures(ID3D11Device* pDevice)
 	
 	for (int iSubMesh = 0; iSubMesh < m_pMesh->iSubMeshNum; iSubMesh++)
 	{
-		if (m_pMaterial == nullptr 
-			|| m_pMaterial->SubMaterial.size() <= 0 
-			|| m_pMaterial->SubMaterial[iSubMesh].TextrueMapList.size() <= 0)
+		if (m_pMaterial == nullptr)
+		{
+			m_pMesh->m_dxobjList[iSubMesh].g_pTextureSRV = nullptr;
+		}
+		else if (m_pMaterial->SubMaterial.size() <= 0
+			|| m_pMaterial->SubMaterial[iSubMesh].TextrueMapList.size() <= 0
+			|| m_pMesh->m_SubMaterialNum.size() <= 0)
 		{
 			m_pMesh->m_dxobjList[iSubMesh].g_pTextureSRV = nullptr;
 		}
 		else
 		{
+			int iSubMaterial = m_pMesh->m_SubMaterialNum[iSubMesh];
 			m_pMesh->m_dxobjList[iSubMesh].g_pTextureSRV = m_pMaterial->SubMaterial[iSubMesh].TextrueMapList[0].STexture->m_pSRV;
 		}
 	}
@@ -110,7 +113,7 @@ HRESULT SObject::CreateVertexBuffer()
 		dxobj.m_iNumVertex = m_pMesh->m_VertexList[iSubMesh].size();
 		dxobj.m_iVertexSize = sizeof(PNCT_VERTEX);
 
-		if (dxobj.m_iNumVertex <= 0) return S_OK;
+		if (dxobj.m_iNumVertex <= 0) continue;
 		void** pData = nullptr;
 		if (m_pMesh->m_VertexList[iSubMesh].size() > 0) pData = (void**)&m_pMesh->m_VertexList[iSubMesh].at(0);
 
@@ -132,7 +135,7 @@ HRESULT	SObject::CreateIndexBuffer()
 		dxobj.m_iNumIndex = m_pMesh->m_IndexList[iSubMesh].size();
 		dxobj.m_iIndexSize = sizeof(DWORD);
 
-		if (dxobj.m_iNumIndex <= 0) return S_OK;
+		if (dxobj.m_iNumIndex <= 0) continue;
 		void** pData = nullptr;
 		if (m_pMesh->m_IndexList[iSubMesh].size() > 0) pData = (void**)&m_pMesh->m_IndexList[iSubMesh].at(0);
 
@@ -204,8 +207,14 @@ void SObject::Interpolate(
 	D3DXMatrixIdentity(&sMesh.m_matCalculation);
 
 	SAnimTrack StartTrack, EndTrack;
+
+	ZeroMemory(&StartTrack, sizeof(StartTrack));
+	ZeroMemory(&EndTrack, sizeof(EndTrack));
 	D3DXQUATERNION qRotatin;
-	D3DXVECTOR3 vTrans;
+	D3DXQUATERNION qScale;
+	D3DXQuaternionRotationMatrix(&qRotatin, &matAnimRot);
+	D3DXQuaternionRotationMatrix(&qScale, &matAnimScale);
+
 	if (sMesh.m_RotAnimList.size())
 	{
 		if (GetAnimationTrack(
@@ -221,6 +230,11 @@ void SObject::Interpolate(
 		}
 		D3DXMatrixRotationQuaternion(&matAnimRot, &qRotatin);
 	}
+	ZeroMemory(&StartTrack, sizeof(StartTrack));
+	ZeroMemory(&EndTrack, sizeof(EndTrack));
+
+	D3DXMATRIX matScaleRotation, matScaleRotInverse, matScaleVector;
+	D3DXVECTOR3 vTrans(matAnimPos._41, matAnimPos._42, matAnimPos._43);
 	if (sMesh.m_ScaleAnimList.size())
 	{
 		if (GetAnimationTrack(
@@ -237,15 +251,14 @@ void SObject::Interpolate(
 				&StartTrack.p,
 				&EndTrack.p, t);
 		}
-		D3DXMATRIX matScaleVector;
-		D3DXMATRIX matScaleRotation, matScaleRotInverse;
 		D3DXMatrixScaling(&matScaleVector, vTrans.x, vTrans.y, vTrans.z);
 		D3DXMatrixRotationQuaternion(&matScaleRotation, &qRotatin);
 		D3DXMatrixInverse(&matScaleRotInverse, NULL, &matScaleRotation);
 		matAnimScale = matScaleRotInverse * matScaleVector * matScaleRotation;
 	}
 
-
+	ZeroMemory(&StartTrack, sizeof(StartTrack));
+	ZeroMemory(&EndTrack, sizeof(EndTrack));
 	if (sMesh.m_PosAnimList.size())
 	{
 		if (GetAnimationTrack(
@@ -261,22 +274,29 @@ void SObject::Interpolate(
 	}
 
 	D3DXMATRIX matAnim;
+	D3DXMatrixIdentity(&matAnim);
 	matAnim = matAnimScale * matAnimRot;
+	//matAnim = matAnimRot;
 	matAnim._41 = matAnimPos._41;
 	matAnim._42 = matAnimPos._42;
 	matAnim._43 = matAnimPos._43;
 
-	sMesh.m_matCalculation = sMesh.m_matInvWorld * matAnim * matParent;
+	D3DXMATRIX matinvParent;
+	D3DXMatrixIdentity(&matinvParent);
+	D3DXMatrixInverse(&matinvParent, nullptr, &matParent);
+
+	sMesh.m_matCalculation = matAnim * matParent;
+	return;
 }
 bool SObject::UpdateBuffer() { return true; }
 bool SObject::Init() { return true; }
 bool SObject::Frame() 
 {
-	m_fElapseTime += 1.0f *  I_Timer.GetSPF() *
+	m_fElapseTime += 1.00f *  I_Timer.GetSPF() *
 		m_pMesh->m_Scene.iFrameSpeed *
 		m_pMesh->m_Scene.iTickPerFrame;
 
-	float fEndTime = m_pMesh->m_Scene.iLastFrame*
+	float fEndTime = m_pMesh->m_Scene.iLastFrame *
 		m_pMesh->m_Scene.iTickPerFrame;
 	if (m_fElapseTime >= fEndTime)
 	{
@@ -284,21 +304,18 @@ bool SObject::Frame()
 	}
 	D3DXMATRIX matParent;
 	D3DXMatrixIdentity(&matParent);
-	for (int iObj = 0; iObj < m_pMesh->iSubMeshNum; iObj++)
-	{
 
-		if (m_pMesh->m_pParent)
-		{
-			Interpolate(*m_pMesh,
-				m_pMesh->m_pParent->m_matCalculation,
-				m_fElapseTime);
-		}
-		else
-		{
-			Interpolate(*m_pMesh,
-				matParent,
-				m_fElapseTime);
-		}
+	if (m_pMesh->m_pParent != nullptr)
+	{
+		Interpolate(*m_pMesh,
+			m_pMesh->m_pParent->m_matCalculation,
+			m_fElapseTime);
+	}
+	else
+	{
+		Interpolate(*m_pMesh,
+			matParent,
+			m_fElapseTime);
 	}
 
 	return true;
@@ -341,13 +358,11 @@ bool SObject::PostRender(ID3D11DeviceContext* pContext)
 }
 bool SObject::Render(ID3D11DeviceContext* pContext)
 {
-	UpdateConstantBuffer(pContext);
 	pContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)m_dxobj.m_iPrimitiveType);
 	for (int iSubMesh = 0; iSubMesh < m_pMesh->iSubMeshNum; iSubMesh++)
 	{
 		DXGame::SDxHelperEX& dxobj = m_pMesh->m_dxobjList[iSubMesh];
-		dxobj.PreRender(pContext, dxobj.m_iVertexSize);
-
+		
 		D3DXMatrixTranspose(&m_cbData.matWorld,
 			&m_pMesh->m_matCalculation);
 
@@ -359,6 +374,9 @@ bool SObject::Render(ID3D11DeviceContext* pContext)
 		pContext->UpdateSubresource(
 			dxobj.g_pConstantBuffer.Get(),
 			0, NULL, &m_cbData, 0, 0);
+		dxobj.PreRender(pContext, dxobj.m_iVertexSize);
+
+		pContext->VSSetConstantBuffers(0, 1, dxobj.g_pConstantBuffer.GetAddressOf());
 
 		dxobj.PostRender(pContext, dxobj.m_iNumIndex);
 	}
@@ -382,6 +400,7 @@ SObject::SObject()
 	D3DXMatrixIdentity(&m_matView);
 	D3DXMatrixIdentity(&m_matProj);
 	D3DXMatrixIdentity(&m_matWorld);
+	m_fElapseTime = 0.0f;
 
 }
 
