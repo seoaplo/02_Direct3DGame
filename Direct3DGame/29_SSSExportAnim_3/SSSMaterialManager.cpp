@@ -35,6 +35,7 @@ int	SSSMaterialManager::AddMaterial(INode* pNode)
 		Material.SubMaterialList[0].szName = Material.szName;
 		GetTexture(pMtl, Material.SubMaterialList[0]);
 	}
+	return Material.iMaterialID;
 
 }
 void SSSMaterialManager::GetTexture(Mtl* pMtl, SubMaterial& SubMtrl)

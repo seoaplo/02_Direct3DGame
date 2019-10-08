@@ -40,7 +40,7 @@ void SSSObjectManager::AddObject(INode* pNode, SScene& Scene, Interval& interval
 			{
 				Object.m_ClassType = CLASS_GEOM;
 				if (iMaterialID < 0) return;
-				else Object.m_Mesh.iMaterialID = iMaterialID;
+				else Object.m_ClassType = CLASS_GEOM;
 			}
 			break;
 		default:
@@ -62,6 +62,7 @@ void SSSObjectManager::AddObject(INode* pNode, SScene& Scene, Interval& interval
 
 	if (Object.m_ClassType == CLASS_GEOM)
 	{
+		Object.m_Mesh.iMaterialID = iMaterialID;
 		GetMesh(pNode, Object.m_Mesh, interval);
 	}
 	else
@@ -179,6 +180,9 @@ void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
 }
 void SSSObjectManager::GetBox(SMesh& sMesh)
 {
+	sMesh.iSubNum = 1;
+	sMesh.SubMeshList[0].bUse = true;
+
 	sMesh.SubMeshList[0].VertexList.resize(24);
 	sMesh.SubMeshList[0].IndexList.resize(36);
 

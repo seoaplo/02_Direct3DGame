@@ -38,9 +38,6 @@ void DumpMatrix3(D3D_MATRIX& mat, Matrix3* m)
 	row = m->GetRow(1);
 	mat._31 = row.x; mat._33 = row.y; mat._32 = row.z;
 
-	row = m->GetRow(3);
-	mat._41 = row.x; mat._43 = row.y; mat._42 = row.z;
-
 	mat._14 = mat._24 = mat._34 = 0.0f;
 
 	mat._44 = 1.0f;

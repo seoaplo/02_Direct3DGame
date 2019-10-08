@@ -283,9 +283,13 @@ void SObject::Interpolate(
 
 	D3DXMATRIX matinvParent;
 	D3DXMatrixIdentity(&matinvParent);
-	D3DXMatrixInverse(&matinvParent, nullptr, &matParent);
+	if (sMesh.m_pParent != nullptr)
+	{
+		//matinvParent = sMesh.m_pParent->m_matCalculationBasic;
+		D3DXMatrixInverse(&matinvParent, nullptr, &sMesh.m_matWorld);
+	}
 
-	sMesh.m_matCalculation = matAnim * matParent;
+	sMesh.m_matCalculation =  matAnim * matParent;
 	return;
 }
 bool SObject::UpdateBuffer() { return true; }
@@ -363,8 +367,10 @@ bool SObject::Render(ID3D11DeviceContext* pContext)
 	{
 		DXGame::SDxHelperEX& dxobj = m_pMesh->m_dxobjList[iSubMesh];
 		
+		D3DXMATRIX matWorld = m_pMesh->m_matInvWorld * m_pMesh->m_matCalculation;
+
 		D3DXMatrixTranspose(&m_cbData.matWorld,
-			&m_pMesh->m_matCalculation);
+			&matWorld);
 
 		float fTime = I_Timer.GetElapsedTime();
 		m_cbData.Color[0] = cosf(fTime);

@@ -61,6 +61,7 @@ struct SMesh
 	SMesh*	m_pParent;
 	D3DXMATRIX m_matWorld;
 	D3DXMATRIX m_matInvWorld;
+	D3DXMATRIX  m_matCalculationBasic;
 	D3DXMATRIX  m_matCalculation;
 
 	// 0 frame 분해된 에니메이션 트랙의 행렬

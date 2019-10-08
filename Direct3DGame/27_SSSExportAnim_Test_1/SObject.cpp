@@ -261,12 +261,23 @@ void SObject::Interpolate(
 	}
 
 	D3DXMATRIX matAnim;
+	D3DXMATRIX matParentInv;
 	matAnim = matAnimScale * matAnimRot;
 	matAnim._41 = matAnimPos._41;
 	matAnim._42 = matAnimPos._42;
 	matAnim._43 = matAnimPos._43;
 
-	sMesh.m_matCalculation = sMesh.m_matInvWorld * matAnim * matParent;
+	if (sMesh.m_pParent == nullptr)
+	{
+		D3DXMatrixIdentity(&matParentInv);
+	}
+	else
+	{
+		matParentInv = sMesh.m_pParent->m_matInvWorld;
+	}
+
+
+	sMesh.m_matCalculation = matParentInv * sMesh.m_matInvWorld * matAnim * matParent;
 }
 bool SObject::UpdateBuffer() { return true; }
 bool SObject::Init() { return true; }

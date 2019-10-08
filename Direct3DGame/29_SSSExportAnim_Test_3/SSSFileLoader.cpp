@@ -114,7 +114,7 @@ int SSSFileLoader::Load(T_STR FilePath)
 		TCHAR ParentName[MAX_PATH];
 		ZeroMemory(ParentName, _countof(ParentName));
 
-		_stscanf_s(m_Paser.m_pBuffer, _T("\n%s %s %d %d %d %d"),
+		_stscanf_s(m_Paser.m_pBuffer, _T("\n%s %s %d %d %d"),
 			String, MAX_PATH,
 			ParentName, MAX_PATH,
 			&m_MeshList[iMesh].iClassID,
