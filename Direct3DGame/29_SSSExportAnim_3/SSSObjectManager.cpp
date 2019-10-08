@@ -4,7 +4,14 @@
 void SSSObjectManager::AddObject(INode* pNode, SScene& Scene, Interval& interval, int iMaterialID)
 {
 	ObjectState os = pNode->EvalWorldState(interval.Start());
+	Object* CheckID = nullptr;
+	int ChildNum = pNode->NumChildren();
 	int iObjectNumber = -1;
+
+	SObject Object;
+	iObjectNumber = m_ObjectList.size();
+	CheckID = pNode->GetObjectRef();
+
 	if (os.obj)
 	{
 		// 불필요한 노드(시야의 방향 등에 쓰이는 노드)
@@ -18,47 +25,53 @@ void SSSObjectManager::AddObject(INode* pNode, SScene& Scene, Interval& interval
 			// 해당 노드이면 저장
 		case GEOMOBJECT_CLASS_ID:
 		case HELPER_CLASS_ID:
-			m_ObjectList.push_back(SObject());
-			iObjectNumber = m_ObjectList.size() - 1;
-			Object* CheckID = pNode->GetObjectRef();
+			
 			if (CheckID->ClassID() == Class_ID(BONE_CLASS_ID, 0))// 본 오브젝트   
 			{
-				m_ObjectList[iObjectNumber].m_ClassType = CLASS_BONE;
+				if (ChildNum <= 0) return;
+				Object.m_ClassType = CLASS_BONE;
 			}
 			else if (CheckID->ClassID() == Class_ID(DUMMY_CLASS_ID, 0))  // 더미 오브젝트
 			{
-				m_ObjectList[iObjectNumber].m_ClassType = CLASS_DUMMY;
+				if (ChildNum <= 0) return;
+				Object.m_ClassType = CLASS_DUMMY;
 			}
 			else
 			{
-				m_ObjectList[iObjectNumber].m_ClassType = CLASS_GEOM;
+				Object.m_ClassType = CLASS_GEOM;
 				if (iMaterialID < 0) return;
-				else m_ObjectList[iObjectNumber].m_Mesh.iMaterialID = iMaterialID;
+				else Object.m_Mesh.iMaterialID = iMaterialID;
 			}
 			break;
 		default:
 			return;
 		}
 	}
+	else
+	{
+		return;
+	}
 	INode* pParentNode = pNode->GetParentNode();
 	if (pParentNode &&	pParentNode->IsRootNode() == false)
 	{
-		m_ObjectList[iObjectNumber].ParentName = SSSGlobal::FixupName(pParentNode->GetName());
+		Object.ParentName = SSSGlobal::FixupName(pParentNode->GetName());
 	}
-
+	Object.name = SSSGlobal::FixupName(pNode->GetName());
 	Matrix3 wtm = pNode->GetNodeTM(interval.Start());
-	SSSGlobal::DumpMatrix3(m_ObjectList[iObjectNumber].matWorld, &wtm);
+	SSSGlobal::DumpMatrix3(Object.matWorld, &wtm);
 
-	if (m_ObjectList[iObjectNumber].m_ClassType == CLASS_GEOM)
+	if (Object.m_ClassType == CLASS_GEOM)
 	{
-		GetMesh(pNode, m_ObjectList[iObjectNumber].m_Mesh, interval);
+		GetMesh(pNode, Object.m_Mesh, interval);
 	}
 	else
 	{
-		GetBox(m_ObjectList[iObjectNumber].m_Mesh);
+		GetBox(Object.m_Mesh);
 	}
 
-	GetAnimation(pNode, m_ObjectList[iObjectNumber].m_Mesh, Scene, interval);
+	GetAnimation(pNode, Object.m_AnimTrack, Scene, interval);
+
+	m_ObjectList.push_back(Object);
 }
 
 void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
@@ -216,6 +229,11 @@ void SSSObjectManager::SetUniqueBuffer(SMesh& sMesh)
 
 	for (int iSub = 0; iSub < SUBMATERIAL_SIZE; iSub++)
 	{
+		if (m_TriList[iSub].size() <= 0) continue;
+
+		sMesh.iSubNum++;
+		sMesh.SubMeshList[iSub].bUse = true;
+
 		for (int iFace = 0; iFace < m_TriList[iSub].size(); iFace++)
 		{
 			std::vector<STriangle>& triArray = m_TriList[iSub];
@@ -249,7 +267,7 @@ int	SSSObjectManager::IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList)
 	}
 	return -1;
 }
-Point3	GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
+Point3	SSSObjectManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
 {
 	Face* f = &mesh->faces[iFace];
 	DWORD smGroup = f->smGroup;
@@ -298,7 +316,7 @@ TriObject* SSSObjectManager::GetTriObjectFromNode(INode* pNode, TimeValue time, 
 }
 
 
-void SSSObjectManager::GetAnimation(INode* pNode, SObject& sObject, SScene& Scene, Interval& interval)
+void SSSObjectManager::GetAnimation(INode* pNode, SAnimationTrack& AnimTrack, SScene& Scene, Interval& interval)
 {
 
 
@@ -315,20 +333,18 @@ void SSSObjectManager::GetAnimation(INode* pNode, SObject& sObject, SScene& Scen
 	float   Start_RotValue;
 	AngAxisFromQ(StartAP.q, &Start_RotValue, Start_RotAxis);
 	//<----------------------------
-	SAnimationTrack StartAnim;
-	ZeroMemory(&StartAnim, sizeof(SAnimTrack));
-	StartAnim.i = startFrame;
-	StartAnim.p = StartAP.t;
-	StartAnim.q = StartAP.q;
-	sMesh.animPos.push_back(StartAnim);
-	sMesh.animRot.push_back(StartAnim);
-	StartAnim.p = StartAP.k;
-	StartAnim.q = StartAP.u;
-	sMesh.animScl.push_back(StartAnim);
 
-	TimeValue start =
-		m_Interval.Start() + GetTicksPerFrame();
-	TimeValue end = m_Interval.End();
+	SPositionAnim	PosTrack;
+	SRotationAnim	RotTrack;
+	SScaleAnim		ScaleTrack;
+
+	ZeroMemory(&PosTrack, sizeof(PosTrack));
+	ZeroMemory(&RotTrack, sizeof(RotTrack));
+	ZeroMemory(&ScaleTrack, sizeof(ScaleTrack));
+
+
+	TimeValue start = interval.Start();
+	TimeValue end = interval.End();
 	// 시작+1프레임
 	for (TimeValue t = start; t <= end; t += GetTicksPerFrame())
 	{
@@ -338,51 +354,201 @@ void SSSObjectManager::GetAnimation(INode* pNode, SObject& sObject, SScene& Scen
 		AffineParts FrameAP;
 		decomp_affine(tm, &FrameAP);
 
-		SAnimTrack anim;
-		ZeroMemory(&anim, sizeof(SAnimTrack));
-		anim.i = t;
-		anim.p = FrameAP.t;
-		anim.q = FrameAP.q;
-		sMesh.animPos.push_back(anim);
-		sMesh.animRot.push_back(anim);
-		anim.p = FrameAP.k;
-		anim.q = FrameAP.u;
-		sMesh.animScl.push_back(anim);
+		PosTrack.i = t;
+		PosTrack.p = FrameAP.t;
+		AnimTrack.PositionTrack.push_back(PosTrack);
+
+		RotTrack.i = t;
+		RotTrack.q = FrameAP.q;
+		AnimTrack.RotationTrack.push_back(RotTrack);
+
+		ScaleTrack.p = FrameAP.k;
+		ScaleTrack.q = FrameAP.u;
+		AnimTrack.ScaleTrack.push_back(ScaleTrack);
 
 		Point3  Frame_RotAxis;
 		float   Frame_RotValue;
 		AngAxisFromQ(FrameAP.q, &Frame_RotValue, Frame_RotAxis);
 
 
-		if (!sMesh.bAnimatin[0]) {
-			if (!EqualPoint3(StartAP.t, FrameAP.t))
+		if (!AnimTrack.bPosition) {
+			if (!SSSGlobal::EqualPoint3(StartAP.t, FrameAP.t))
 			{
-				sMesh.bAnimatin[0] = true;
+				AnimTrack.bPosition = true;
 			}
 		}
 
-		if (!sMesh.bAnimatin[1]) {
-			if (!EqualPoint3(Start_RotAxis, Frame_RotAxis))
+		if (!AnimTrack.bRotation) {
+			if (!SSSGlobal::EqualPoint3(Start_RotAxis, Frame_RotAxis))
 			{
-				sMesh.bAnimatin[1] = true;
+				AnimTrack.bRotation = true;
 			}
 			else
 			{
-				if (Frame_RotValue != Frame_RotValue)
+				if (Start_RotValue != Frame_RotValue)
 				{
-					sMesh.bAnimatin[1] = true;
+					AnimTrack.bRotation = true;
 				}
 			}
 		}
 
-		if (!sMesh.bAnimatin[2]) {
-			if (!EqualPoint3(StartAP.k, FrameAP.k))
+		if (!AnimTrack.bScale) {
+			if (!SSSGlobal::EqualPoint3(StartAP.k, FrameAP.k))
 			{
-				sMesh.bAnimatin[2] = true;
+				AnimTrack.bScale = true;
 			}
 		}
 	}
 }
+bool SSSObjectManager::ExportObject(FILE* pStream)
+{
+	if (pStream == nullptr)
+	{
+		return false;
+	}
+	_ftprintf(pStream, _T("\n%s"), L"#OBJECT_INFO");
+
+	for (int iObj = 0; iObj <m_ObjectList.size(); iObj++)
+	{
+
+		_ftprintf(pStream, _T("\n%s %s %d %d %d"),
+			m_ObjectList[iObj].name,
+			m_ObjectList[iObj].ParentName,
+			m_ObjectList[iObj].m_ClassType,
+			m_ObjectList[iObj].m_Mesh.iMaterialID,
+			m_ObjectList[iObj].m_Mesh.iSubNum);
+
+		// World Matrix
+		_ftprintf(pStream, _T("\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f"),
+			m_ObjectList[iObj].matWorld._11,
+			m_ObjectList[iObj].matWorld._12,
+			m_ObjectList[iObj].matWorld._13,
+			m_ObjectList[iObj].matWorld._14,
+
+			m_ObjectList[iObj].matWorld._21,
+			m_ObjectList[iObj].matWorld._22,
+			m_ObjectList[iObj].matWorld._23,
+			m_ObjectList[iObj].matWorld._24,
+
+			m_ObjectList[iObj].matWorld._31,
+			m_ObjectList[iObj].matWorld._32,
+			m_ObjectList[iObj].matWorld._33,
+			m_ObjectList[iObj].matWorld._34,
+
+			m_ObjectList[iObj].matWorld._41,
+			m_ObjectList[iObj].matWorld._42,
+			m_ObjectList[iObj].matWorld._43,
+			m_ObjectList[iObj].matWorld._44);
+
+		ExportMesh(pStream, m_ObjectList[iObj].m_Mesh);
+		ExportAnimation(pStream, m_ObjectList[iObj].m_AnimTrack);
+	}
+
+	return true;
+}
+bool SSSObjectManager::ExportMesh(FILE* pStream, SMesh& sMesh)
+{
+	if (pStream == nullptr)
+	{
+		return false;
+	}
+	for (int iSubTri = 0; iSubTri < SUBMATERIAL_SIZE; iSubTri++)
+	{
+		if (sMesh.SubMeshList[iSubTri].bUse == false) continue;
+		std::vector<PNCT>& vList = sMesh.SubMeshList[iSubTri].VertexList;
+		std::vector<DWORD>& iList = sMesh.SubMeshList[iSubTri].IndexList;
+
+		_ftprintf(pStream, _T("\nSubMesh %d %d %d"),
+			iSubTri, vList.size(), iList.size());
+
+		for (int iVer = 0; iVer < vList.size(); iVer++)
+		{
+			_ftprintf(pStream, _T("\n%10.4f %10.4f %10.4f"),
+				vList[iVer].p.x,
+				vList[iVer].p.y,
+				vList[iVer].p.z);
+			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f"),
+				vList[iVer].n.x,
+				vList[iVer].n.y,
+				vList[iVer].n.z);
+			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f"),
+				vList[iVer].c.x,
+				vList[iVer].c.y,
+				vList[iVer].c.z,
+				vList[iVer].c.w);
+			_ftprintf(pStream, _T("%10.4f %10.4f"),
+				vList[iVer].t.x,
+				vList[iVer].t.y);
+		}
+
+		for (int iIndex = 0; iIndex < iList.size(); iIndex += 3)
+		{
+			_ftprintf(pStream, _T("\n%d %d %d"),
+				iList[iIndex + 0],
+				iList[iIndex + 1],
+				iList[iIndex + 2]);
+		}
+	}
+
+
+	return true;
+}
+bool SSSObjectManager::ExportAnimation(FILE* pStream, SAnimationTrack& AnimTrack)
+{
+	if (pStream == nullptr)
+	{
+		return false;
+	}
+
+	_ftprintf(pStream, _T("\n%s %d %d %d"),
+		L"#AnimationData",
+		(AnimTrack.bPosition) ? AnimTrack.PositionTrack.size() : 0,
+		(AnimTrack.bRotation) ? AnimTrack.RotationTrack.size() : 0,
+		(AnimTrack.bScale) ? AnimTrack.ScaleTrack.size() : 0);
+	if (AnimTrack.bPosition)
+	{
+		for (int iTrack = 0; iTrack < AnimTrack.PositionTrack.size(); iTrack++)
+		{
+			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f"),
+				iTrack,
+				AnimTrack.PositionTrack[iTrack].i,
+				AnimTrack.PositionTrack[iTrack].p.x,
+				AnimTrack.PositionTrack[iTrack].p.z,
+				AnimTrack.PositionTrack[iTrack].p.y);
+		}
+	}
+	if (AnimTrack.bRotation)
+	{
+		for (int iTrack = 0; iTrack < AnimTrack.RotationTrack.size(); iTrack++)
+		{
+			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f"),
+				iTrack,
+				AnimTrack.RotationTrack[iTrack].i,
+				AnimTrack.RotationTrack[iTrack].q.x,
+				AnimTrack.RotationTrack[iTrack].q.z,
+				AnimTrack.RotationTrack[iTrack].q.y,
+				AnimTrack.RotationTrack[iTrack].q.w);
+		}
+	}
+	if (AnimTrack.bScale)
+	{
+		for (int iTrack = 0; iTrack < AnimTrack.ScaleTrack.size(); iTrack++)
+		{
+			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
+				iTrack,
+				AnimTrack.ScaleTrack[iTrack].i,
+				AnimTrack.ScaleTrack[iTrack].p.x,
+				AnimTrack.ScaleTrack[iTrack].p.z,
+				AnimTrack.ScaleTrack[iTrack].p.y,
+				AnimTrack.ScaleTrack[iTrack].q.x,
+				AnimTrack.ScaleTrack[iTrack].q.z,
+				AnimTrack.ScaleTrack[iTrack].q.y,
+				AnimTrack.ScaleTrack[iTrack].q.w);
+		}
+	}
+	return true;
+}
+
 SSSObjectManager::SSSObjectManager()
 {
 }

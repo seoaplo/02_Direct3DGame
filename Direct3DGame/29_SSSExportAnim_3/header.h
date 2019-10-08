@@ -24,19 +24,19 @@
 
 const enum MaterialTextureType
 {
-	MtrType_AmbientColor = 0,
-	MtrType_DiffuseColor,
-	MtrType_SpecularColor,
-	MtrType_SpecularLevel,
-	MtrType_Glossiness,
-	MtrType_Self_IIIumination,
-	MtrType_Opacity,
-	MtrType_FilterColor,
-	MtrType_Bump,
-	MtrType_Reflection1,
-	MtrType_Reflection2,
-	MtrType_Displacement,
-	MtrType_Number,
+	TexType_AmbientColor = 0,
+	TexType_DiffuseColor,
+	TexType_SpecularColor,
+	TexType_SpecularLevel,
+	TexType_Glossiness,
+	TexType_Self_IIIumination,
+	TexType_Opacity,
+	TexType_FilterColor,
+	TexType_Bump,
+	TexType_Reflection1,
+	TexType_Reflection2,
+	TexType_Displacement,
+	TexType_Number,
 };
 
 const enum OBJECTCLASSTYPE {
@@ -86,19 +86,25 @@ struct PNCT
 
 struct STextureMap
 {
-	int		iMapType;
+	bool	bUse;
 	TSTR	szName;
 	STextureMap()
 	{
-		iMapType = -1;
+		bUse = false;
 	}
 };
 
 struct SubMaterial
 {
-	int		iSubIndex;
+	bool	bUse;
 	TSTR	szName;
-	STextureMap TextureMapList[MtrType_Number];
+	int		iTextureNumSize;
+	STextureMap TextureMapList[TexType_Number];
+	SubMaterial()
+	{
+		bUse = false;
+		iTextureNumSize = 0;
+	}
 };
 
 struct SMaterial
@@ -109,6 +115,11 @@ struct SMaterial
 
 	int SubMaterialNum;
 	SubMaterial	SubMaterialList[SUBMATERIAL_SIZE];
+	SMaterial()
+	{
+		pMaterial = nullptr;
+		iMaterialID -1;
+	}
 };
 
 struct STriangle
@@ -123,8 +134,13 @@ struct STriangle
 
 struct SSubMesh
 {
+	bool bUse;
 	std::vector<PNCT>			VertexList;
 	std::vector<DWORD>			IndexList;
+	SSubMesh()
+	{
+		bUse = false;
+	}
 };
 
 struct SMesh
@@ -135,7 +151,7 @@ struct SMesh
 	SMesh()
 	{
 		iMaterialID = -1;
-		iSubNum = -1;
+		iSubNum = 0;
 	}
 };
 

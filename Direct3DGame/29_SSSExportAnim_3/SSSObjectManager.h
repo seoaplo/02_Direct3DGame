@@ -3,10 +3,11 @@
 
 class SSSObjectManager
 {
-public:
+	friend class SSSWriter;
+private:
 	std::vector<SObject>				m_ObjectList;
 	std::vector<STriangle>				m_TriList[SUBMATERIAL_SIZE];
-public:
+private:
 	void	AddObject(INode* pNode, SScene& Scene, Interval& interval, int iMaterialID);
 	void	GetMesh(INode* pNode, SMesh& sMesh, Interval& interval);
 	void	GetBox(SMesh& sMesh);
@@ -16,13 +17,11 @@ public:
 	Point3	GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex);
 	TriObject* GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit);
 
-	void GetAnimation(INode* pNode, SObject& sObject, SScene& Scene, Interval& interval);
-	bool CheckForAnimation(INode* pNode, bool&  bPos, bool& bRot, bool& bScl);
-	void DumpPosSample(INode* pNode, SObject& pMesh);
-	void DumpRotSample(INode* pNode, SObject& pMesh);
-	void DumpSclSample(INode* pNode, SObject& pMesh);
+	void GetAnimation(INode* pNode, SAnimationTrack& AnimTrack, SScene& Scene, Interval& interval);
 
 	bool ExportObject(FILE* pStream);
+	bool ExportMesh(FILE* pStream, SMesh& sMesh);
+	bool ExportAnimation(FILE* pStream, SAnimationTrack& AnimTrack);
 
 private:
 	SSSObjectManager();

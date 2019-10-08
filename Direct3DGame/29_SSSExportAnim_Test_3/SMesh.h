@@ -55,7 +55,6 @@ struct SMesh
 	int     iMtrlID;
 	int		iClassID;
 	int     iSubMeshNum;
-	int		iTriangleNum;
 	bool	bChild;
 	T_STR   name;
 	T_STR   ParentName;

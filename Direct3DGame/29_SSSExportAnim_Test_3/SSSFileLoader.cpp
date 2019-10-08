@@ -119,8 +119,7 @@ int SSSFileLoader::Load(T_STR FilePath)
 			ParentName, MAX_PATH,
 			&m_MeshList[iMesh].iClassID,
 			&m_MeshList[iMesh].iMtrlID,
-			&m_MeshList[iMesh].iSubMeshNum,
-			&m_MeshList[iMesh].iTriangleNum);
+			&m_MeshList[iMesh].iSubMeshNum);
 		m_MeshList[iMesh].name = String;
 		m_MeshList[iMesh].ParentName = ParentName;
 		m_MeshList[iMesh].iMtrlID = m_MaterialList.size() - SceneData.iNumMaterials + m_MeshList[iMesh].iMtrlID;
@@ -317,59 +316,6 @@ int SSSFileLoader::Load(T_STR FilePath)
 		else
 		{
 			m_ObjectList[iObject].m_pMaterial = &m_MaterialList[m_ObjectList[iObject].m_pMesh->iMtrlID];
-		}
-
-		if (m_ObjectList[iObject].m_pMesh->iSubMeshNum <= 0)
-		{
-			m_ObjectList[iObject].m_pMesh->iSubMeshNum = 1;
-			
-			m_ObjectList[iObject].m_pMesh->m_VertexList.resize(1);
-			m_ObjectList[iObject].m_pMesh->m_IndexList.resize(1);
-			m_ObjectList[iObject].m_pMesh->m_dxobjList.resize(1);
-			static BOX_VERTEX_LIST BoxVertex;
-
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0].resize(24);
-
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][0] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, 1.0f, -1.0f), D3DXVECTOR3(0.0f, 0.0f, -1.0f), D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f), D3DXVECTOR2(0.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][1] = PNCT_VERTEX(D3DXVECTOR3(1.0f, 1.0f, -1.0f), D3DXVECTOR3(0.0f, 0.0f, -1.0f), D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f), D3DXVECTOR2(1.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][2] = PNCT_VERTEX(D3DXVECTOR3(1.0f, -1.0f, -1.0f), D3DXVECTOR3(0.0f, 0.0f, -1.0f), D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f), D3DXVECTOR2(1.0f, 1.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][3] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(0.0f, 0.0f, -1.0f), D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f), D3DXVECTOR2(0.0f, 1.0f));
-
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][4] = PNCT_VERTEX(D3DXVECTOR3(1.0f, 1.0f, 1.0f), D3DXVECTOR3(0.0f, 0.0f, 1.0f), D3DXVECTOR4(0.0f, 0.0f, 0.0f, 1.0f), D3DXVECTOR2(0.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][5] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, 1.0f, 1.0f), D3DXVECTOR3(0.0f, 0.0f, 1.0f), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f), D3DXVECTOR2(1.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][6] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, -1.0f, 1.0f), D3DXVECTOR3(0.0f, 0.0f, 1.0f), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f), D3DXVECTOR2(1.0f, 1.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][7] = PNCT_VERTEX(D3DXVECTOR3(1.0f, -1.0f, 1.0f), D3DXVECTOR3(0.0f, 0.0f, 1.0f), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f), D3DXVECTOR2(0.0f, 1.0f));
-
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][8] = PNCT_VERTEX(D3DXVECTOR3(1.0f, 1.0f, -1.0f), D3DXVECTOR3(1.0f, 0.0f, 0.0f), D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f), D3DXVECTOR2(0.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][9] = PNCT_VERTEX(D3DXVECTOR3(1.0f, 1.0f, 1.0f), D3DXVECTOR3(1.0f, 0.0f, 0.0f), D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f), D3DXVECTOR2(1.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][10] = PNCT_VERTEX(D3DXVECTOR3(1.0f, -1.0f, 1.0f), D3DXVECTOR3(1.0f, 0.0f, 0.0f), D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f), D3DXVECTOR2(1.0f, 1.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][11] = PNCT_VERTEX(D3DXVECTOR3(1.0f, -1.0f, -1.0f), D3DXVECTOR3(1.0f, 0.0f, 0.0f), D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f), D3DXVECTOR2(0.0f, 1.0f));
-
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][12] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, 1.0f, 1.0f), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f), D3DXVECTOR2(0.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][13] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, 1.0f, -1.0f), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f), D3DXVECTOR2(1.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][14] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f), D3DXVECTOR2(1.0f, 1.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][15] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, -1.0f, 1.0f), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f), D3DXVECTOR2(0.0f, 1.0f));
-
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][16] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, 1.0f, 1.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), D3DXVECTOR4(1.0f, 0.5f, 1.0f, 1.0f), D3DXVECTOR2(0.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][17] = PNCT_VERTEX(D3DXVECTOR3(1.0f, 1.0f, 1.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), D3DXVECTOR4(1.0f, 0.5f, 1.0f, 1.0f), D3DXVECTOR2(1.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][18] = PNCT_VERTEX(D3DXVECTOR3(1.0f, 1.0f, -1.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), D3DXVECTOR4(1.0f, 0.5f, 1.0f, 1.0f), D3DXVECTOR2(1.0f, 1.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][19] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, 1.0f, -1.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), D3DXVECTOR4(1.0f, 0.5f, 1.0f, 1.0f), D3DXVECTOR2(0.0f, 1.0f));
-
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][20] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR2(0.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][21] = PNCT_VERTEX(D3DXVECTOR3(1.0f, -1.0f, -1.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR2(1.0f, 0.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][22] = PNCT_VERTEX(D3DXVECTOR3(1.0f, -1.0f, 1.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR2(1.0f, 1.0f));
-			m_ObjectList[iObject].m_pMesh->m_VertexList[0][23] = PNCT_VERTEX(D3DXVECTOR3(-1.0f, -1.0f, 1.0f), D3DXVECTOR3(0.0f, -1.0f, 0.0f), D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f), D3DXVECTOR2(0.0f, 1.0f));
-
-			int iIndex = 0;
-			m_ObjectList[iObject].m_pMesh->m_IndexList[0].resize(36);
-
-			m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 0; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 1; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 2; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 0;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 2; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 3;
-			m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 4; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 5; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 6; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 4;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 6; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 7;
-			m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 8; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 9; 	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 10; m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 8;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 10;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 11;
-			m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 12;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 13;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 14;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 12;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 14;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 15;
-			m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 16;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 17;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 18;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 16;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 18;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 19;
-			m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 20;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 21;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 22;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 20;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 22;	m_ObjectList[iObject].m_pMesh->m_IndexList[0][iIndex++] = 23;
-
 		}
 
 		m_ObjectList[iObject].Create(m_pDevice, m_pContext, _T("Test.hlsl"));

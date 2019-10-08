@@ -1,3 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <FxCompile Include="Test.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SMesh.cpp" />
+    <ClCompile Include="SObject.cpp" />
+    <ClCompile Include="SParser.cpp" />
+    <ClCompile Include="SSSFileLoader.cpp" />
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SModelViewCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SMesh.h" />
+    <ClInclude Include="SObject.h" />
+    <ClInclude Include="SParser.h" />
+    <ClInclude Include="SSSFileLoader.h" />
+    <ClInclude Include="SArcBall.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelViewCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{4bc5ee81-e2ea-4754-b869-83c746a94101}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
 </Project>

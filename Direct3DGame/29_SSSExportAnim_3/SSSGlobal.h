@@ -6,7 +6,7 @@ class SSSGlobal
 public:
 	static TCHAR*  FixupName(MSTR name)
 	{
-		TCHAR m_tmpBuffer[MAX_PATH] = { 0, };
+		static TCHAR m_tmpBuffer[MAX_PATH] = { 0, };
 		memset(m_tmpBuffer, 0, sizeof(TCHAR)*MAX_PATH);
 
 		TCHAR* cPtr;
