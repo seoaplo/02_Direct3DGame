@@ -128,10 +128,11 @@
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="SArcBall.cpp" />
     <ClCompile Include="SCamera.cpp" />
+    <ClCompile Include="SDrawObject.cpp" />
     <ClCompile Include="SFrustum.cpp" />
+    <ClCompile Include="SMaterial.cpp" />
     <ClCompile Include="SMesh.cpp" />
     <ClCompile Include="SModelViewCamera.cpp" />
-    <ClCompile Include="SObject.cpp" />
     <ClCompile Include="SParser.cpp" />
     <ClCompile Include="SSSFileLoader.cpp" />
   </ItemGroup>
@@ -139,10 +140,11 @@
     <ClInclude Include="Sample.h" />
     <ClInclude Include="SArcBall.h" />
     <ClInclude Include="SCamera.h" />
+    <ClInclude Include="SDrawObject.h" />
     <ClInclude Include="SFrustum.h" />
+    <ClInclude Include="SMaterial.h" />
     <ClInclude Include="SMesh.h" />
     <ClInclude Include="SModelViewCamera.h" />
-    <ClInclude Include="SObject.h" />
     <ClInclude Include="SParser.h" />
     <ClInclude Include="SSSFileLoader.h" />
   </ItemGroup>

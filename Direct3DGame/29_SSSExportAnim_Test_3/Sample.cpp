@@ -24,10 +24,6 @@ bool Sample::Init()
 	I_SSSFileLoaderManeger.Init(GetDevice(), GetContext());
 	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestAnim5.SSS");
 
-	for (int i = 0; i < I_SSSFileLoaderManeger.GetSize(); i++)
-	{
-		m_ObjectList.push_back(I_SSSFileLoaderManeger.GetPtr(i));
-	}
 	
 
 	//--------------------------------------------------------------------------------------
@@ -58,10 +54,6 @@ bool Sample::Frame()
 
 	//m_pObj->Frame();
 	m_pMainCamera->Frame();
-	for (int i = 0; i < m_ObjectList.size(); i++)
-	{
-		m_ObjectList[i]->Frame();
-	}
 	return true;
 }
 bool Sample::Render()
@@ -73,11 +65,6 @@ bool Sample::Render()
 	//m_pObj->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 
 	//m_pObj->Render(GetContext());
-	for (int i = 0; i < m_ObjectList.size(); i++)
-	{
-		m_ObjectList[i]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-		m_ObjectList[i]->Render(GetContext());
-	}
 	return true;
 }
 bool Sample::Release()

@@ -22,8 +22,6 @@ public:
 	D3DXMATRIX				m_matInitWorld;
 	D3DXMATRIX				m_matWorld;
 
-	SObject*				m_pObj;
-	std::vector<SObject*>	m_ObjectList;
 	vector<vector<PNCT_VERTEX>> VertexList;
 public:
 	//====================================================================

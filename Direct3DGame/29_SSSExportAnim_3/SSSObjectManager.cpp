@@ -456,14 +456,14 @@ bool SSSObjectManager::ExportMesh(FILE* pStream, SMesh& sMesh)
 	{
 		return false;
 	}
-	for (int iSubTri = 0; iSubTri < SUBMATERIAL_SIZE; iSubTri++)
+	for (int iSubMesh = 0; iSubMesh < SUBMATERIAL_SIZE; iSubMesh++)
 	{
-		if (sMesh.SubMeshList[iSubTri].bUse == false) continue;
-		std::vector<PNCT>& vList = sMesh.SubMeshList[iSubTri].VertexList;
-		std::vector<DWORD>& iList = sMesh.SubMeshList[iSubTri].IndexList;
+		if (sMesh.SubMeshList[iSubMesh].bUse == false) continue;
+		std::vector<PNCT>& vList = sMesh.SubMeshList[iSubMesh].VertexList;
+		std::vector<DWORD>& iList = sMesh.SubMeshList[iSubMesh].IndexList;
 
 		_ftprintf(pStream, _T("\nSubMesh %d %d %d"),
-			iSubTri, vList.size(), iList.size());
+			iSubMesh, vList.size(), iList.size());
 
 		for (int iVer = 0; iVer < vList.size(); iVer++)
 		{

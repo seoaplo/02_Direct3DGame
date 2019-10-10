@@ -92,8 +92,9 @@ bool	SSSMaterialManager::ExportMaterial(FILE* pStream)
 		for (int iSubMtrl = 0; iSubMtrl < SUBMATERIAL_SIZE; iSubMtrl++)
 		{
 			if (m_MaterialList[iMtl].SubMaterialList[iSubMtrl].bUse == false) continue;
-			_ftprintf(pStream, _T("\n%s %d"),
+			_ftprintf(pStream, _T("\n%s %d %d"),
 				m_MaterialList[iMtl].SubMaterialList[iSubMtrl].szName,
+				iSubMtrl,
 				m_MaterialList[iMtl].SubMaterialList[iSubMtrl].iTextureNumSize
 			);
 

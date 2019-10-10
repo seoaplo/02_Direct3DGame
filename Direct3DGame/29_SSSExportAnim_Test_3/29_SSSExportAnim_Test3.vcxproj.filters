@@ -6,7 +6,6 @@
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="SMesh.cpp" />
-    <ClCompile Include="SObject.cpp" />
     <ClCompile Include="SParser.cpp" />
     <ClCompile Include="SSSFileLoader.cpp" />
     <ClCompile Include="SArcBall.cpp">
@@ -21,11 +20,12 @@
     <ClCompile Include="SModelViewCamera.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
+    <ClCompile Include="SDrawObject.cpp" />
+    <ClCompile Include="SMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
     <ClInclude Include="SMesh.h" />
-    <ClInclude Include="SObject.h" />
     <ClInclude Include="SParser.h" />
     <ClInclude Include="SSSFileLoader.h" />
     <ClInclude Include="SArcBall.h">
@@ -40,6 +40,8 @@
     <ClInclude Include="SModelViewCamera.h">
       <Filter>Camera</Filter>
     </ClInclude>
+    <ClInclude Include="SDrawObject.h" />
+    <ClInclude Include="SMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Camera">

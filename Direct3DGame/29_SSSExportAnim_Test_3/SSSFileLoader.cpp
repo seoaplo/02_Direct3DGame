@@ -1,24 +1,26 @@
 #include "SSSFileLoader.h"
 
+static TCHAR SSSExporter[] = L"SSSExporter100";
+static TCHAR Header[] = L"#HEADERINFO";
+static TCHAR Material[] = L"#MATERIAL_INFO";
+static TCHAR Object[] = L"#OBJECT_INFO";
+static TCHAR SubMesh[] = L"SubMesh";
+static TCHAR Animation[] = L"#AnimationData";
+
 bool SSSFileLoader::Init(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	m_pDevice = pDevice;
 	m_pContext = pContext;
-	m_iMaterialSize = 0;
-	m_iMeshSize = 0;
 
 	return true; 
 }
 int SSSFileLoader::Load(T_STR FilePath)
 {
+	if (m_pDevice == nullptr) return -1;
+	if (m_pContext == nullptr) return -1;
 	SScene	SceneData;
 	bool bCheck = false;
-	static TCHAR SSSExporter[] = L"SSSExporter100";
-	static TCHAR Header[] = L"#HEADERINFO";
-	static TCHAR Material[] = L"#MATERIAL_INFO";
-	static TCHAR Object[] = L"#OBJECT_INFO";
-	static TCHAR SubMesh[] = L"SubMesh";
-	static TCHAR Animation[] = L"#AnimationData";
+
 	static TCHAR String[MAX_PATH];
 	ZeroMemory(String, _countof(String));
 	ZeroMemory(&SceneData, sizeof(SceneData));
@@ -40,67 +42,51 @@ int SSSFileLoader::Load(T_STR FilePath)
 		&SceneData.iNumMaterials);
 	ZeroMemory(String, _countof(String));
 
-	for (int iMaterial = 0; iMaterial < SceneData.iNumMaterials; iMaterial++)
-	{
-		m_MaterialList.push_back(SMaterial());
-		m_MaterialList[m_iMaterialSize].iIndex = m_iMaterialSize;
-		m_iMaterialSize++;
-	}
-	for (int iMesh = 0; iMesh < SceneData.iNumObjects; iMesh++)
-	{
-		m_MeshList.push_back(SMesh());
-		m_MeshList[m_iMeshSize].iIndex = m_iMaterialSize;
-		m_iMaterialSize++;
-	}
 
 	bCheck = m_Paser.GetDataFromFileNext(Material);
 	if (bCheck == false) return -1;
 	// Material
-	for (int iMaterial = m_MaterialList.size() - SceneData.iNumMaterials; iMaterial < m_MaterialList.size(); iMaterial++)
+
+	int iSubMaterialSize = 0;
+	for (int iMaterial = 0; iMaterial < SceneData.iNumMaterials; iMaterial++)
 	{
+		SMaterial* pMaterial = I_MaterialManager.Create();
 		m_Paser.GetNextLine();
-		_stscanf_s(m_Paser.m_pBuffer, _T("%s%d"), String, MAX_PATH, &m_MaterialList[iMaterial].iSubMaterialNum, &SceneData.iNumObjects);
-		m_MaterialList[iMaterial].MaterialName = String;
+		_stscanf_s(m_Paser.m_pBuffer, _T("%s%d"), String, MAX_PATH, &iSubMaterialSize);
+		pMaterial->m_MaterialName = String;
 		ZeroMemory(String, _countof(String));
-		
-		if (m_MaterialList[iMaterial].iSubMaterialNum <= 0)
-		{
-			m_MaterialList[iMaterial].iSubMaterialNum = 1;
-		}
 
 		// SubMaterial
-		m_MaterialList[iMaterial].SubMaterial.resize(m_MaterialList[iMaterial].iSubMaterialNum);
-		for (int iSubMaterial = 0; iSubMaterial < m_MaterialList[iMaterial].iSubMaterialNum; iSubMaterial++)
+		for (int iSubMaterial = 0; iSubMaterial < iSubMaterialSize; iSubMaterial++)
 		{
+			SSubMaterial* pSubMaterial = pMaterial->Create();
+			int iTextureSize = 0;
 			m_Paser.GetNextLine();
-			_stscanf_s(m_Paser.m_pBuffer, _T("%s%d"),
+			_stscanf_s(m_Paser.m_pBuffer, _T("%s%d%d"),
 						String, MAX_PATH,
-						&m_MaterialList[iMaterial].SubMaterial[iSubMaterial].iTextureMapNum);
-			m_MaterialList[iMaterial].SubMaterial[iSubMaterial].MaterialName = String;
-			m_MaterialList[iMaterial].SubMaterial[iSubMaterial].iIndex = iSubMaterial;
+						&pSubMaterial->iIndex,
+						&iTextureSize);
+			pSubMaterial->m_Name = String;
 			ZeroMemory(String, _countof(String));
 
-			int iMaxTextureMap = m_MaterialList[iMaterial].SubMaterial[iSubMaterial].iTextureMapNum;
-			
-			if (iMaxTextureMap <= 0) continue;
-			m_MaterialList[iMaterial].SubMaterial[iSubMaterial].TextrueMapList.resize(iMaxTextureMap);
+			if (iTextureSize <= 0) continue;
 
+			STextureList& pTextureList = pSubMaterial->m_TextureList;
 			// Texture Map
-			for (int iTextureMap = 0; iTextureMap < iMaxTextureMap; iTextureMap++)
+			for (int iTextureMap = 0; iTextureMap < iTextureSize; iTextureMap++)
 			{
+				int iTextureType = -1;
 				m_Paser.GetNextLine();
 				_stscanf_s(m_Paser.m_pBuffer, _T("%d%s"),
-					&m_MaterialList[iMaterial].SubMaterial[iSubMaterial].TextrueMapList[iTextureMap].iMapID,
+					&iTextureType,
 					String, MAX_PATH);
-				m_MaterialList[iMaterial].SubMaterial[iSubMaterial].TextrueMapList[iTextureMap].TextureName = String;
+				
 				T_STR FilePath = L"../../data/Obj/";
 				FilePath += String;
 
 				int iTextureNumber;
 				iTextureNumber = I_TextureManager.Load(m_pDevice, FilePath);
-				m_MaterialList[iMaterial].SubMaterial[iSubMaterial].TextrueMapList[iTextureMap].STexture 
-					= I_TextureManager.GetPtr(iTextureNumber);
-				m_MaterialList[iMaterial].SubMaterial[iSubMaterial].TextrueMapList[iTextureMap].iIndexMap = iTextureNumber;
+				pTextureList.ConvertToMax(I_TextureManager.GetPtr(iTextureNumber), iTextureType);
 				ZeroMemory(String, _countof(String));
 			}
 		}
@@ -108,62 +94,58 @@ int SSSFileLoader::Load(T_STR FilePath)
 	
 	bCheck = m_Paser.GetDataFromFileNext(Object);
 	if (!bCheck) return -1;
-	for (int iMesh = m_MeshList.size() - SceneData.iNumObjects; iMesh < m_MeshList.size(); iMesh++)
+	for (int iMesh = 0; iMesh < SceneData.iNumObjects; iMesh++)
 	{
 		m_Paser.GetNextLine();
 		TCHAR ParentName[MAX_PATH];
 		ZeroMemory(ParentName, _countof(ParentName));
+		int iSubMeshSize = 0;
 
+		SDrawObject* pDrawObject = I_DrawObjectManager.Create();
 		_stscanf_s(m_Paser.m_pBuffer, _T("\n%s %s %d %d %d"),
 			String, MAX_PATH,
 			ParentName, MAX_PATH,
-			&m_MeshList[iMesh].iClassID,
-			&m_MeshList[iMesh].iMtrlID,
-			&m_MeshList[iMesh].iSubMeshNum);
-		m_MeshList[iMesh].name = String;
-		m_MeshList[iMesh].ParentName = ParentName;
-		m_MeshList[iMesh].iMtrlID = m_MaterialList.size() - SceneData.iNumMaterials + m_MeshList[iMesh].iMtrlID;
-		m_MeshList[iMesh].m_Scene = SceneData;
-		m_MeshList[iMesh].iIndex = iMesh;
+			&pDrawObject->m_iClassType,
+			&pDrawObject->m_iMaterialID,
+			&iSubMeshSize);
+		pDrawObject->m_ObjectName = String;
+		pDrawObject->m_ParentName = ParentName;
+		pDrawObject->m_iMaterialID = I_MaterialManager.GetSize() - SceneData.iNumMaterials + pDrawObject->m_iMaterialID;
+		pDrawObject->m_Scene = SceneData;
 		m_Paser.GetNextLine();
 		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&m_MeshList[iMesh].m_matWorld._11,
-			&m_MeshList[iMesh].m_matWorld._12,
-			&m_MeshList[iMesh].m_matWorld._13,
-			&m_MeshList[iMesh].m_matWorld._14);
-
-		m_Paser.GetNextLine();
-		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&m_MeshList[iMesh].m_matWorld._21,
-			&m_MeshList[iMesh].m_matWorld._22,
-			&m_MeshList[iMesh].m_matWorld._23,
-			&m_MeshList[iMesh].m_matWorld._24);
+			&pDrawObject->m_matWorld._11,
+			&pDrawObject->m_matWorld._12,
+			&pDrawObject->m_matWorld._13,
+			&pDrawObject->m_matWorld._14);
 
 		m_Paser.GetNextLine();
 		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&m_MeshList[iMesh].m_matWorld._31,
-			&m_MeshList[iMesh].m_matWorld._32,
-			&m_MeshList[iMesh].m_matWorld._33,
-			&m_MeshList[iMesh].m_matWorld._34);
+			&pDrawObject->m_matWorld._21,
+			&pDrawObject->m_matWorld._22,
+			&pDrawObject->m_matWorld._23,
+			&pDrawObject->m_matWorld._24);
 
 		m_Paser.GetNextLine();
 		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&m_MeshList[iMesh].m_matWorld._41,
-			&m_MeshList[iMesh].m_matWorld._42,
-			&m_MeshList[iMesh].m_matWorld._43,
-			&m_MeshList[iMesh].m_matWorld._44);
+			&pDrawObject->m_matWorld._31,
+			&pDrawObject->m_matWorld._32,
+			&pDrawObject->m_matWorld._33,
+			&pDrawObject->m_matWorld._34);
 
-		m_MeshList[iMesh].m_VertexList.resize(m_MeshList[iMesh].iSubMeshNum);
-		m_MeshList[iMesh].m_IndexList.resize(m_MeshList[iMesh].iSubMeshNum);
-		m_MeshList[iMesh].m_dxobjList.resize(m_MeshList[iMesh].iSubMeshNum);
-		m_MeshList[iMesh].m_SubMaterialNum.resize(m_MeshList[iMesh].iSubMeshNum);
-		
+		m_Paser.GetNextLine();
+		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
+			&pDrawObject->m_matWorld._41,
+			&pDrawObject->m_matWorld._42,
+			&pDrawObject->m_matWorld._43,
+			&pDrawObject->m_matWorld._44);
 
-		for (int iSubMesh = 0; iSubMesh < m_MeshList[iMesh].iSubMeshNum; iSubMesh++)
+		for (int iSubMesh = 0; iSubMesh < iSubMeshSize; iSubMesh++)
 		{
 			int iVertexSize;
 			int iIndexSize;
 			int iSumMaterialNum;
+			SMesh& pMesh = *pDrawObject->CreateMesh();
 
 			bCheck = m_Paser.GetDataFromFileNext(SubMesh);
 			if (!bCheck) return -1;
@@ -175,35 +157,36 @@ int SSSFileLoader::Load(T_STR FilePath)
 				&iIndexSize);
 			ZeroMemory(String, _countof(String));
 
-			m_MeshList[iMesh].m_VertexList[iSubMesh].resize(iVertexSize);
-			m_MeshList[iMesh].m_IndexList[iSubMesh].resize(iIndexSize);
-			m_MeshList[iMesh].m_SubMaterialNum[iSubMesh] = iSumMaterialNum;
+			pMesh._VertexList.resize(iVertexSize);
+			pMesh._IndexList.resize(iIndexSize);
+			pMesh.iSubMtrlIndex = iSumMaterialNum;
 			for (int iVertex = 0; iVertex < iVertexSize; iVertex++)
 			{
 				m_Paser.GetNextLine();
 				_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f %f %f %f %f %f %f %f"),
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].p.x,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].p.y,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].p.z,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].n.x,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].n.y,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].n.z,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].c.x,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].c.y,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].c.z,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].c.w,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].t.x,
-					&m_MeshList[iMesh].m_VertexList[iSubMesh][iVertex].t.y);
+					&pMesh._VertexList[iVertex].p.x,
+					&pMesh._VertexList[iVertex].p.y,
+					&pMesh._VertexList[iVertex].p.z,
+					&pMesh._VertexList[iVertex].n.x,
+					&pMesh._VertexList[iVertex].n.y,
+					&pMesh._VertexList[iVertex].n.z,
+					&pMesh._VertexList[iVertex].c.x,
+					&pMesh._VertexList[iVertex].c.y,
+					&pMesh._VertexList[iVertex].c.z,
+					&pMesh._VertexList[iVertex].c.w,
+					&pMesh._VertexList[iVertex].t.x,
+					&pMesh._VertexList[iVertex].t.y);
 			}
 ;
 			for (int iIndex = 0; iIndex < iIndexSize; iIndex+=3)
 			{
 				m_Paser.GetNextLine();
 				_stscanf_s(m_Paser.m_pBuffer, _T("%d %d %d"),
-					&m_MeshList[iMesh].m_IndexList[iSubMesh][iIndex + 0],
-					&m_MeshList[iMesh].m_IndexList[iSubMesh][iIndex + 1],
-					&m_MeshList[iMesh].m_IndexList[iSubMesh][iIndex + 2]);
+					&pMesh._IndexList[iIndex + 0],
+					&pMesh._IndexList[iIndex + 1],
+					&pMesh._IndexList[iIndex + 2]);
 			}
+
 		}
 
 		int iMaxScaleNum = 0;
@@ -212,120 +195,57 @@ int SSSFileLoader::Load(T_STR FilePath)
 		bCheck = m_Paser.GetDataFromFile(Animation);
 		if (bCheck == false) return -1;
 
+
 		_stscanf_s(m_Paser.m_pBuffer, _T("%s%d%d%d"), String, MAX_PATH,
 			&iMaxTransposeNum,
 			&iMaxRotationNum,
 			&iMaxScaleNum);
 		ZeroMemory(String, _countof(String));
-		m_MeshList[iMesh].m_PosAnimList.resize(iMaxTransposeNum);
-		m_MeshList[iMesh].m_RotAnimList.resize(iMaxRotationNum);
-		m_MeshList[iMesh].m_ScaleAnimList.resize(iMaxScaleNum);
+		pDrawObject->m_PosAnimList.resize(iMaxTransposeNum);
+		pDrawObject->m_RotAnimList.resize(iMaxRotationNum);
+		pDrawObject->m_ScaleAnimList.resize(iMaxScaleNum);
 		int iCountTrack;
 		for (int iTranspose = 0; iTranspose < iMaxTransposeNum; iTranspose++)
 		{
 			m_Paser.GetNextLine();
 			_stscanf_s(m_Paser.m_pBuffer, _T("\n%d %d %f %f %f"),
 				&iCountTrack,
-				&m_MeshList[iMesh].m_PosAnimList[iTranspose].i,
-				&m_MeshList[iMesh].m_PosAnimList[iTranspose].p.x,
-				&m_MeshList[iMesh].m_PosAnimList[iTranspose].p.y,
-				&m_MeshList[iMesh].m_PosAnimList[iTranspose].p.z);
+				&pDrawObject->m_PosAnimList[iTranspose].iTick,
+				&pDrawObject->m_PosAnimList[iTranspose].Position.x,
+				&pDrawObject->m_PosAnimList[iTranspose].Position.y,
+				&pDrawObject->m_PosAnimList[iTranspose].Position.z);
 		}
 		for (int iRotation = 0; iRotation < iMaxRotationNum; iRotation++)
 		{
 			m_Paser.GetNextLine();
 			_stscanf_s(m_Paser.m_pBuffer, _T("\n%d %d %f %f %f %f"),
 				&iCountTrack,
-				&m_MeshList[iMesh].m_RotAnimList[iRotation].i,
-				&m_MeshList[iMesh].m_RotAnimList[iRotation].q.x,
-				&m_MeshList[iMesh].m_RotAnimList[iRotation].q.y,
-				&m_MeshList[iMesh].m_RotAnimList[iRotation].q.z,
-				&m_MeshList[iMesh].m_RotAnimList[iRotation].q.w);
+				&pDrawObject->m_RotAnimList[iRotation].iTick,
+				&pDrawObject->m_RotAnimList[iRotation].Quaternion.x,
+				&pDrawObject->m_RotAnimList[iRotation].Quaternion.y,
+				&pDrawObject->m_RotAnimList[iRotation].Quaternion.z,
+				&pDrawObject->m_RotAnimList[iRotation].Quaternion.w);
 		}
 		for (int iScale = 0; iScale < iMaxScaleNum; iScale++)
 		{
 			m_Paser.GetNextLine();
 			_stscanf_s(m_Paser.m_pBuffer, _T("\n%d %d %f %f %f %f %f %f %f"),
 				&iCountTrack,
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].i,
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].p.x,
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].p.y,
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].p.z,
+				&pDrawObject->m_ScaleAnimList[iScale].iTick,
+				&pDrawObject->m_ScaleAnimList[iScale].Position.x,
+				&pDrawObject->m_ScaleAnimList[iScale].Position.y,
+				&pDrawObject->m_ScaleAnimList[iScale].Position.z,
 
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].q.x,
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].q.y,
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].q.z,
-				&m_MeshList[iMesh].m_ScaleAnimList[iScale].q.w);
+				&pDrawObject->m_ScaleAnimList[iScale].Quaternion.x,
+				&pDrawObject->m_ScaleAnimList[iScale].Quaternion.y,
+				&pDrawObject->m_ScaleAnimList[iScale].Quaternion.z,
+				&pDrawObject->m_ScaleAnimList[iScale].Quaternion.w);
 		}
+		pDrawObject->Init();
 	}
 	m_Paser.CloseStream();
-
-	for (int iObject = m_MeshList.size() - SceneData.iNumObjects; iObject < m_MeshList.size(); iObject++)
-	{
-		m_ObjectList.push_back(SObject());
-		m_ObjectList[iObject].m_pMesh = &m_MeshList[iObject];
-
-		D3DXMATRIX matInvParent;
-		D3DXMatrixIdentity(&matInvParent);
-		if (m_MeshList[iObject].ParentName == L"none")
-		{
-			m_MeshList[iObject].m_pParent = nullptr;
-		}
-		else
-		{
-			for (int iCount = m_MeshList.size() - SceneData.iNumObjects; iCount < m_MeshList.size(); iCount++)
-			{
-				if (m_MeshList[iObject].ParentName == m_MeshList[iCount].name)
-				{
-					matInvParent = m_MeshList[iCount].m_matInvWorld;
-					m_MeshList[iObject].m_pParent = &m_MeshList[iCount];
-					m_MeshList[iCount].bChild = true;
-					break;
-				}
-			}
-		}
-
-		m_MeshList[iObject].m_matAnimSelf =
-			m_MeshList[iObject].m_matWorld * matInvParent;
-		D3DXMatrixInverse(
-			&m_MeshList[iObject].m_matInvWorld, NULL,
-			&m_MeshList[iObject].m_matWorld);
-
-		D3DXMatrixDecompose(
-			&m_MeshList[iObject].m_vScaleTrack,
-			&m_MeshList[iObject].m_qRotTrack,
-			&m_MeshList[iObject].m_vPosTrack,
-			&m_MeshList[iObject].m_matAnimSelf);
-
-		D3DXMatrixTranslation(&m_MeshList[iObject].m_matPos,
-			m_MeshList[iObject].m_vPosTrack.x,
-			m_MeshList[iObject].m_vPosTrack.y,
-			m_MeshList[iObject].m_vPosTrack.z);
-		D3DXMatrixScaling(&m_MeshList[iObject].m_matScl,
-			m_MeshList[iObject].m_vScaleTrack.x,
-			m_MeshList[iObject].m_vScaleTrack.y,
-			m_MeshList[iObject].m_vScaleTrack.z);
-		D3DXMatrixRotationQuaternion(
-			&m_MeshList[iObject].m_matRot,
-			&m_MeshList[iObject].m_qRotTrack);
-
-		if (m_ObjectList[iObject].m_pMesh->iMtrlID < 0)
-		{
-			m_ObjectList[iObject].m_pMaterial = nullptr;
-		}
-		else
-		{
-			m_ObjectList[iObject].m_pMaterial = &m_MaterialList[m_ObjectList[iObject].m_pMesh->iMtrlID];
-		}
-
-		m_ObjectList[iObject].Create(m_pDevice, m_pContext, _T("Test.hlsl"));
-	}
 	
 	return 0;
-}
-SObject* SSSFileLoader::GetPtr(int iIndex)
-{
-	return &m_ObjectList[iIndex];
 }
 SSSFileLoader::SSSFileLoader()
 {
