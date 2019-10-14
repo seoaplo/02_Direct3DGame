@@ -13,7 +13,7 @@ private:
 
 public:
 	bool Init(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	int Load(T_STR FilePath);
+	bool Load(T_STR FilePath);
 private:
 	SSSFileLoader();
 public:

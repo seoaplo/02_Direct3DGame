@@ -14,7 +14,7 @@ bool SSSFileLoader::Init(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	return true; 
 }
-int SSSFileLoader::Load(T_STR FilePath)
+bool SSSFileLoader::Load(T_STR FilePath)
 {
 	if (m_pDevice == nullptr) return -1;
 	if (m_pContext == nullptr) return -1;
@@ -114,31 +114,31 @@ int SSSFileLoader::Load(T_STR FilePath)
 		pDrawObject->m_Scene = SceneData;
 		m_Paser.GetNextLine();
 		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&pDrawObject->m_matWorld._11,
-			&pDrawObject->m_matWorld._12,
-			&pDrawObject->m_matWorld._13,
-			&pDrawObject->m_matWorld._14);
+			&pDrawObject->m_matAnim._11,
+			&pDrawObject->m_matAnim._12,
+			&pDrawObject->m_matAnim._13,
+			&pDrawObject->m_matAnim._14);
 
 		m_Paser.GetNextLine();
 		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&pDrawObject->m_matWorld._21,
-			&pDrawObject->m_matWorld._22,
-			&pDrawObject->m_matWorld._23,
-			&pDrawObject->m_matWorld._24);
+			&pDrawObject->m_matAnim._21,
+			&pDrawObject->m_matAnim._22,
+			&pDrawObject->m_matAnim._23,
+			&pDrawObject->m_matAnim._24);
 
 		m_Paser.GetNextLine();
 		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&pDrawObject->m_matWorld._31,
-			&pDrawObject->m_matWorld._32,
-			&pDrawObject->m_matWorld._33,
-			&pDrawObject->m_matWorld._34);
+			&pDrawObject->m_matAnim._31,
+			&pDrawObject->m_matAnim._32,
+			&pDrawObject->m_matAnim._33,
+			&pDrawObject->m_matAnim._34);
 
 		m_Paser.GetNextLine();
 		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f"),
-			&pDrawObject->m_matWorld._41,
-			&pDrawObject->m_matWorld._42,
-			&pDrawObject->m_matWorld._43,
-			&pDrawObject->m_matWorld._44);
+			&pDrawObject->m_matAnim._41,
+			&pDrawObject->m_matAnim._42,
+			&pDrawObject->m_matAnim._43,
+			&pDrawObject->m_matAnim._44);
 
 		for (int iSubMesh = 0; iSubMesh < iSubMeshSize; iSubMesh++)
 		{
@@ -242,10 +242,11 @@ int SSSFileLoader::Load(T_STR FilePath)
 				&pDrawObject->m_ScaleAnimList[iScale].Quaternion.w);
 		}
 		pDrawObject->Init();
+		pDrawObject->Create(m_pDevice, m_pContext, L"Test.hlsl");
 	}
 	m_Paser.CloseStream();
 	
-	return 0;
+	return true;
 }
 SSSFileLoader::SSSFileLoader()
 {

@@ -10,7 +10,7 @@ bool SDrawObject::Init()
 	m_fAnimElapseTime = 0.0f;
 	return true;
 }
-bool SDrawObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TCHAR* pShaderFile)
+bool SDrawObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* pShaderFile)
 {
 	bool bMaterial = SetMaterial(m_iMaterialID);
 	bool bParent = SetParent(m_ParentName);
@@ -29,13 +29,13 @@ bool SDrawObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, T
 	}
 
 	D3DXMATRIX matInvParent;
-	if (bParent) matInvParent = m_pParentObject->m_matInvWorld;
+	if (bParent) matInvParent = m_pParentObject->m_matAnimInv;
 	else D3DXMatrixIdentity(&matInvParent);
 
-	m_matAnimSelf =	m_matWorld * matInvParent;
+	m_matAnimSelf =	m_matAnim * matInvParent;
 	D3DXMatrixInverse(
-		&m_matInvWorld, NULL,
-		&m_matWorld);
+		&m_matAnimInv, NULL,
+		&m_matAnim);
 
 	D3DXMatrixDecompose(
 		&m_vScaleTrack,
@@ -77,11 +77,16 @@ bool SDrawObject::Frame()
 	{
 		Interpolate(matParent,	m_fAnimElapseTime);
 	}
-
 	return true;
 }
 bool SDrawObject::Render(ID3D11DeviceContext* pContext)
 {
+	D3DXMATRIX matWorld = m_matAnimInv * m_matCalculation * m_matWorld;
+	for (auto& TargetMesh : m_MeshList)
+	{
+		TargetMesh.SetMatrix(&matWorld, &m_matView, &m_matProj);
+		TargetMesh.Render(pContext);
+	}
 	return true;
 }
 bool SDrawObject::Release()
@@ -175,10 +180,6 @@ void SDrawObject::Interpolate(D3DXMATRIX &matParent, float fElapseTime)
 	matAnim._42 = matAnimPos._42;
 	matAnim._43 = matAnimPos._43;
 
-	D3DXMATRIX matinvParent;
-	D3DXMatrixIdentity(&matinvParent);
-	D3DXMatrixInverse(&matinvParent, nullptr, &matParent);
-
 	m_matCalculation = matAnim * matParent;
 	return;
 }
@@ -198,6 +199,25 @@ bool SDrawObject::GetAnimationTrack(
 			break;
 		}
 		StartTrack = track;
+	}
+	return true;
+}
+bool SDrawObject::SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView, D3DXMATRIX* pProj)
+{
+	if (pWorld != NULL)
+	{
+		m_matWorld = *pWorld;
+		m_vCenter.x = pWorld->_41;
+		m_vCenter.y = pWorld->_42;
+		m_vCenter.z = pWorld->_43;
+	}
+	if (pView != NULL)
+	{
+		m_matView = *pView;
+	}
+	if (pProj != NULL)
+	{
+		m_matProj = *pProj;
 	}
 	return true;
 }
@@ -229,6 +249,15 @@ bool SDrawObject::SetMaterial(SMaterial* pMaterial)
 	m_pMaterial = pMaterial;
 	if (m_pMaterial == nullptr) return false;
 	else m_iMaterialID = m_pMaterial->m_iIndex;
+
+	for (auto& TargetMesh : m_MeshList)
+	{
+		if (m_pMaterial != nullptr && m_iClassType == CLASS_GEOM)
+		{
+			STextureList& TargetTexList = m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			TargetMesh.m_pTextureList = &m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+		}
+	}
 	return true;
 }
 bool SDrawObject::SetMaterial(T_STR MaterialName)
@@ -236,6 +265,15 @@ bool SDrawObject::SetMaterial(T_STR MaterialName)
 	m_pMaterial = I_MaterialManager.GetMaterial(MaterialName);
 	if (m_pMaterial == nullptr) return false;
 	else m_iMaterialID = m_pMaterial->m_iIndex;
+
+	for (auto& TargetMesh : m_MeshList)
+	{
+		if (m_pMaterial != nullptr && m_iClassType == CLASS_GEOM)
+		{
+			STextureList& TargetTexList = m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			TargetMesh.m_pTextureList = &m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+		}
+	}
 	return true;
 }
 bool SDrawObject::SetMaterial(int iMaterialNumber)
@@ -243,6 +281,15 @@ bool SDrawObject::SetMaterial(int iMaterialNumber)
 	m_iMaterialID = iMaterialNumber;
 	m_pMaterial = I_MaterialManager.GetMaterial(iMaterialNumber);
 	if (m_pMaterial == nullptr) return false;
+
+	for (auto& TargetMesh : m_MeshList)
+	{
+		if (m_pMaterial != nullptr && m_iClassType == CLASS_GEOM)
+		{
+			STextureList& TargetTexList = m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			TargetMesh.m_pTextureList = &m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+		}
+	}
 	return true;
 }
 SDrawObject::SDrawObject()
@@ -253,6 +300,10 @@ SDrawObject::SDrawObject()
 	m_ParentName = L"none";
 	m_pMaterial = nullptr;
 	m_pParentObject = nullptr;
+
+	D3DXMatrixIdentity(&m_matWorld);
+	D3DXMatrixIdentity(&m_matView);
+	D3DXMatrixIdentity(&m_matProj);
 }
 
 
@@ -264,6 +315,7 @@ SDrawObject::~SDrawObject()
 SDrawObject* SDrawObjectManager::Create()
 {
 	m_DrawObjectList.push_back(SDrawObject());
+	UpdateParent();
 	m_DrawObjectList[m_DrawObjectList.size() - 1].m_iIndex = m_DrawObjectList.size() - 1;
 	return &m_DrawObjectList[m_DrawObjectList.size() - 1];
 }
@@ -277,6 +329,7 @@ SDrawObject* SDrawObjectManager::GetDrawObject(T_STR DrawObjectName)
 			return &Target;
 		}
 	}
+	return nullptr;
 }
 SDrawObject* SDrawObjectManager::GetDrawObject(int	iIndex)
 {
@@ -286,4 +339,13 @@ SDrawObject* SDrawObjectManager::GetDrawObject(int	iIndex)
 int	SDrawObjectManager::GetSize() 
 {
 	return m_DrawObjectList.size();
+}
+
+void SDrawObjectManager::UpdateParent()
+{
+	for (auto& TargetObj : m_DrawObjectList)
+	{
+		if (TargetObj.m_ParentName == L"none") continue;
+		TargetObj.SetParent(GetDrawObject(TargetObj.m_ParentName));
+	}
 }

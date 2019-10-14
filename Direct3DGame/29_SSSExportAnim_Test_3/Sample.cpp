@@ -36,6 +36,10 @@ bool Sample::Init()
 	//--------------------------------------------------------------------------------------	
 	m_pMainCamera = make_shared<SCamera>();
 
+	for (int iCount = 0; iCount < I_DrawObjectManager.GetSize(); iCount++)
+	{
+		m_ObjList.push_back(I_DrawObjectManager.GetDrawObject(iCount));
+	}
 
 	float fAspectRatio = m_nWindowWidth / (FLOAT)m_nWindowHeight;
 	m_pMainCamera->SetViewMatrix(D3DXVECTOR3(0.0f, 0.0f, -10.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -52,6 +56,11 @@ bool Sample::Frame()
 
 	// 2초당 1회전( 1 초 * D3DX_PI = 3.14 )
 
+	for (int iCount = 0; iCount < I_DrawObjectManager.GetSize(); iCount++)
+	{
+		m_ObjList[iCount]->Frame();
+	}
+
 	//m_pObj->Frame();
 	m_pMainCamera->Frame();
 	return true;
@@ -62,9 +71,13 @@ bool Sample::Render()
 	// Direction 오브젝트 랜더링
 	//--------------------------------------------------------------------------------------
 	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-	//m_pObj->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 
-	//m_pObj->Render(GetContext());
+	for (int iCount = 0; iCount < I_DrawObjectManager.GetSize(); iCount++)
+	{
+		m_ObjList[iCount]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+		m_ObjList[iCount]->Render(GetContext());
+	}
+
 	return true;
 }
 bool Sample::Release()

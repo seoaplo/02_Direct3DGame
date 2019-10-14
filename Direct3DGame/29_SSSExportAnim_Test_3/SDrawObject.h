@@ -29,13 +29,18 @@ public:
 	T_STR	m_ParentName;
 	SDrawObject*	m_pParentObject;
 
+	D3DXVECTOR3 m_vCenter;
+
 	SScene	m_Scene;
 	SMaterial* m_pMaterial;
 	std::vector<SMesh> m_MeshList;
 
-	D3DXMATRIX m_matWorld;
-	D3DXMATRIX m_matInvWorld;
+	D3DXMATRIX m_matAnim;
+	D3DXMATRIX m_matAnimInv;
 	D3DXMATRIX  m_matCalculation;
+	D3DXMATRIX  m_matWorld;
+	D3DXMATRIX  m_matView;
+	D3DXMATRIX  m_matProj;
 
 	float m_fAnimationSpeed;
 	float m_fAnimElapseTime;
@@ -59,7 +64,7 @@ public:
 	bool Render(ID3D11DeviceContext* pContext);
 	bool Release();
 
-	bool Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TCHAR* pShaderFile);
+	bool Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* pShaderFile = nullptr);
 
 	void Interpolate(D3DXMATRIX &matParent,  float fElapseTime);
 	bool GetAnimationTrack(float fElapseTime, std::vector<SAnimTrack>& trackList, SAnimTrack& StartTrack, SAnimTrack& EndTrack);
@@ -72,6 +77,7 @@ public:
 	bool SetMaterial(T_STR MaterialName);
 	bool SetMaterial(int iMaterialNumber);
 
+	bool SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView = nullptr, D3DXMATRIX* pProj = nullptr);
 public:
 	SDrawObject();
 	~SDrawObject();
@@ -87,6 +93,8 @@ public:
 	SDrawObject*	GetDrawObject(T_STR DrawObjectName);
 	SDrawObject*	GetDrawObject(int	iIndex);
 	int			GetSize();
+private:
+	void UpdateParent();
 private:
 	SDrawObjectManager() {}
 public:

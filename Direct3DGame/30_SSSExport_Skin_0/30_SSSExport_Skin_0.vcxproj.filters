@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="SCAManager">
+      <UniqueIdentifier>{1347aaf5-5373-4f9c-aff7-7a17af0ec56d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAExporter">
+      <UniqueIdentifier>{2ccd82fc-a954-4f84-b3e3-1814b6330dcd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="header.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SCAGlobal.h">
+      <Filter>SCAManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAMaterialManager.h">
+      <Filter>SCAManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAObjectManager.h">
+      <Filter>SCAManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAWriter.h">
+      <Filter>SCAExporter</Filter>
+    </ClInclude>
+    <ClInclude Include="SCASkinExp.h">
+      <Filter>SCAExporter</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="SCAGlobal.cpp">
+      <Filter>SCAManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAMaterialManager.cpp">
+      <Filter>SCAManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAObjectManager.cpp">
+      <Filter>SCAManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAExport.cpp">
+      <Filter>SCAExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAWriter.cpp">
+      <Filter>SCAExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SCASkinExp.cpp">
+      <Filter>SCAExporter</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SCAExport.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

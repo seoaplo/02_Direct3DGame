@@ -156,6 +156,25 @@ HRESULT SMesh::SetInputLayout()
 	return hr;
 }
 
+void SMesh::SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView, D3DXMATRIX* pProj)
+{
+	if (pWorld != NULL)
+	{
+		m_matWorld = *pWorld;
+	}
+	if (pView != NULL)
+	{
+		m_matView = *pView;
+	}
+	if (pProj != NULL)
+	{
+		m_matProj = *pProj;
+	}
+	D3DXMatrixTranspose(&m_cbData.matWorld, &m_matWorld);
+	D3DXMatrixTranspose(&m_cbData.matView, &m_matView);
+	D3DXMatrixTranspose(&m_cbData.matProj, &m_matProj);
+}
+
 //----------------------------------------------------------------------------------------------------------
 // Frame Work
 //----------------------------------------------------------------------------------------------------------
@@ -169,15 +188,32 @@ bool SMesh::Frame()
 }
 bool SMesh::PreRender(ID3D11DeviceContext* pContext)
 {
+	pContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)m_dxobj.m_iPrimitiveType);
+	m_dxobj.PreRender(pContext, m_dxobj.m_iVertexSize);
+	if (m_pTextureList != nullptr)
+	{
+		for (int iCount = 0; iCount < TexType_Size; iCount++)
+		{
+			if (m_pTextureList->List[iCount] != nullptr)
+			{
+				pContext->PSSetShaderResources(iCount, 1, &m_pTextureList->List[iCount]->m_pSRV);
+			}
+		}
+	}
+
 	return true;
 }
 bool SMesh::Render(ID3D11DeviceContext*		pContext)
 {
+	PreRender(pContext);
+	PostRender(pContext);
 	return true;
 
 }
 bool SMesh::PostRender(ID3D11DeviceContext* pContext)
 {
+	UpdateConstantBuffer(pContext);
+	m_dxobj.PostRender(pContext, m_dxobj.m_iNumIndex);
 	return true;
 }
 bool SMesh::Release()

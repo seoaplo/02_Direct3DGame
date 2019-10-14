@@ -1,14 +1,14 @@
-#include "SSSObjectManager.h"
+#include "SCAObjectManager.h"
 
 
-void SSSObjectManager::AddObject(INode* pNode, SScene& Scene, Interval& interval, int iMaterialID)
+void SCAObjectManager::AddObject(INode* pNode, SCAScene& Scene, Interval& interval, int iMaterialID)
 {
 	ObjectState os = pNode->EvalWorldState(interval.Start());
 	Object* CheckID = nullptr;
 	int ChildNum = pNode->NumChildren();
 	int iObjectNumber = -1;
 
-	SObject Object;
+	SCAObject Object;
 	iObjectNumber = m_ObjectList.size();
 	CheckID = pNode->GetObjectRef();
 
@@ -54,11 +54,11 @@ void SSSObjectManager::AddObject(INode* pNode, SScene& Scene, Interval& interval
 	INode* pParentNode = pNode->GetParentNode();
 	if (pParentNode &&	pParentNode->IsRootNode() == false)
 	{
-		Object.ParentName = SSSGlobal::FixupName(pParentNode->GetName());
+		Object.ParentName = SCAGlobal::FixupName(pParentNode->GetName());
 	}
-	Object.name = SSSGlobal::FixupName(pNode->GetName());
+	Object.name = SCAGlobal::FixupName(pNode->GetName());
 	Matrix3 wtm = pNode->GetNodeTM(interval.Start());
-	SSSGlobal::DumpMatrix3(Object.matWorld, &wtm);
+	SCAGlobal::DumpMatrix3(Object.matWorld, &wtm);
 
 	if (Object.m_ClassType == CLASS_GEOM)
 	{
@@ -75,7 +75,7 @@ void SSSObjectManager::AddObject(INode* pNode, SScene& Scene, Interval& interval
 	m_ObjectList.push_back(Object);
 }
 
-void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
+void SCAObjectManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval)
 {
 	for (int iCount = 0; iCount < SUBMATERIAL_SIZE; iCount++)
 	{
@@ -84,14 +84,6 @@ void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
 
 	// 로컬 좌표계이면 월드 행렬, 아니면 단위 행렬
 	Matrix3 tm = pNode->GetObjTMAfterWSM(interval.Start());
-	Matrix3 ParentTM = pNode->GetParentTM(interval.Start());
-	Matrix3 LocalTM = pNode->GetNodeTM(interval.Start()) * Inverse(ParentTM);
-
-	D3D_MATRIX Parent;
-	D3D_MATRIX Local;
-
-	SSSGlobal::DumpMatrix3(Parent, &ParentTM);
-	SSSGlobal::DumpMatrix3(Local, &LocalTM);
 
 	bool deleteit = false;
 	// 트라이앵글 오브젝트
@@ -99,7 +91,7 @@ void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
 	if (tri == nullptr) return;
 	// 메쉬 오브젝트
 	Mesh* mesh = &tri->GetMesh();
-	bool negScale = SSSGlobal::TMNegParity(tm);
+	bool negScale = SCAGlobal::TMNegParity(tm);
 
 	int v0, v1, v2;
 	if (negScale) { v0 = 2; v1 = 1; v2 = 0; }
@@ -117,7 +109,7 @@ void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
 			{
 				continue;
 			}
-			m_TriList[iSubIndex].push_back(STriangle());
+			m_TriList[iSubIndex].push_back(SCATriangle());
 			int iFaceNum = m_TriList[iSubIndex].size() - 1;
 
 			// position
@@ -125,13 +117,13 @@ void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
 			if (iNumPos > 0)
 			{
 				Point3 v = mesh->verts[mesh->faces[iFace].v[v0]] * tm;
-				SSSGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[0].p, v);
+				SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[0].p, v);
 
 				v = mesh->verts[mesh->faces[iFace].v[v2]] * tm;
-				SSSGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[1].p, v);
+				SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[1].p, v);
 
 				v = mesh->verts[mesh->faces[iFace].v[v1]] * tm;
-				SSSGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[2].p, v);
+				SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[2].p, v);
 			}
 			// color
 			int iNumColor = mesh->getNumVertCol();
@@ -167,17 +159,17 @@ void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
 			int vert = mesh->faces[iFace].getVert(v0);
 			RVertex* rVertex = mesh->getRVertPtr(vert);
 			Point3 vn = GetVertexNormal(mesh, iFace, rVertex);
-			SSSGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v0].n, vn);
+			SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v0].n, vn);
 
 			vert = mesh->faces[iFace].getVert(v2);
 			rVertex = mesh->getRVertPtr(vert);
 			vn = GetVertexNormal(mesh, iFace, rVertex);
-			SSSGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v1].n, vn);
+			SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v1].n, vn);
 
 			vert = mesh->faces[iFace].getVert(v1);
 			rVertex = mesh->getRVertPtr(vert);
 			vn = GetVertexNormal(mesh, iFace, rVertex);
-			SSSGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v2].n, vn);
+			SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v2].n, vn);
 		}
 
 		// vb, ib
@@ -186,7 +178,7 @@ void SSSObjectManager::GetMesh(INode* pNode, SMesh& sMesh, Interval& interval)
 
 	if (deleteit) delete tri;
 }
-void SSSObjectManager::GetBox(SMesh& sMesh)
+void SCAObjectManager::GetBox(SCAMesh& sMesh)
 {
 	sMesh.iSubNum = 1;
 	sMesh.SubMeshList[0].bUse = true;
@@ -236,7 +228,7 @@ void SSSObjectManager::GetBox(SMesh& sMesh)
 
 	return;
 }
-void SSSObjectManager::SetUniqueBuffer(SMesh& sMesh)
+void SCAObjectManager::SetUniqueBuffer(SCAMesh& sMesh)
 {
 
 	for (int iSub = 0; iSub < SUBMATERIAL_SIZE; iSub++)
@@ -248,8 +240,8 @@ void SSSObjectManager::SetUniqueBuffer(SMesh& sMesh)
 
 		for (int iFace = 0; iFace < m_TriList[iSub].size(); iFace++)
 		{
-			std::vector<STriangle>& triArray = m_TriList[iSub];
-			STriangle& tri = triArray[iFace];
+			std::vector<SCATriangle>& triArray = m_TriList[iSub];
+			SCATriangle& tri = triArray[iFace];
 			std::vector<PNCT>& vList = sMesh.SubMeshList[iSub].VertexList;
 			std::vector<DWORD>& iList = sMesh.SubMeshList[iSub].IndexList;
 			for (int iVer = 0; iVer < 3; iVer++)
@@ -265,21 +257,21 @@ void SSSObjectManager::SetUniqueBuffer(SMesh& sMesh)
 		}
 	}
 }
-int	SSSObjectManager::IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList)
+int	SCAObjectManager::IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList)
 {
 	for (int iVer = 0; iVer < vList.size(); iVer++)
 	{
-		if (SSSGlobal::EqualPoint3(vertex.p, vList[iVer].p) &&
-			SSSGlobal::EqualPoint3(vertex.n, vList[iVer].n) &&
-			SSSGlobal::EqualPoint4(vertex.c, vList[iVer].c) &&
-			SSSGlobal::EqualPoint2(vertex.t, vList[iVer].t))
+		if (SCAGlobal::EqualPoint3(vertex.p, vList[iVer].p) &&
+			SCAGlobal::EqualPoint3(vertex.n, vList[iVer].n) &&
+			SCAGlobal::EqualPoint4(vertex.c, vList[iVer].c) &&
+			SCAGlobal::EqualPoint2(vertex.t, vList[iVer].t))
 		{
 			return iVer;
 		}
 	}
 	return -1;
 }
-Point3	SSSObjectManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
+Point3	SCAObjectManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
 {
 	Face* f = &mesh->faces[iFace];
 	DWORD smGroup = f->smGroup;
@@ -313,7 +305,7 @@ Point3	SSSObjectManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex
 	}
 	return vertexNormal;
 }
-TriObject* SSSObjectManager::GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit)
+TriObject* SCAObjectManager::GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit)
 {
 	// 오브젝트를 받는다.
 	Object* obj = pNode->EvalWorldState(time).obj;
@@ -328,7 +320,7 @@ TriObject* SSSObjectManager::GetTriObjectFromNode(INode* pNode, TimeValue time, 
 }
 
 
-void SSSObjectManager::GetAnimation(INode* pNode, SAnimationTrack& AnimTrack, SScene& Scene, Interval& interval)
+void SCAObjectManager::GetAnimation(INode* pNode, SCAAnimationTrack& AnimTrack, SCAScene& Scene, Interval& interval)
 {
 
 
@@ -346,9 +338,9 @@ void SSSObjectManager::GetAnimation(INode* pNode, SAnimationTrack& AnimTrack, SS
 	AngAxisFromQ(StartAP.q, &Start_RotValue, Start_RotAxis);
 	//<----------------------------
 
-	SPositionAnim	PosTrack;
-	SRotationAnim	RotTrack;
-	SScaleAnim		ScaleTrack;
+	SCAPositionAnim	PosTrack;
+	SCARotationAnim	RotTrack;
+	SCAScaleAnim		ScaleTrack;
 
 	ZeroMemory(&PosTrack, sizeof(PosTrack));
 	ZeroMemory(&RotTrack, sizeof(RotTrack));
@@ -384,14 +376,14 @@ void SSSObjectManager::GetAnimation(INode* pNode, SAnimationTrack& AnimTrack, SS
 
 
 		if (!AnimTrack.bPosition) {
-			if (!SSSGlobal::EqualPoint3(StartAP.t, FrameAP.t))
+			if (!SCAGlobal::EqualPoint3(StartAP.t, FrameAP.t))
 			{
 				AnimTrack.bPosition = true;
 			}
 		}
 
 		if (!AnimTrack.bRotation) {
-			if (!SSSGlobal::EqualPoint3(Start_RotAxis, Frame_RotAxis))
+			if (!SCAGlobal::EqualPoint3(Start_RotAxis, Frame_RotAxis))
 			{
 				AnimTrack.bRotation = true;
 			}
@@ -405,14 +397,14 @@ void SSSObjectManager::GetAnimation(INode* pNode, SAnimationTrack& AnimTrack, SS
 		}
 
 		if (!AnimTrack.bScale) {
-			if (!SSSGlobal::EqualPoint3(StartAP.k, FrameAP.k))
+			if (!SCAGlobal::EqualPoint3(StartAP.k, FrameAP.k))
 			{
 				AnimTrack.bScale = true;
 			}
 		}
 	}
 }
-bool SSSObjectManager::ExportObject(FILE* pStream)
+bool SCAObjectManager::ExportObject(FILE* pStream)
 {
 	if (pStream == nullptr)
 	{
@@ -458,7 +450,7 @@ bool SSSObjectManager::ExportObject(FILE* pStream)
 
 	return true;
 }
-bool SSSObjectManager::ExportMesh(FILE* pStream, SMesh& sMesh)
+bool SCAObjectManager::ExportMesh(FILE* pStream, SCAMesh& sMesh)
 {
 	if (pStream == nullptr)
 	{
@@ -505,7 +497,7 @@ bool SSSObjectManager::ExportMesh(FILE* pStream, SMesh& sMesh)
 
 	return true;
 }
-bool SSSObjectManager::ExportAnimation(FILE* pStream, SAnimationTrack& AnimTrack)
+bool SCAObjectManager::ExportAnimation(FILE* pStream, SCAAnimationTrack& AnimTrack)
 {
 	if (pStream == nullptr)
 	{
@@ -561,11 +553,11 @@ bool SSSObjectManager::ExportAnimation(FILE* pStream, SAnimationTrack& AnimTrack
 	return true;
 }
 
-SSSObjectManager::SSSObjectManager()
+SCAObjectManager::SCAObjectManager()
 {
 }
 
 
-SSSObjectManager::~SSSObjectManager()
+SCAObjectManager::~SCAObjectManager()
 {
 }

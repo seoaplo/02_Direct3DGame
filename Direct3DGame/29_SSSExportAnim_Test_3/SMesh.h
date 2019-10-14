@@ -25,7 +25,7 @@ public:
 
 	virtual bool				Load(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* szLoadName, const TCHAR* pLoadShaderFile, bool bThread = false)override;
 	HRESULT						LoadTextures(ID3D11Device* pDevice);
-
+	void						SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView, D3DXMATRIX* pProj)override;
 	//----------------------------------------------------------------------------------------------------------
 	// Frame Work
 	//----------------------------------------------------------------------------------------------------------

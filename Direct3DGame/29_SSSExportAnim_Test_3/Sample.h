@@ -17,6 +17,8 @@ public:
 	//===================================================================
 	shared_ptr<SCamera > m_pMainCamera;
 	
+	std::vector<SDrawObject*> m_ObjList;
+
 	DXGame::SDxHelperEX		dxObj;
 	bool					m_bDebugRender;
 	D3DXMATRIX				m_matInitWorld;
