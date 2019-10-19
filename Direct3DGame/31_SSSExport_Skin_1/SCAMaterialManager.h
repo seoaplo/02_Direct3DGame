@@ -7,7 +7,7 @@ class SCAMaterialManager
 private:
 	std::vector<SCAMaterial>	m_MaterialList;
 public:
-	int	AddMaterial(INode* pNode);
+	int		AddMaterial(INode* pNode);
 	void	GetTexture(Mtl* pMtl, SCASubMaterial& SubMtrl);
 	int		FindMaterial(INode* pNode);
 	bool	ExportMaterial(FILE* pStream);

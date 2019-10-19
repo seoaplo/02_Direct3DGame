@@ -22,7 +22,7 @@ bool Sample::Init()
 {
 	int iKey;
 	I_SSSFileLoaderManeger.Init(GetDevice(), GetContext());
-	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestGreyStone.SSS");
+	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestSOA.SOA");
 
 	
 
@@ -73,6 +73,7 @@ bool Sample::Render()
 	
 	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 
+	D3DXMatrixIdentity(&m_matWorld);
 	//D3DXMatrixScaling(&m_matWorld, 100, 100, 100);
 	for (int iCount = 0; iCount < I_DrawObjectManager.GetSize(); iCount++)
 	{

@@ -15,6 +15,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #define CTL_CHARS			31
 #define SINGLE_QUOTE		39 // ( ' )
@@ -61,6 +62,16 @@ typedef struct _D3D_MATRIX
 	};
 }D3D_MATRIX, *LPD3D_MATRIX;
 
+struct SAScene
+{
+	int   iFirstFrame;  // 0
+	int   iLastFrame;   // 100
+	int   iFrameSpeed; // 1 Scecond = 30 Frame
+	int   iTickPerFrame; // 1 Frame = 160 Tick
+	int   iNumObjects;
+	int   iNumMaterials;
+};
+
 struct PNCT
 {
 	Point3 p;
@@ -84,38 +95,36 @@ struct PNCT
 	}
 };
 
-struct SCATextureMap
+struct SATextureMap
 {
 	bool	bUse;
 	TSTR	szName;
-	SCATextureMap()
+	SATextureMap()
 	{
 		bUse = false;
 	}
 };
 
-struct SCASubMaterial
+struct SASubMaterial
 {
-	bool	bUse;
 	TSTR	szName;
 	int		iTextureNumSize;
-	SCATextureMap TextureMapList[TexType_Number];
-	SCASubMaterial()
+	SATextureMap TextureMapList[TexType_Number];
+	SASubMaterial()
 	{
-		bUse = false;
 		iTextureNumSize = 0;
 	}
 };
 
-struct SCAMaterial
+struct SAMaterial
 {
 	Mtl*	pMaterial;
 	int		iMaterialID;
 	TSTR	szName;
 
 	int SubMaterialNum;
-	SCASubMaterial	SubMaterialList[SUBMATERIAL_SIZE];
-	SCAMaterial()
+	std::vector<SASubMaterial>	SubMaterialList;
+	SAMaterial()
 	{
 		pMaterial = nullptr;
 		iMaterialID -1;
@@ -132,14 +141,31 @@ struct SOATriangle
 	}
 };
 
+struct SOATriangleList
+{
+	int iSize;
+	std::vector<SOATriangle> List;
+	SOATriangleList()
+	{
+		iSize = 0;
+	}
+	~SOATriangleList()
+	{
+		List.clear();
+	}
+};
+
 struct SOASubMesh
 {
-	bool bUse;
+	int iVertexSize;
+	int iIndexSize;
 	std::vector<PNCT>			VertexList;
 	std::vector<DWORD>			IndexList;
+
 	SOASubMesh()
 	{
-		bUse = false;
+		iVertexSize = 0;
+		iIndexSize = 0;
 	}
 };
 
@@ -148,7 +174,9 @@ struct SOAMesh
 	int				iMaterialID;
 	int				iSubNum;
 	Box3			m_box;
-	SOASubMesh		SubMeshList[SUBMATERIAL_SIZE];
+
+	std::vector<SOASubMesh>	SubMeshList;
+
 	SOAMesh()
 	{
 		iMaterialID = -1;
@@ -157,35 +185,35 @@ struct SOAMesh
 };
 
 
-struct SCAPositionAnim
+struct SAPositionAnim
 {
 	int     i;
 	Point3  p;
 };
 
-struct SCARotationAnim
+struct SARotationAnim
 {
 	int     i;
 	Quat    q;
 };
 
-struct SCAScaleAnim
+struct SAScaleAnim
 {
 	int     i;
 	Point3  p;
 	Quat    q;
 };
 
-struct SCAAnimationTrack
+struct SAAnimationTrack
 {
 	bool	bPosition;
 	bool	bRotation;
 	bool	bScale;
 
-	std::vector<SCAPositionAnim>	PositionTrack;
-	std::vector<SCARotationAnim>	RotationTrack;
-	std::vector<SCAScaleAnim>		ScaleTrack;
-	SCAAnimationTrack()
+	std::vector<SAPositionAnim>	PositionTrack;
+	std::vector<SARotationAnim>	RotationTrack;
+	std::vector<SAScaleAnim>		ScaleTrack;
+	SAAnimationTrack()
 	{
 		bPosition = false;
 		bRotation = false;
@@ -197,16 +225,16 @@ struct SOAObject
 {
 	INode*  pINode;
 	int		m_ClassType;
-	int		iIndex;
+
 	TSTR    name;
 	TSTR    ParentName;
 
 	Matrix3    wtm;
 	D3D_MATRIX matWorld;
-	D3D_MATRIX matInvWorld;
-	
+
 	SOAMesh			m_Mesh;
-	SCAAnimationTrack	m_AnimTrack;
+	SAAnimationTrack	m_AnimTrack;
+
 
 	SOAObject()
 	{
@@ -214,17 +242,6 @@ struct SOAObject
 		ParentName = L"none";
 	}
 };
-
-struct SCAScene
-{
-	int   iFirstFrame;  // 0
-	int   iLastFrame;   // 100
-	int   iFrameSpeed; // 1 Scecond = 30 Frame
-	int   iTickPerFrame; // 1 Frame = 160 Tick
-	int   iNumObjects;
-	int   iNumMaterials;
-};
-
 
 struct SCABiped
 {
@@ -328,7 +345,7 @@ struct SCAObject
 	D3D_MATRIX matInvWorld;
 
 	SCAMesh			m_Mesh;
-	SCAAnimationTrack	m_AnimTrack;
+	SAAnimationTrack	m_AnimTrack;
 
 	SCAObject()
 	{

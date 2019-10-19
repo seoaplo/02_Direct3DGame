@@ -1,9 +1,10 @@
 #include "SSSFileLoader.h"
 
-static TCHAR SSSExporter[] = L"SSSExporter100";
+static TCHAR SOAExporter[] = L"SOAExporter100";
 static TCHAR Header[] = L"#HEADERINFO";
 static TCHAR Material[] = L"#MATERIAL_INFO";
 static TCHAR Object[] = L"#OBJECT_INFO";
+static TCHAR Mesh[] = L"Mesh";
 static TCHAR SubMesh[] = L"SubMesh";
 static TCHAR Animation[] = L"#AnimationData";
 
@@ -27,7 +28,7 @@ bool SSSFileLoader::Load(T_STR FilePath)
 
 	m_Paser.OpenStream(FilePath.c_str());
 	
-	bCheck = m_Paser.GetDataFromFileNext(SSSExporter);
+	bCheck = m_Paser.GetDataFromFileNext(SOAExporter);
 	if (bCheck == false) return -1;
 
 	bCheck = m_Paser.GetDataFromFile(Header);

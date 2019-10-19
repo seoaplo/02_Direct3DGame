@@ -1,5 +1,12 @@
 #include "SCAObjectManager.h"
 
+struct BipAscendingSort
+{
+	bool operator()(SCABiped& rpStart, SCABiped& rpEnd)
+	{
+		return rpStart.m_fWeight < rpEnd.m_fWeight;
+	}
+};
 
 void SCAObjectManager::AddObject(INode* pNode, SCAScene& Scene, Interval& interval, int iMaterialID)
 {
@@ -9,8 +16,9 @@ void SCAObjectManager::AddObject(INode* pNode, SCAScene& Scene, Interval& interv
 	int iObjectNumber = -1;
 
 	SCAObject Object;
-	iObjectNumber = m_ObjectList.size();
+	iObjectNumber = m_CharacterList.size();
 	CheckID = pNode->GetObjectRef();
+	Control* pControl = pNode->GetTMController();
 
 	if (os.obj)
 	{
@@ -25,22 +33,28 @@ void SCAObjectManager::AddObject(INode* pNode, SCAScene& Scene, Interval& interv
 			// 해당 노드이면 저장
 		case GEOMOBJECT_CLASS_ID:
 		case HELPER_CLASS_ID:
-			
+
 			if (CheckID->ClassID() == Class_ID(BONE_CLASS_ID, 0))// 본 오브젝트   
 			{
-				if (ChildNum <= 0) return;
 				Object.m_ClassType = CLASS_BONE;
 			}
 			else if (CheckID->ClassID() == Class_ID(DUMMY_CLASS_ID, 0))  // 더미 오브젝트
 			{
-				if (ChildNum <= 0) return;
 				Object.m_ClassType = CLASS_DUMMY;
 			}
 			else
 			{
 				Object.m_ClassType = CLASS_GEOM;
-				if (iMaterialID < 0) return;
-				else Object.m_ClassType = CLASS_GEOM;
+			}
+			if (pControl && pControl->ClassID()
+				== BIPBODY_CONTROL_CLASS_ID)
+			{
+				Object.m_ClassType = CLASS_BIPED;
+			}
+			if (pControl && pControl->ClassID()
+				== BIPSLAVE_CONTROL_CLASS_ID)
+			{
+				Object.m_ClassType = CLASS_BIPED;
 			}
 			break;
 		default:
@@ -57,29 +71,23 @@ void SCAObjectManager::AddObject(INode* pNode, SCAScene& Scene, Interval& interv
 		Object.ParentName = SCAGlobal::FixupName(pParentNode->GetName());
 	}
 	Object.name = SCAGlobal::FixupName(pNode->GetName());
+	Object.pINode = pNode;
 	Matrix3 wtm = pNode->GetNodeTM(interval.Start());
+	Matrix3 Invwtm = Inverse(wtm);
 	SCAGlobal::DumpMatrix3(Object.matWorld, &wtm);
+	SCAGlobal::DumpMatrix3(Object.matInvWorld, &Invwtm);
 
-	if (Object.m_ClassType == CLASS_GEOM)
-	{
-		Object.m_Mesh.iMaterialID = iMaterialID;
-		GetMesh(pNode, Object.m_Mesh, interval);
-	}
-	else
-	{
-		GetBox(Object.m_Mesh);
-	}
+	Object.m_Mesh.iMaterialID = iMaterialID;
+	GetMesh(pNode, Object.m_Mesh, interval);
 
-	GetAnimation(pNode, Object.m_AnimTrack, Scene, interval);
-
-	m_ObjectList.push_back(Object);
+	Object.iIndex = m_CharacterList.size();
+	m_CharacterList.push_back(Object);
 }
-
 void SCAObjectManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval)
 {
 	for (int iCount = 0; iCount < SUBMATERIAL_SIZE; iCount++)
 	{
-		m_TriList[iCount].clear();
+		m_SCATriList[iCount].clear();
 	}
 
 	// 로컬 좌표계이면 월드 행렬, 아니면 단위 행렬
@@ -88,14 +96,26 @@ void SCAObjectManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval)
 	bool deleteit = false;
 	// 트라이앵글 오브젝트
 	TriObject* tri = GetTriObjectFromNode(pNode, interval.Start(), deleteit);
-	if (tri == nullptr) return;
+	if (tri == nullptr)
+	{
+		Object* helperObj = pNode->EvalWorldState(interval.Start()).obj;
+		helperObj->GetDeformBBox(0,
+			sMesh.m_box,
+			&pNode->GetObjectTM(0));
+		return;
+	}
 	// 메쉬 오브젝트
 	Mesh* mesh = &tri->GetMesh();
 	bool negScale = SCAGlobal::TMNegParity(tm);
 
+	mesh->buildBoundingBox();
+	sMesh.m_box = mesh->getBoundingBox(&tm);
+
 	int v0, v1, v2;
 	if (negScale) { v0 = 2; v1 = 1; v2 = 0; }
 	else { v0 = 0; v1 = 1; v2 = 2; }
+	
+	SetBippedInfo(pNode, sMesh);
 
 	if (mesh)
 	{
@@ -103,40 +123,44 @@ void SCAObjectManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval)
 
 		for (int iFace = 0; iFace < iNumFace; iFace++)
 		{
+			int iV0 = mesh->faces[iFace].v[v0];
+			int iV1 = mesh->faces[iFace].v[v2];
+			int iV2 = mesh->faces[iFace].v[v1];
+
 			int iSubIndex = mesh->faces[iFace].getMatID();
 			if (iSubIndex > SUBMATERIAL_SIZE ||
 				iSubIndex < 0)
 			{
 				continue;
 			}
-			m_TriList[iSubIndex].push_back(SCATriangle());
-			int iFaceNum = m_TriList[iSubIndex].size() - 1;
+			m_SCATriList[iSubIndex].push_back(SCATriangle());
+			int iFaceNum = m_SCATriList[iSubIndex].size() - 1;
 
 			// position
 			int iNumPos = mesh->getNumVerts();
 			if (iNumPos > 0)
 			{
-				Point3 v = mesh->verts[mesh->faces[iFace].v[v0]] * tm;
-				SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[0].p, v);
+				Point3 v = mesh->verts[iV0] * tm;
+				SCAGlobal::DumpPoint3(m_SCATriList[iSubIndex][iFaceNum].v[0].p, v);
+
+				v = mesh->verts[iV1] * tm;
+				SCAGlobal::DumpPoint3(m_SCATriList[iSubIndex][iFaceNum].v[1].p, v);
 
 				v = mesh->verts[mesh->faces[iFace].v[v2]] * tm;
-				SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[1].p, v);
-
-				v = mesh->verts[mesh->faces[iFace].v[v1]] * tm;
-				SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[2].p, v);
+				SCAGlobal::DumpPoint3(m_SCATriList[iSubIndex][iFaceNum].v[2].p, v);
 			}
 			// color
 			int iNumColor = mesh->getNumVertCol();
-			m_TriList[iSubIndex][iFaceNum].v[0].c = Point4(1, 1, 1, 1);
-			m_TriList[iSubIndex][iFaceNum].v[1].c = Point4(1, 1, 1, 1);
-			m_TriList[iSubIndex][iFaceNum].v[2].c = Point4(1, 1, 1, 1);
+			m_SCATriList[iSubIndex][iFaceNum].v[0].c = Point4(1, 1, 1, 1);
+			m_SCATriList[iSubIndex][iFaceNum].v[1].c = Point4(1, 1, 1, 1);
+			m_SCATriList[iSubIndex][iFaceNum].v[2].c = Point4(1, 1, 1, 1);
 			if (iNumColor > 0)
 			{
-				m_TriList[iSubIndex][iFaceNum].v[0].c =
+				m_SCATriList[iSubIndex][iFaceNum].v[0].c =
 					mesh->vertCol[mesh->vcFace[iFace].t[v0]];
-				m_TriList[iSubIndex][iFaceNum].v[1].c =
+				m_SCATriList[iSubIndex][iFaceNum].v[1].c =
 					mesh->vertCol[mesh->vcFace[iFace].t[v2]];
-				m_TriList[iSubIndex][iFaceNum].v[2].c =
+				m_SCATriList[iSubIndex][iFaceNum].v[2].c =
 					mesh->vertCol[mesh->vcFace[iFace].t[v1]];
 			}
 			// texcoord
@@ -144,105 +168,96 @@ void SCAObjectManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval)
 			if (iNumTex > 0)
 			{
 				Point2 v = (Point2)mesh->tVerts[mesh->tvFace[iFace].t[v0]];
-				m_TriList[iSubIndex][iFaceNum].v[0].t.x = v.x;
-				m_TriList[iSubIndex][iFaceNum].v[0].t.y = 1.0f - v.y;
+				m_SCATriList[iSubIndex][iFaceNum].v[0].t.x = v.x;
+				m_SCATriList[iSubIndex][iFaceNum].v[0].t.y = 1.0f - v.y;
 
 				v = (Point2)mesh->tVerts[mesh->tvFace[iFace].t[v2]];
-				m_TriList[iSubIndex][iFaceNum].v[1].t.x = v.x;
-				m_TriList[iSubIndex][iFaceNum].v[1].t.y = 1.0f - v.y;
+				m_SCATriList[iSubIndex][iFaceNum].v[1].t.x = v.x;
+				m_SCATriList[iSubIndex][iFaceNum].v[1].t.y = 1.0f - v.y;
 				v = (Point2)mesh->tVerts[mesh->tvFace[iFace].t[v1]];
-				m_TriList[iSubIndex][iFaceNum].v[2].t.x = v.x;
-				m_TriList[iSubIndex][iFaceNum].v[2].t.y = 1.0f - v.y;
+				m_SCATriList[iSubIndex][iFaceNum].v[2].t.x = v.x;
+				m_SCATriList[iSubIndex][iFaceNum].v[2].t.y = 1.0f - v.y;
 			}
 
 			mesh->buildNormals();
 			int vert = mesh->faces[iFace].getVert(v0);
 			RVertex* rVertex = mesh->getRVertPtr(vert);
 			Point3 vn = GetVertexNormal(mesh, iFace, rVertex);
-			SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v0].n, vn);
+			SCAGlobal::DumpPoint3(m_SCATriList[iSubIndex][iFaceNum].v[v0].n, vn);
 
 			vert = mesh->faces[iFace].getVert(v2);
 			rVertex = mesh->getRVertPtr(vert);
 			vn = GetVertexNormal(mesh, iFace, rVertex);
-			SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v1].n, vn);
+			SCAGlobal::DumpPoint3(m_SCATriList[iSubIndex][iFaceNum].v[v1].n, vn);
 
 			vert = mesh->faces[iFace].getVert(v1);
 			rVertex = mesh->getRVertPtr(vert);
 			vn = GetVertexNormal(mesh, iFace, rVertex);
-			SCAGlobal::DumpPoint3(m_TriList[iSubIndex][iFaceNum].v[v2].n, vn);
-		}
+			SCAGlobal::DumpPoint3(m_SCATriList[iSubIndex][iFaceNum].v[v2].n, vn);
 
+			//biped index & weight save
+			if (m_bipedList.size() <= 0) continue;
+			if (m_bipedList[iV0].m_BipedList.size() > 0)
+			{
+				for (int iWeight = 0;
+					iWeight <
+					m_bipedList[iV0].m_dwNumWeight;
+					iWeight++)
+				{
+					m_SCATriList[iSubIndex][iFaceNum].v[v0].i[iWeight] =
+						m_bipedList[iV0].m_BipedList[iWeight].BipID;
+					m_SCATriList[iSubIndex][iFaceNum].v[v0].w[iWeight] =
+						m_bipedList[iV0].m_BipedList[iWeight].m_fWeight;
+				}
+			}
+			if (m_bipedList[iV2].m_BipedList.size() > 0)
+			{
+				for (int iWeight = 0;
+					iWeight <
+					m_bipedList[iV2].m_dwNumWeight;
+					iWeight++)
+				{
+					m_SCATriList[iSubIndex][iFaceNum].v[v1].i[iWeight] =
+						m_bipedList[iV2].m_BipedList[iWeight].BipID;
+					m_SCATriList[iSubIndex][iFaceNum].v[v1].w[iWeight] =
+						m_bipedList[iV2].m_BipedList[iWeight].m_fWeight;
+				}
+			}
+			if (m_bipedList[iV1].m_BipedList.size() > 0)
+			{
+				for (int iWeight = 0;
+					iWeight <
+					m_bipedList[iV1].m_dwNumWeight;
+					iWeight++)
+				{
+					m_SCATriList[iSubIndex][iFaceNum].v[v2].i[iWeight] =
+						m_bipedList[iV1].m_BipedList[iWeight].BipID;
+					m_SCATriList[iSubIndex][iFaceNum].v[v2].w[iWeight] =
+						m_bipedList[iV1].m_BipedList[iWeight].m_fWeight;
+				}
+			}
+		}
 		// vb, ib
 		SetUniqueBuffer(sMesh);
 	}
 
 	if (deleteit) delete tri;
 }
-void SCAObjectManager::GetBox(SCAMesh& sMesh)
-{
-	sMesh.iSubNum = 1;
-	sMesh.SubMeshList[0].bUse = true;
-
-	sMesh.SubMeshList[0].VertexList.resize(24);
-	sMesh.SubMeshList[0].IndexList.resize(36);
-
-	sMesh.SubMeshList[0].VertexList[0] = PNCT(Point3(-1.0f, 1.0f, -1.0f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[1] = PNCT(Point3(1.0f, 1.0f, -1.0f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[2] = PNCT(Point3(1.0f, -1.0f, -1.0f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
-	sMesh.SubMeshList[0].VertexList[3] = PNCT(Point3(-1.0f, -1.0f, -1.0f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
-
-	sMesh.SubMeshList[0].VertexList[4] = PNCT(Point3(1.0f, 1.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[5] = PNCT(Point3(-1.0f, 1.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[6] = PNCT(Point3(-1.0f, -1.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
-	sMesh.SubMeshList[0].VertexList[7] = PNCT(Point3(1.0f, -1.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
-
-	sMesh.SubMeshList[0].VertexList[8] = PNCT(Point3(1.0f, 1.0f, -1.0f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[9] = PNCT(Point3(1.0f, 1.0f, 1.0f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[10] = PNCT(Point3(1.0f, -1.0f, 1.0f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
-	sMesh.SubMeshList[0].VertexList[11] = PNCT(Point3(1.0f, -1.0f, -1.0f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
-
-	sMesh.SubMeshList[0].VertexList[12] = PNCT(Point3(-1.0f, 1.0f, 1.0f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[13] = PNCT(Point3(-1.0f, 1.0f, -1.0f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[14] = PNCT(Point3(-1.0f, -1.0f, -1.0f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
-	sMesh.SubMeshList[0].VertexList[15] = PNCT(Point3(-1.0f, -1.0f, 1.0f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
-
-	sMesh.SubMeshList[0].VertexList[16] = PNCT(Point3(-1.0f, 1.0f, 1.0f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[17] = PNCT(Point3(1.0f, 1.0f, 1.0f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[18] = PNCT(Point3(1.0f, 1.0f, -1.0f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
-	sMesh.SubMeshList[0].VertexList[19] = PNCT(Point3(-1.0f, 1.0f, -1.0f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
-
-	sMesh.SubMeshList[0].VertexList[20] = PNCT(Point3(-1.0f, -1.0f, -1.0f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[21] = PNCT(Point3(1.0f, -1.0f, -1.0f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
-	sMesh.SubMeshList[0].VertexList[22] = PNCT(Point3(1.0f, -1.0f, 1.0f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
-	sMesh.SubMeshList[0].VertexList[23] = PNCT(Point3(-1.0f, -1.0f, 1.0f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
-
-	int iIndex = 0;
-	sMesh.SubMeshList[0].IndexList.resize(36);
-
-	sMesh.SubMeshList[0].IndexList[iIndex++] = 0; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 1; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 2; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 0;	sMesh.SubMeshList[0].IndexList[iIndex++] = 2; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 3;
-	sMesh.SubMeshList[0].IndexList[iIndex++] = 4; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 5; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 6; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 4;	sMesh.SubMeshList[0].IndexList[iIndex++] = 6; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 7;
-	sMesh.SubMeshList[0].IndexList[iIndex++] = 8; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 9; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 10; sMesh.SubMeshList[0].IndexList[iIndex++] = 8;	sMesh.SubMeshList[0].IndexList[iIndex++] = 10;	sMesh.SubMeshList[0].IndexList[iIndex++] = 11;
-	sMesh.SubMeshList[0].IndexList[iIndex++] = 12;	sMesh.SubMeshList[0].IndexList[iIndex++] = 13;	sMesh.SubMeshList[0].IndexList[iIndex++] = 14;	sMesh.SubMeshList[0].IndexList[iIndex++] = 12;	sMesh.SubMeshList[0].IndexList[iIndex++] = 14;	sMesh.SubMeshList[0].IndexList[iIndex++] = 15;
-	sMesh.SubMeshList[0].IndexList[iIndex++] = 16;	sMesh.SubMeshList[0].IndexList[iIndex++] = 17;	sMesh.SubMeshList[0].IndexList[iIndex++] = 18;	sMesh.SubMeshList[0].IndexList[iIndex++] = 16;	sMesh.SubMeshList[0].IndexList[iIndex++] = 18;	sMesh.SubMeshList[0].IndexList[iIndex++] = 19;
-	sMesh.SubMeshList[0].IndexList[iIndex++] = 20;	sMesh.SubMeshList[0].IndexList[iIndex++] = 21;	sMesh.SubMeshList[0].IndexList[iIndex++] = 22;	sMesh.SubMeshList[0].IndexList[iIndex++] = 20;	sMesh.SubMeshList[0].IndexList[iIndex++] = 22;	sMesh.SubMeshList[0].IndexList[iIndex++] = 23;
-
-	return;
-}
 void SCAObjectManager::SetUniqueBuffer(SCAMesh& sMesh)
 {
 
 	for (int iSub = 0; iSub < SUBMATERIAL_SIZE; iSub++)
 	{
-		if (m_TriList[iSub].size() <= 0) continue;
+		if (m_SCATriList[iSub].size() <= 0) continue;
 
 		sMesh.iSubNum++;
 		sMesh.SubMeshList[iSub].bUse = true;
 
-		for (int iFace = 0; iFace < m_TriList[iSub].size(); iFace++)
+		for (int iFace = 0; iFace < m_SCATriList[iSub].size(); iFace++)
 		{
-			std::vector<SCATriangle>& triArray = m_TriList[iSub];
+			std::vector<SCATriangle>& triArray = m_SCATriList[iSub];
 			SCATriangle& tri = triArray[iFace];
-			std::vector<PNCT>& vList = sMesh.SubMeshList[iSub].VertexList;
+			std::vector<PNCTIW_VERTEX>& vList = sMesh.SubMeshList[iSub].VertexList;
 			std::vector<DWORD>& iList = sMesh.SubMeshList[iSub].IndexList;
 			for (int iVer = 0; iVer < 3; iVer++)
 			{
@@ -257,7 +272,7 @@ void SCAObjectManager::SetUniqueBuffer(SCAMesh& sMesh)
 		}
 	}
 }
-int	SCAObjectManager::IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList)
+int	 SCAObjectManager::IsEqulVerteList(PNCTIW_VERTEX& vertex, std::vector<PNCTIW_VERTEX>& vList)
 {
 	for (int iVer = 0; iVer < vList.size(); iVer++)
 	{
@@ -271,139 +286,173 @@ int	SCAObjectManager::IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList)
 	}
 	return -1;
 }
-Point3	SCAObjectManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
-{
-	Face* f = &mesh->faces[iFace];
-	DWORD smGroup = f->smGroup;
-	int numNormals = rVertex->rFlags & NORCT_MASK;
 
-	Point3 vertexNormal;
-	if (rVertex->rFlags & SPECIFIED_NORMAL)
-	{
-		vertexNormal = rVertex->rn.getNormal();
-	}
-	else if (numNormals && smGroup)
-	{
-		if (numNormals == 1)
-		{
-			vertexNormal = rVertex->rn.getNormal();
-		}
-		else
-		{
-			for (int i = 0; i < numNormals; i++)
-			{
-				if (rVertex->ern[i].getSmGroup() & smGroup)
-				{
-					vertexNormal = rVertex->ern[i].getNormal();
-				}
-			}
-		}
-	}
-	else
-	{
-		vertexNormal = mesh->getFaceNormal(iFace);
-	}
-	return vertexNormal;
-}
-TriObject* SCAObjectManager::GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit)
+void SCAObjectManager::SetBippedInfo(INode* pNode, SCAMesh& sMesh)
 {
-	// 오브젝트를 받는다.
-	Object* obj = pNode->EvalWorldState(time).obj;
-	// 변환 가능하면 실행
-	if (obj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0)))
+	// 에니메이션 제작 도구
+	Modifier* Pointer_Physique = FindModifier(pNode,
+		Class_ID(PHYSIQUE_CLASS_ID_A, PHYSIQUE_CLASS_ID_B));
+	if (Pointer_Physique)
 	{
-		TriObject* tri = (TriObject*)obj->ConvertToType(time, Class_ID(TRIOBJ_CLASS_ID, 0));
-		if (obj != tri) deleteit = true;
-		return tri;
+		PhysiqueData(pNode, Pointer_Physique, sMesh);
+		return;
+	}
+	Modifier* skinMod = FindModifier(pNode,
+		SKIN_CLASSID);
+	if (skinMod)
+	{
+		SkinData(pNode, skinMod, sMesh);
+		return;
+	}
+}
+Modifier*  SCAObjectManager::FindModifier(
+	INode* pNode, Class_ID classID)
+
+{
+	Object *ObjectPtr = pNode->GetObjectRef();
+	if (!ObjectPtr)
+	{
+		return nullptr;
+	}
+	while (ObjectPtr->SuperClassID() == GEN_DERIVOB_CLASS_ID && ObjectPtr)
+	{
+		IDerivedObject *DerivedObjectPtr = (IDerivedObject *)(ObjectPtr);
+
+		int ModStackIndex = 0;
+		while (ModStackIndex < DerivedObjectPtr->NumModifiers())
+		{
+			Modifier* ModifierPtr = DerivedObjectPtr->GetModifier(ModStackIndex);
+
+			if (ModifierPtr->ClassID() == classID)
+			{
+				return ModifierPtr;
+			}
+
+			ModStackIndex++;
+		}
+		ObjectPtr = DerivedObjectPtr->GetObjRef();
 	}
 	return nullptr;
 }
-
-
-void SCAObjectManager::GetAnimation(INode* pNode, SCAAnimationTrack& AnimTrack, SCAScene& Scene, Interval& interval)
+void SCAObjectManager::PhysiqueData(INode* pNode, Modifier* Pointer_Physique, SCAMesh& sMesh)
 {
+	IPhysiqueExport *phyExport =
+		(IPhysiqueExport*)Pointer_Physique->GetInterface(I_PHYINTERFACE);
+	IPhyContextExport *contextExport =
+		(IPhyContextExport *)phyExport->GetContextInterface(pNode);
 
+	contextExport->ConvertToRigid(true);
+	contextExport->AllowBlending(true);
 
-	//-------------------> 중요
-	TimeValue startFrame = interval.Start();
-	// tm = selfTm * parentTm * Inverse(parentTm);
-	Matrix3 tm = pNode->GetNodeTM(startFrame)
-		* Inverse(pNode->GetParentTM(startFrame));
-	// 행렬 분해
-	AffineParts StartAP;
-	decomp_affine(tm, &StartAP);
-	// quaternion -> axis, angle 변환
-	Point3  Start_RotAxis;
-	float   Start_RotValue;
-	AngAxisFromQ(StartAP.q, &Start_RotValue, Start_RotAxis);
-	//<----------------------------
+	// mesh 정점개수와 동일해야 함.
+	int iNumVert = contextExport->GetNumberVertices();
+	m_bipedList.resize(iNumVert);
 
-	SCAPositionAnim	PosTrack;
-	SCARotationAnim	RotTrack;
-	SCAScaleAnim		ScaleTrack;
-
-	ZeroMemory(&PosTrack, sizeof(PosTrack));
-	ZeroMemory(&RotTrack, sizeof(RotTrack));
-	ZeroMemory(&ScaleTrack, sizeof(ScaleTrack));
-
-
-	TimeValue start = interval.Start();
-	TimeValue end = interval.End();
-	// 시작+1프레임
-	for (TimeValue t = start; t <= end; t += GetTicksPerFrame())
+	for (int iVertex = 0; iVertex < iNumVert; iVertex++)
 	{
-		Matrix3 tm = pNode->GetNodeTM(t)
-			* Inverse(pNode->GetParentTM(t));
-
-		AffineParts FrameAP;
-		decomp_affine(tm, &FrameAP);
-
-		PosTrack.i = t;
-		PosTrack.p = FrameAP.t;
-		AnimTrack.PositionTrack.push_back(PosTrack);
-
-		RotTrack.i = t;
-		RotTrack.q = FrameAP.q;
-		AnimTrack.RotationTrack.push_back(RotTrack);
-
-		ScaleTrack.p = FrameAP.k;
-		ScaleTrack.q = FrameAP.u;
-		AnimTrack.ScaleTrack.push_back(ScaleTrack);
-
-		Point3  Frame_RotAxis;
-		float   Frame_RotValue;
-		AngAxisFromQ(FrameAP.q, &Frame_RotValue, Frame_RotAxis);
-
-
-		if (!AnimTrack.bPosition) {
-			if (!SCAGlobal::EqualPoint3(StartAP.t, FrameAP.t))
+		IPhyVertexExport *vtxExport =
+			(IPhyVertexExport *)contextExport->GetVertexInterface(iVertex);
+		if (vtxExport)
+		{
+			int iVertexType = vtxExport->GetVertexType();
+			switch (iVertexType)
 			{
-				AnimTrack.bPosition = true;
-			}
-		}
-
-		if (!AnimTrack.bRotation) {
-			if (!SCAGlobal::EqualPoint3(Start_RotAxis, Frame_RotAxis))
+			case RIGID_NON_BLENDED_TYPE:
 			{
-				AnimTrack.bRotation = true;
-			}
-			else
-			{
-				if (Start_RotValue != Frame_RotValue)
+				IPhyRigidVertex* pVertex =
+					(IPhyRigidVertex*)vtxExport;
+				INode* node = pVertex->GetNode();
+				SOAObject* pTargetObject = I_Writer.FindObject(node);
+				if (pTargetObject != nullptr)
 				{
-					AnimTrack.bRotation = true;
+					SCABiped Biped;
+					Biped.BipID = pTargetObject->iIndex;
+					Biped.m_fWeight = 1.0f;
+					m_bipedList[iVertex].m_BipedList.push_back(Biped);
+					m_bipedList[iVertex].m_dwNumWeight = 1;
 				}
-			}
-		}
-
-		if (!AnimTrack.bScale) {
-			if (!SCAGlobal::EqualPoint3(StartAP.k, FrameAP.k))
+				else
+				{
+					return;
+				}
+				
+			}break;
+			case RIGID_BLENDED_TYPE:
 			{
-				AnimTrack.bScale = true;
+				IPhyBlendedRigidVertex* pVertex =
+					(IPhyBlendedRigidVertex*)vtxExport;
+				for (int iWeight = 0;
+					iWeight < pVertex->GetNumberNodes();
+					iWeight++)
+				{
+					INode* node = pVertex->GetNode(iWeight);
+					SOAObject* pTargetObject = I_Writer.FindObject(node);
+					if (pTargetObject != nullptr)
+					{
+						SCABiped Biped;
+						Biped.BipID = pTargetObject->iIndex;
+						Biped.m_fWeight = pVertex->GetWeight(iWeight);
+
+						if (ALMOST_ZERO > Biped.m_fWeight) continue;
+						else m_bipedList[iVertex].m_BipedList.push_back(Biped);
+					}
+					else
+					{
+						break;
+					}
+				}
+				std::sort(m_bipedList[iVertex].m_BipedList.begin(),
+							m_bipedList[iVertex].m_BipedList.end(),
+							BipAscendingSort());
+				if (m_bipedList[iVertex].m_BipedList.size() > MAX_WEIGHT_BIPED)
+				{
+					m_bipedList[iVertex].m_BipedList.resize(MAX_WEIGHT_BIPED);
+				}
+				m_bipedList[iVertex].m_dwNumWeight =
+					m_bipedList[iVertex].m_BipedList.size();
+
+			}break;
+			default:break;
 			}
 		}
+		contextExport->ReleaseVertexInterface(vtxExport);
+	}
+	phyExport->ReleaseContextInterface(contextExport);
+	Pointer_Physique->ReleaseInterface(I_PHYINTERFACE, phyExport);
+}
+void SCAObjectManager::SkinData(INode* pNode, Modifier* Pointer_Skin, SCAMesh& sMesh)
+{
+	ISkin* skin = (ISkin*)Pointer_Skin->GetInterface(I_SKIN);
+	ISkinContextData* skinData = skin->GetContextInterface(pNode);
+
+	if (!skin || !skinData) return;
+
+	int iNumVertex = skinData->GetNumPoints();
+	m_bipedList.resize(iNumVertex);
+
+	for (int iVertex = 0; iVertex < iNumVertex; iVertex++)
+	{
+		m_bipedList[iVertex].m_dwNumWeight =
+			skinData->GetNumAssignedBones(iVertex);
+		for (int iWeight = 0; iWeight < m_bipedList[iVertex].m_dwNumWeight; iWeight++)
+		{
+			int iBoneID = skinData->GetAssignedBone(iVertex, iWeight);
+			INode* node = skin->GetBone(iBoneID);
+			SOAObject* pTargetObject = I_Writer.FindObject(node);
+
+			SCABiped Biped;
+			Biped.BipID = pTargetObject->iIndex;
+			Biped.m_fWeight = skinData->GetBoneWeight(iVertex, iWeight);
+
+			if (ALMOST_ZERO > Biped.m_fWeight) continue;
+			else m_bipedList[iVertex].m_BipedList.push_back(Biped);
+		}
+		std::sort(m_bipedList[iVertex].m_BipedList.begin(),
+		m_bipedList[iVertex].m_BipedList.end(),
+		BipAscendingSort());
 	}
 }
+
 bool SCAObjectManager::ExportObject(FILE* pStream)
 {
 	if (pStream == nullptr)
@@ -412,40 +461,64 @@ bool SCAObjectManager::ExportObject(FILE* pStream)
 	}
 	_ftprintf(pStream, _T("\n%s"), L"#OBJECT_INFO");
 
-	for (int iObj = 0; iObj <m_ObjectList.size(); iObj++)
+	for (int iObj = 0; iObj < m_CharacterList.size(); iObj++)
 	{
 
 		_ftprintf(pStream, _T("\n%s %s %d %d %d"),
-			m_ObjectList[iObj].name,
-			m_ObjectList[iObj].ParentName,
-			m_ObjectList[iObj].m_ClassType,
-			m_ObjectList[iObj].m_Mesh.iMaterialID,
-			m_ObjectList[iObj].m_Mesh.iSubNum);
+			m_CharacterList[iObj].name,
+			m_CharacterList[iObj].ParentName,
+			m_CharacterList[iObj].m_ClassType,
+			m_CharacterList[iObj].m_Mesh.iMaterialID,
+			m_CharacterList[iObj].m_Mesh.iSubNum);
 
 		// World Matrix
+		_ftprintf(pStream, _T("\nWolrdMatrix"));
 		_ftprintf(pStream, _T("\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f"),
-			m_ObjectList[iObj].matWorld._11,
-			m_ObjectList[iObj].matWorld._12,
-			m_ObjectList[iObj].matWorld._13,
-			m_ObjectList[iObj].matWorld._14,
+			m_CharacterList[iObj].matWorld._11,
+			m_CharacterList[iObj].matWorld._12,
+			m_CharacterList[iObj].matWorld._13,
+			m_CharacterList[iObj].matWorld._14,
 
-			m_ObjectList[iObj].matWorld._21,
-			m_ObjectList[iObj].matWorld._22,
-			m_ObjectList[iObj].matWorld._23,
-			m_ObjectList[iObj].matWorld._24,
+			m_CharacterList[iObj].matWorld._21,
+			m_CharacterList[iObj].matWorld._22,
+			m_CharacterList[iObj].matWorld._23,
+			m_CharacterList[iObj].matWorld._24,
 
-			m_ObjectList[iObj].matWorld._31,
-			m_ObjectList[iObj].matWorld._32,
-			m_ObjectList[iObj].matWorld._33,
-			m_ObjectList[iObj].matWorld._34,
+			m_CharacterList[iObj].matWorld._31,
+			m_CharacterList[iObj].matWorld._32,
+			m_CharacterList[iObj].matWorld._33,
+			m_CharacterList[iObj].matWorld._34,
 
-			m_ObjectList[iObj].matWorld._41,
-			m_ObjectList[iObj].matWorld._42,
-			m_ObjectList[iObj].matWorld._43,
-			m_ObjectList[iObj].matWorld._44);
+			m_CharacterList[iObj].matWorld._41,
+			m_CharacterList[iObj].matWorld._42,
+			m_CharacterList[iObj].matWorld._43,
+			m_CharacterList[iObj].matWorld._44);
 
-		ExportMesh(pStream, m_ObjectList[iObj].m_Mesh);
-		ExportAnimation(pStream, m_ObjectList[iObj].m_AnimTrack);
+		// World Invese Matrix
+		_ftprintf(pStream, _T("\nWolrdInverseMatrix"));
+		_ftprintf(pStream, _T("\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f"),
+			m_CharacterList[iObj].matInvWorld._11,
+			m_CharacterList[iObj].matInvWorld._12,
+			m_CharacterList[iObj].matInvWorld._13,
+			m_CharacterList[iObj].matInvWorld._14,
+
+			m_CharacterList[iObj].matInvWorld._21,
+			m_CharacterList[iObj].matInvWorld._22,
+			m_CharacterList[iObj].matInvWorld._23,
+			m_CharacterList[iObj].matInvWorld._24,
+
+			m_CharacterList[iObj].matInvWorld._31,
+			m_CharacterList[iObj].matInvWorld._32,
+			m_CharacterList[iObj].matInvWorld._33,
+			m_CharacterList[iObj].matInvWorld._34,
+
+			m_CharacterList[iObj].matInvWorld._41,
+			m_CharacterList[iObj].matInvWorld._42,
+			m_CharacterList[iObj].matInvWorld._43,
+			m_CharacterList[iObj].matInvWorld._44);
+
+		ExportMesh(pStream, m_CharacterList[iObj].m_Mesh);
+		//ExportAnimation(pStream, m_CharacterList[iObj].m_AnimTrack);
 	}
 
 	return true;
@@ -459,7 +532,7 @@ bool SCAObjectManager::ExportMesh(FILE* pStream, SCAMesh& sMesh)
 	for (int iSubMesh = 0; iSubMesh < SUBMATERIAL_SIZE; iSubMesh++)
 	{
 		if (sMesh.SubMeshList[iSubMesh].bUse == false) continue;
-		std::vector<PNCT>& vList = sMesh.SubMeshList[iSubMesh].VertexList;
+		std::vector<PNCTIW_VERTEX>& vList = sMesh.SubMeshList[iSubMesh].VertexList;
 		std::vector<DWORD>& iList = sMesh.SubMeshList[iSubMesh].IndexList;
 
 		_ftprintf(pStream, _T("\nSubMesh %d %d %d"),
@@ -483,6 +556,26 @@ bool SCAObjectManager::ExportMesh(FILE* pStream, SCAMesh& sMesh)
 			_ftprintf(pStream, _T("%10.4f %10.4f"),
 				vList[iVer].t.x,
 				vList[iVer].t.y);
+
+			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
+				vList[iVer].i[0],
+				vList[iVer].i[1],
+				vList[iVer].i[2],
+				vList[iVer].i[3],
+				vList[iVer].i[4], 
+				vList[iVer].i[5], 
+				vList[iVer].i[6],
+				vList[iVer].i[7]);
+
+			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
+				vList[iVer].w[0],
+				vList[iVer].w[1],
+				vList[iVer].w[2],
+				vList[iVer].w[3],
+				vList[iVer].w[4],
+				vList[iVer].w[5],
+				vList[iVer].w[6],
+				vList[iVer].w[7]);
 		}
 
 		for (int iIndex = 0; iIndex < iList.size(); iIndex += 3)
@@ -493,71 +586,19 @@ bool SCAObjectManager::ExportMesh(FILE* pStream, SCAMesh& sMesh)
 				iList[iIndex + 2]);
 		}
 	}
-
-
-	return true;
 }
 bool SCAObjectManager::ExportAnimation(FILE* pStream, SCAAnimationTrack& AnimTrack)
 {
-	if (pStream == nullptr)
-	{
-		return false;
-	}
-
-	_ftprintf(pStream, _T("\n%s %d %d %d"),
-		L"#AnimationData",
-		(AnimTrack.bPosition) ? AnimTrack.PositionTrack.size() : 0,
-		(AnimTrack.bRotation) ? AnimTrack.RotationTrack.size() : 0,
-		(AnimTrack.bScale) ? AnimTrack.ScaleTrack.size() : 0);
-	if (AnimTrack.bPosition)
-	{
-		for (int iTrack = 0; iTrack < AnimTrack.PositionTrack.size(); iTrack++)
-		{
-			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f"),
-				iTrack,
-				AnimTrack.PositionTrack[iTrack].i,
-				AnimTrack.PositionTrack[iTrack].p.x,
-				AnimTrack.PositionTrack[iTrack].p.z,
-				AnimTrack.PositionTrack[iTrack].p.y);
-		}
-	}
-	if (AnimTrack.bRotation)
-	{
-		for (int iTrack = 0; iTrack < AnimTrack.RotationTrack.size(); iTrack++)
-		{
-			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f"),
-				iTrack,
-				AnimTrack.RotationTrack[iTrack].i,
-				AnimTrack.RotationTrack[iTrack].q.x,
-				AnimTrack.RotationTrack[iTrack].q.z,
-				AnimTrack.RotationTrack[iTrack].q.y,
-				AnimTrack.RotationTrack[iTrack].q.w);
-		}
-	}
-	if (AnimTrack.bScale)
-	{
-		for (int iTrack = 0; iTrack < AnimTrack.ScaleTrack.size(); iTrack++)
-		{
-			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
-				iTrack,
-				AnimTrack.ScaleTrack[iTrack].i,
-				AnimTrack.ScaleTrack[iTrack].p.x,
-				AnimTrack.ScaleTrack[iTrack].p.z,
-				AnimTrack.ScaleTrack[iTrack].p.y,
-				AnimTrack.ScaleTrack[iTrack].q.x,
-				AnimTrack.ScaleTrack[iTrack].q.z,
-				AnimTrack.ScaleTrack[iTrack].q.y,
-				AnimTrack.ScaleTrack[iTrack].q.w);
-		}
-	}
 	return true;
 }
 
 SCAObjectManager::SCAObjectManager()
 {
+
 }
 
 
 SCAObjectManager::~SCAObjectManager()
 {
+
 }

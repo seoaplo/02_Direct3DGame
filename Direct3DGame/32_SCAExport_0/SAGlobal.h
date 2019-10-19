@@ -1,7 +1,7 @@
 #pragma once
 #include "header.h"
 
-class SCAGlobal
+class SAGlobal
 {
 public:
 	static TCHAR*  FixupName(MSTR name)
@@ -112,7 +112,7 @@ public:
 		}
 	}
 public:
-	SCAGlobal();
-	~SCAGlobal();
+	SAGlobal() {}
+	~SAGlobal() {}
 };
 

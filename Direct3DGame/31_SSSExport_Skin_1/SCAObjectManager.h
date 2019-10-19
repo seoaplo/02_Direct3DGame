@@ -1,30 +1,77 @@
 #pragma once
-#include "SCAMaterialManager.h"
+#include "SOAObjectManager.h"
+#include "SCAWriter.h"
 
-class SCAObjectManager
+class SCAObjectManager : public SOAObjectManager
 {
-	friend class SCAWriter;
 	friend class SCASkinExp;
 private:
-	std::vector<SCAObject>				m_ObjectList;
-	std::vector<SCATriangle>				m_TriList[SUBMATERIAL_SIZE];
-private:
+	std::vector<SCAObject>				m_CharacterList;
+	std::vector<SCATriangle>			m_SCATriList[SUBMATERIAL_SIZE];
+	std::vector<SCABipedVertex>			m_bipedList;
+public:
 	void	AddObject(INode* pNode, SCAScene& Scene, Interval& interval, int iMaterialID);
 	void	GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval);
-	void	GetBox(SCAMesh& sMesh);
-	
-	void	SetUniqueBuffer(SCAMesh& tMesh);
-	int		IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList);
-	Point3	GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex);
-	TriObject* GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit);
 
-	void GetAnimation(INode* pNode, SCAAnimationTrack& AnimTrack, SCAScene& Scene, Interval& interval);
+	void	SetUniqueBuffer(SCAMesh& sMesh);
+	int		IsEqulVerteList(PNCTIW_VERTEX& vertex, std::vector<PNCTIW_VERTEX>& vList);
+	//void GetAnimation(INode* pNode, SCAAnimationTrack& AnimTrack, SCAScene& Scene, Interval& interval);
 
-	bool ExportObject(FILE* pStream);
+	void SetBippedInfo(INode* pNode, SCAMesh&);
+	Modifier*  FindModifier(
+		INode* pNode, Class_ID classID);
+	void PhysiqueData(INode* pNode, Modifier*, SCAMesh&);
+	void SkinData(INode* pNode, Modifier*, SCAMesh&);
+
+	bool ExportObject(FILE* pStream)override;
 	bool ExportMesh(FILE* pStream, SCAMesh& sMesh);
-	bool ExportAnimation(FILE* pStream, SCAAnimationTrack& AnimTrack);
+	bool ExportAnimation(FILE* pStream, SCAAnimationTrack& AnimTrack)override;
 
-private:
+
+	SCAObject* FindObject(int iIndex)
+	{
+		for (auto& Object : m_CharacterList)
+		{
+			if (Object.iIndex == iIndex)
+			{
+				return &Object;
+			}
+		}
+		return nullptr;
+	}
+	SCAObject* FindObject(TSTR name)
+	{
+		for (auto& Object : m_CharacterList)
+		{
+			if (Object.name == name)
+			{
+				return &Object;
+			}
+		}
+		return nullptr;
+	}
+	SCAObject* FindObject(INode* pNode)
+	{
+		for (auto& Object : m_CharacterList)
+		{
+			if (Object.pINode == pNode)
+			{
+				return &Object;
+			}
+		}
+		return nullptr;
+	}
+
+
+	void Clear() override
+	{
+		m_CharacterList.clear();
+		for (auto Triangle : m_SCATriList)
+		{
+			Triangle.clear();
+		}
+	}
+public:
 	SCAObjectManager();
 	~SCAObjectManager();
 };

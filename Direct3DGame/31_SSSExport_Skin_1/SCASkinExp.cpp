@@ -11,6 +11,11 @@ void  SCASkinExp::Set(const TCHAR* Pointer_TCHAR_filename, Interface* Pointer_In
 	My_SCAScene_Scene.iLastFrame = My_Interval_interval.End() / GetTicksPerFrame();		// 종료 프레임
 	My_SCAScene_Scene.iFrameSpeed = GetFrameRate();							// 프레임 당 속도
 	My_SCAScene_Scene.iTickPerFrame = GetTicksPerFrame();						// 틱 당 속도
+
+	for (auto pNode : m_SelectNodeList)
+	{
+		Process(pNode);
+	}
 }
 bool  SCASkinExp::Export()
 {
@@ -20,7 +25,7 @@ bool  SCASkinExp::Export()
 	My_SCAScene_Scene.iNumMaterials = My_MaterialManager.m_MaterialList.size();
 	My_SCAScene_Scene.iNumObjects =  My_ObjectManager.m_ObjectList.size();
 	_wfopen_s(&My_Pointer_FILE_file, My_wstring_filename.c_str(), _T("wb"));
-	_ftprintf(My_Pointer_FILE_file, _T("%s"), _T("SSSExporter100"));
+	_ftprintf(My_Pointer_FILE_file, _T("%s"), _T("SCAExporter100"));
 	_ftprintf(My_Pointer_FILE_file, _T("\n%s %d %d %d %d %d %d"),
 		L"#HEADERINFO",
 		My_SCAScene_Scene.iFirstFrame,

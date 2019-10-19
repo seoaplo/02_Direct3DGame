@@ -1,19 +1,19 @@
-ï»¿// SCAExport.cpp : DLL ì‘ìš© í”„ë¡œê·¸ëž¨ì„ ìœ„í•´ ë‚´ë³´ë‚¸ í•¨ìˆ˜ë¥¼ ì •ì˜í•©ë‹ˆë‹¤.
+// SAExport.cpp : DLL ÀÀ¿ë ÇÁ·Î±×·¥À» À§ÇØ ³»º¸³½ ÇÔ¼ö¸¦ Á¤ÀÇÇÕ´Ï´Ù.
 //
 
 #include "header.h"
 #include "resource.h"
-#include "SCAWriter.h"
-#include "SCASkinExp.h"
+#include "SAExporter.h"
+#include "SOAExporter.h"
 
-#define SCAExport_CLASS_ID Class_ID(0x7d591383, 0x18c6002a)
+#define SAExport_CLASS_ID Class_ID(0x3e493ddb, 0x77855ad9)
 
 extern HINSTANCE Global_HandleInstance;
 
 INT_PTR CALLBACK DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
-class SCAExport : public UtilityObj
+class SAExport : public UtilityObj
 {
 public:
 	HWND		My_WindowHandle_panel;
@@ -26,7 +26,7 @@ public:
 			Global_HandleInstance,
 			MAKEINTRESOURCE(IDD_DIALOG1),
 			DlgProc,
-			_T("SCA_Exporter"), 0);
+			_T("SA_Exporter"), 0);
 	}
 	virtual void EndEditParams(Interface *Pointer_interface, IUtil *Pointer_Int_util)
 	{
@@ -40,40 +40,40 @@ public:
 	virtual void SelectionSetChanged(Interface *Pointer_interface, IUtil *Pointer_Int_util)
 	{
 		int iNumSelect = Pointer_interface->GetSelNodeCount();
-		
+
 		if (iNumSelect <= 0) return;
-		else I_SkinExporter.Clear();
+		//else I_SkinExporter.Clear();
 
 		for (int iSelObj = 0; iSelObj < iNumSelect;
 			iSelObj++)
 		{
-			INode* Pointer_INode = Pointer_interface->GetSelNode(iSelObj);
-			I_SkinExporter.m_SelectNodeList.push_back(Pointer_INode);
+			//INode* Pointer_INode = Pointer_interface->GetSelNode(iSelObj);
+			//I_SkinExporter.m_SelectNodeList.push_back(Pointer_INode);
 		}
 	}
 public:
-	static SCAExport* GetInstance()
+	static SAExport* GetInstance()
 	{
-		static SCAExport Single_export;
+		static SAExport Single_export;
 		return &Single_export;
 	}
 private:
-	SCAExport() { My_WindowHandle_panel = NULL; };
+	SAExport() { My_WindowHandle_panel = NULL; };
 public:
-	~SCAExport() {};
+	~SAExport() {};
 };
 class SSSExportClassDesc : public ClassDesc2
 {
 public:
 
 	virtual int IsPublic() { return TRUE; }
-	virtual void* Create(BOOL) { return SCAExport::GetInstance(); }
-	virtual const TCHAR *	ClassName() { return _T("SCAExport100"); }
+	virtual void* Create(BOOL) { return SAExport::GetInstance(); }
+	virtual const TCHAR *	ClassName() { return _T("SAExport100"); }
 	virtual SClass_ID SuperClassID() { return UTILITY_CLASS_ID; }
-	virtual Class_ID ClassID() { return SCAExport_CLASS_ID; }
-	virtual const TCHAR* Category() { return _T("SCAExporter"); }
+	virtual Class_ID ClassID() { return SAExport_CLASS_ID; }
+	virtual const TCHAR* Category() { return _T("SAExporter"); }
 
-	virtual const TCHAR* InternalName() { return _T("SCAExportClassDesc"); }	// returns fixed parsable name (scripter-visible name)
+	virtual const TCHAR* InternalName() { return _T("SAExportClassDesc"); }	// returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE HInstance() { return Global_HandleInstance; }					// returns owning module handle
 };
 
@@ -100,15 +100,15 @@ INT_PTR CALLBACK DlgProc(HWND hWnd,
 		{
 		case IDC_SKINEXP:
 		{
-			TSTR szExpFile = SCASkinExp::Get().SaveFileDiallog(L"skm", L"SkinWriter");
-			if (szExpFile != NULL)
-			{
-				I_Writer.Clear();
-				I_Writer.Set(szExpFile, SCAExport::GetInstance()->My_Pointer_interface);
-				I_SkinExporter.Set(szExpFile,
-					SCAExport::GetInstance()->My_Pointer_interface);
-				I_SkinExporter.Export();
-			}
+			//TSTR szExpFile = SCASkinExp::Get().SaveFileDiallog(L"skm", L"SkinWriter");
+			//if (szExpFile != NULL)
+			//{
+			//	I_Writer.Clear();
+			//	I_Writer.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+			//	I_SkinExporter.Set(szExpFile,
+			//		SAExport::GetInstance()->My_Pointer_interface);
+			//	I_SkinExporter.Export();
+			//}
 
 		}break;
 		case IDC_MATRIXEXP:
@@ -119,16 +119,24 @@ INT_PTR CALLBACK DlgProc(HWND hWnd,
 		}break;
 		case IDC_SCAEXP:
 		{
-			TSTR szExpFile = SCAWriter::Get().SaveFileDiallog(L"sca", L"SCAWriter");
-			if (szExpFile != NULL)
-			{
-				I_Writer.Set(szExpFile, SCAExport::GetInstance()->My_Pointer_interface);
-				I_SkinExporter.Set(szExpFile,
-					SCAExport::GetInstance()->My_Pointer_interface);
-				I_SkinExporter.Export();
-			}
+			//TSTR szExpFile = SCAWriter::Get().SaveFileDiallog(L"sca", L"SCAWriter");
+			//if (szExpFile != NULL)
+			//{
+			//	I_Writer.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+			//	I_SkinExporter.Set(szExpFile,
+			//		SAExport::GetInstance()->My_Pointer_interface);
+			//	I_SkinExporter.Export();
+			//}
 
 		}break;
+		case IDC_SOAEXP:
+		{
+			TSTR szExpFile = I_SOAExporter.SaveFileDiallog(L"SOA", L"SAExporter");
+			if(szExpFile != NULL)
+			I_SOAExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+			I_SOAExporter.Convert();
+			I_SOAExporter.Export();
+		}
 		}
 	}
 	case WM_LBUTTONDOWN:

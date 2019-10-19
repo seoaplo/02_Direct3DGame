@@ -8,6 +8,7 @@ class SCASkinExp
 public:
 	SCAMaterialManager		My_MaterialManager;
 	SCAObjectManager		My_ObjectManager;
+	std::vector<INode*>		m_SelectNodeList;
 
 	Interface*				My_Pointer_Interface_max;				// Max Interface
 	std::wstring			My_wstring_filename;			// file path
@@ -24,6 +25,20 @@ public:
 		int iMaterial = My_MaterialManager.AddMaterial(Pointer_INode);
 		My_ObjectManager.AddObject(Pointer_INode, My_SCAScene_Scene, My_Interval_interval, iMaterial);
 	}
+	SCAObject* FindObject(INode* pNode)
+	{
+		return My_ObjectManager.FindObject(pNode);
+	}
+	SCAObject* FindObject(int iIndex)
+	{
+		return My_ObjectManager.FindObject(iIndex);
+	}
+	SCAObject* FindObject(TSTR name)
+	{
+		return My_ObjectManager.FindObject(name);
+	}
+
+
 	void	Clear()
 	{
 		My_MaterialManager.m_MaterialList.clear();

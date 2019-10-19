@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="SOAExporter">
+      <UniqueIdentifier>{41b8f12e-ed34-4017-90f7-c24318dd622d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SAExporter">
+      <UniqueIdentifier>{5136ffd7-dcc1-4b74-91e5-924269001915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{69b93308-f257-45f9-90aa-9813ac956bd3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SCAExport.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Exporter.cpp" />
+    <ClCompile Include="SAExporter.cpp">
+      <Filter>SAExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SOAExporter.cpp">
+      <Filter>SOAExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SOAManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="SAMaterialManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="header.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SAGlobal.h" />
+    <ClInclude Include="SAExporter.h">
+      <Filter>SAExporter</Filter>
+    </ClInclude>
+    <ClInclude Include="SOAExporter.h">
+      <Filter>SOAExporter</Filter>
+    </ClInclude>
+    <ClInclude Include="SOAManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="SAMaterialManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SCAExport.aps" />
+    <None Include="Source.def" />
+  </ItemGroup>
+</Project>

@@ -20,7 +20,6 @@
 #define CTL_CHARS			31
 #define SINGLE_QUOTE		39 // ( ' )
 #define ALMOST_ZERO			1.0e-3f
-#define SUBMATERIAL_SIZE	15
 
 const enum MaterialTextureType
 {
@@ -114,7 +113,7 @@ struct SMaterial
 	TSTR	szName;
 
 	int SubMaterialNum;
-	SubMaterial	SubMaterialList[SUBMATERIAL_SIZE];
+	std::vector<SubMaterial>	SubMaterialList;
 	SMaterial()
 	{
 		pMaterial = nullptr;
@@ -132,14 +131,30 @@ struct STriangle
 	}
 };
 
+struct STriangleList
+{
+	int iSize;
+	std::vector<STriangle> List;
+	STriangleList()
+	{
+		iSize = 0;
+	}
+	~STriangleList()
+	{
+		List.clear();
+	}
+};
+
 struct SSubMesh
 {
-	bool bUse;
+	int iVertexSize;
+	int iIndexSize;
 	std::vector<PNCT>			VertexList;
 	std::vector<DWORD>			IndexList;
 	SSubMesh()
 	{
-		bUse = false;
+		iVertexSize = 0;
+		iIndexSize = 0;
 	}
 };
 
@@ -147,7 +162,7 @@ struct SMesh
 {
 	int				iMaterialID;
 	int				iSubNum;
-	SSubMesh		SubMeshList[SUBMATERIAL_SIZE];
+	std::vector<SSubMesh>	SubMeshList;
 	SMesh()
 	{
 		iMaterialID = -1;

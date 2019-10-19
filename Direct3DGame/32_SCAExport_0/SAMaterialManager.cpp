@@ -1,7 +1,7 @@
-#include "SSSMaterialManager.h"
+#include "SAMaterialManager.h"
 
 
-int	SSSMaterialManager::AddMaterial(INode* pNode)
+int	SAMaterialManager::AddMaterial(INode* pNode)
 {
 	int iMaterial = FindMaterial(pNode);
 
@@ -10,11 +10,11 @@ int	SSSMaterialManager::AddMaterial(INode* pNode)
 	Mtl* pMtl = pNode->GetMtl();
 	if (pMtl == nullptr) return -1;
 
-	m_MaterialList.push_back(SMaterial());
-	SMaterial& Material = m_MaterialList[m_MaterialList.size() - 1];
+	m_MaterialList.push_back(SAMaterial());
+	SAMaterial& Material = m_MaterialList[m_MaterialList.size() - 1];
 	Material.pMaterial = pMtl;
 	Material.iMaterialID = m_MaterialList.size() - 1;
-	Material.szName = SSSGlobal::FixupName(pMtl->GetName());	// material 이름에 오류가 날 문자를 없애거나 바꿔야 한다.
+	Material.szName = SAGlobal::FixupName(pMtl->GetName());	// material 이름에 오류가 날 문자를 없애거나 바꿔야 한다.
 	// sub-material
 	Material.SubMaterialNum = pMtl->NumSubMtls();
 	Material.SubMaterialList.resize(Material.SubMaterialNum);
@@ -25,8 +25,7 @@ int	SSSMaterialManager::AddMaterial(INode* pNode)
 			Mtl* pSubMtl = pMtl->GetSubMtl(iSub);
 			if (pSubMtl == nullptr) continue;
 
-			Material.SubMaterialList[iSub].szName = SSSGlobal::FixupName(pSubMtl->GetName());
-			Material.SubMaterialList[iSub].bUse = true;
+			Material.SubMaterialList[iSub].szName = SAGlobal::FixupName(pSubMtl->GetName());
 			GetTexture(pSubMtl, Material.SubMaterialList[iSub]);
 		}
 	}
@@ -39,7 +38,7 @@ int	SSSMaterialManager::AddMaterial(INode* pNode)
 	return Material.iMaterialID;
 
 }
-void SSSMaterialManager::GetTexture(Mtl* pMtl, SubMaterial& SubMtrl)
+void SAMaterialManager::GetTexture(Mtl* pMtl, SASubMaterial& SubMtrl)
 {
 	int iNumMap = pMtl->NumSubTexmaps();
 	for (int iSubMap = 0; iSubMap < iNumMap; iSubMap++)
@@ -49,7 +48,7 @@ void SSSMaterialManager::GetTexture(Mtl* pMtl, SubMaterial& SubMtrl)
 		{
 			if (tex->ClassID() == Class_ID(BMTEX_CLASS_ID, 0X00))
 			{
-				STextureMap Texmap;
+				SATextureMap Texmap;
 				SubMtrl.TextureMapList[iSubMap].bUse = true;
 
 				TSTR fullName;
@@ -61,7 +60,7 @@ void SSSMaterialManager::GetTexture(Mtl* pMtl, SubMaterial& SubMtrl)
 		}
 	}
 }
-int		SSSMaterialManager::FindMaterial(INode* pNode)
+int		SAMaterialManager::FindMaterial(INode* pNode)
 {
 	Mtl* pMtl = pNode->GetMtl();
 	if (pMtl)
@@ -76,7 +75,7 @@ int		SSSMaterialManager::FindMaterial(INode* pNode)
 	}
 	return -1;
 }
-bool	SSSMaterialManager::ExportMaterial(FILE* pStream)
+bool	SAMaterialManager::ExportMaterial(FILE* pStream)
 {
 	if (pStream == nullptr)
 	{
@@ -92,7 +91,6 @@ bool	SSSMaterialManager::ExportMaterial(FILE* pStream)
 
 		for (int iSubMtrl = 0; iSubMtrl < m_MaterialList[iMtl].SubMaterialNum; iSubMtrl++)
 		{
-			if (m_MaterialList[iMtl].SubMaterialList[iSubMtrl].bUse == false) continue;
 			_ftprintf(pStream, _T("\n%s %d %d"),
 				m_MaterialList[iMtl].SubMaterialList[iSubMtrl].szName,
 				iSubMtrl,
@@ -110,11 +108,15 @@ bool	SSSMaterialManager::ExportMaterial(FILE* pStream)
 	}
 	return true;
 }
-SSSMaterialManager::SSSMaterialManager()
+void SAMaterialManager::Release()
+{
+	m_MaterialList.clear();
+}
+SAMaterialManager::SAMaterialManager()
 {
 }
 
 
-SSSMaterialManager::~SSSMaterialManager()
+SAMaterialManager::~SAMaterialManager()
 {
 }

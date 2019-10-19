@@ -1,36 +1,66 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="리소스 파일">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="SCAExporter">
+      <UniqueIdentifier>{03695140-3c8d-42c8-9beb-f64539799c38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAManager">
+      <UniqueIdentifier>{a411e56a-36fa-4e4b-be4a-269ec56e4ff3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>헤더 파일</Filter>
+    <None Include="Source.def" />
+    <None Include="SCAExport.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="SCAGlobal.cpp" />
+    <ClCompile Include="SCAMaterialManager.cpp">
+      <Filter>SCAManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAWriter.cpp">
+      <Filter>SCAExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SCASkinExp.cpp">
+      <Filter>SCAExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAExport.cpp">
+      <Filter>SCAExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SOAObjectManager.cpp">
+      <Filter>SCAManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAObjectManager.cpp">
+      <Filter>SCAManager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="header.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SCAGlobal.h" />
+    <ClInclude Include="SCAMaterialManager.h">
+      <Filter>SCAManager</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="SCASkinExp.h">
+      <Filter>SCAExporter</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAWriter.h">
+      <Filter>SCAExporter</Filter>
+    </ClInclude>
+    <ClInclude Include="SOAObjectManager.h">
+      <Filter>SCAManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAObjectManager.h">
+      <Filter>SCAManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="31_SSSExport_Skin_1.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
+    <ResourceCompile Include="SCAExport.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

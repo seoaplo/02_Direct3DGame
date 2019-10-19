@@ -1,12 +1,12 @@
 #pragma once
 #include "SCAMaterialManager.h"
-#include "SCAObjectManager.h"
+#include "SOAObjectManager.h"
 
 class SCAWriter
 {
 public:
 	SCAMaterialManager		My_MaterialManager;
-	SCAObjectManager		My_ObjectManager;
+	SOAObjectManager		My_ObjectManager;
 
 	Interface*				My_Pointer_Interface_max;				// Max Interface
 	std::wstring			My_wstring_filename;			// file path
@@ -21,6 +21,19 @@ public:
 	void	Set(const TCHAR* name, Interface* pMax);
 	bool	Export();
 	void	PreProcess(INode* pNode);
+	SOAObject* FindObject(INode* pNode)
+	{
+		return My_ObjectManager.FindObject(pNode);
+	}
+	SOAObject* FindObject(int iIndex)
+	{
+		return My_ObjectManager.FindObject(iIndex);
+	}
+	SOAObject* FindObject(TSTR name)
+	{
+		return My_ObjectManager.FindObject(name);
+	}
+
 	void	Clear()
 	{
 		My_MaterialManager.m_MaterialList.clear();
