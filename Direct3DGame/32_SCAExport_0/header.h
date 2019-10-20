@@ -271,8 +271,11 @@ struct PNCTIW_VERTEX
 	PNCTIW_VERTEX()
 	{
 		memset(this, -1.0f, sizeof(PNCTIW_VERTEX));
-		memset(w, -1.0f, sizeof(float) * 8);
-		memset(i, -1.0f, sizeof(float) * 8);
+		w[0] = -1.0f;		w[1] = -1.0f;		w[2] = -1.0f;		w[3] = -1.0f;
+		w[4] = -1.0f;		w[5] = -1.0f;		w[6] = -1.0f;		w[7] = -1.0f;
+
+		i[0] = -1.0f;		i[1] = -1.0f;		i[2] = -1.0f;		i[3] = -1.0f;
+		i[4] = -1.0f;		i[5] = -1.0f;		i[6] = -1.0f;		i[7] = -1.0f;
 	}
 	PNCTIW_VERTEX(Point3 Pos, Point3 Normal, Point4 Color, Point2 Coord)
 	{
@@ -281,8 +284,11 @@ struct PNCTIW_VERTEX
 		c = Color;
 		t = Coord;
 
-		memset(w, -1.0f, sizeof(float) * 8);
-		memset(i, -1.0f, sizeof(float) * 8);
+		w[0] = -1.0f;		w[1] = -1.0f;		w[2] = -1.0f;		w[3] = -1.0f;
+		w[4] = -1.0f;		w[5] = -1.0f;		w[6] = -1.0f;		w[7] = -1.0f;
+
+		i[0] = -1.0f;		i[1] = -1.0f;		i[2] = -1.0f;		i[3] = -1.0f;
+		i[4] = -1.0f;		i[5] = -1.0f;		i[6] = -1.0f;		i[7] = -1.0f;
 	}
 	PNCTIW_VERTEX(Point3 Pos, Point3 Normal, Point4 Color, Point2 Coord,
 		float w0, float w1, float w2, float w3, float w4, float w5, float w6, float w7,

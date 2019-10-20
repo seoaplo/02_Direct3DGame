@@ -5,32 +5,87 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{39f87c42-52ab-4b82-ae0e-4e0b74509ec8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileLoader">
+      <UniqueIdentifier>{e3543922-64c9-4872-91ea-324d4904822f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ObjectAnimation">
+      <UniqueIdentifier>{f1f2d3e1-b577-471e-a566-c951157cb34e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SSkinObject">
+      <UniqueIdentifier>{899aae6b-04d0-40e1-849a-6e8f9e841eb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Test.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
-    <ClCompile Include="SArcBall.cpp" />
-    <ClCompile Include="SCamera.cpp" />
-    <ClCompile Include="SDrawObject.cpp" />
-    <ClCompile Include="SFrustum.cpp" />
     <ClCompile Include="SMaterial.cpp" />
-    <ClCompile Include="SMesh.cpp" />
     <ClCompile Include="SModelViewCamera.cpp" />
     <ClCompile Include="SParser.cpp" />
-    <ClCompile Include="SSSFileLoader.cpp" />
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SSSFileLoader.cpp">
+      <Filter>FileLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="SDrawObject.cpp">
+      <Filter>ObjectAnimation</Filter>
+    </ClCompile>
+    <ClCompile Include="SMesh.cpp">
+      <Filter>ObjectAnimation</Filter>
+    </ClCompile>
+    <ClCompile Include="SSkinObject.cpp">
+      <Filter>SSkinObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SSkinMesh.cpp">
+      <Filter>SSkinObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinFileLoader.cpp">
+      <Filter>FileLoader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sample.h" />
-    <ClInclude Include="SArcBall.h" />
-    <ClInclude Include="SCamera.h" />
-    <ClInclude Include="SDrawObject.h" />
-    <ClInclude Include="SFrustum.h" />
     <ClInclude Include="SMaterial.h" />
-    <ClInclude Include="SMesh.h" />
     <ClInclude Include="SModelViewCamera.h" />
     <ClInclude Include="SParser.h" />
-    <ClInclude Include="SSSFileLoader.h" />
+    <ClInclude Include="SArcBall.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SSSFileLoader.h">
+      <Filter>FileLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="SDrawObject.h">
+      <Filter>ObjectAnimation</Filter>
+    </ClInclude>
+    <ClInclude Include="SMesh.h">
+      <Filter>ObjectAnimation</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinObject.h">
+      <Filter>SSkinObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinMesh.h">
+      <Filter>SSkinObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAHeader.h" />
+    <ClInclude Include="SkinFileLoader.h">
+      <Filter>FileLoader</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

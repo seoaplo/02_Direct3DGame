@@ -152,7 +152,6 @@ struct PNCT_VERTEX
 		p = vp, n = vn, c = vc, t = vt;
 	}
 };
-
 struct PNCT2_VERTEX
 {
 	D3DXVECTOR3		p;

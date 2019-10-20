@@ -2,6 +2,7 @@
 
 void SSkinExporter::Convert()
 {
+	m_SkinManager.Release();
 	SAExporter::CreateMaterialList();
 	m_SkinManager.SetSize(m_iSelectNodeMax);
 	for (auto& pNode : m_SelectNodeList)
@@ -20,40 +21,6 @@ bool SSkinExporter::Export()
 	ExportHeader(m_pStream);
 	SAExporter::ExportMaterial(m_pStream);
 	m_SkinManager.ExportObject(m_pStream);
-
-	_ftprintf(m_pStream, _T("\n%s %d"), L"#INV_GETNODETM", g_iNodeMaxNum);
-	for (auto& pObj : g_NodeList)
-	{
-		INode* pNode = pObj.first;
-		Matrix3 wtm = pNode->GetNodeTM(g_Interval.Start());
-		Matrix3 invWtm = Inverse(wtm);
-
-		D3D_MATRIX tm;
-		SAGlobal::DumpMatrix3(tm, &invWtm);
-
-		_ftprintf(m_pStream,
-			_T("\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f"),
-			tm._11,
-			tm._12,
-			tm._13,
-			tm._14,
-
-			tm._21,
-			tm._22,
-			tm._23,
-			tm._24,
-
-			tm._31,
-			tm._32,
-			tm._33,
-			tm._34,
-
-			tm._41,
-			tm._42,
-			tm._43,
-			tm._44);
-
-	}
 
 	fclose(m_pStream);
 	MessageBox(GetActiveWindow(), m_filename.c_str(),

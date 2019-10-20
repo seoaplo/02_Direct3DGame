@@ -1,23 +1,8 @@
 #pragma once
 #include "SMesh.h"
 #include "STimer.h"
+#include "SCAHeader.h"
 
-struct SScene
-{
-	int   iFirstFrame;  // 0
-	int   iLastFrame;   // 100
-	int   iFrameSpeed; // 1 Scecond = 30 Frame
-	int   iTickPerFrame; // 1 Frame = 160 Tick
-	int   iNumObjects;
-	int   iNumMaterials;
-};
-
-struct SAnimTrack
-{
-	int					iTick;
-	D3DXVECTOR3			Position;
-	D3DXQUATERNION		Quaternion;
-};
 
 class SDrawObject
 {
@@ -32,7 +17,7 @@ public:
 	D3DXVECTOR3 m_vCenter;
 
 	SScene	m_Scene;
-	SMaterial* m_pMaterial;
+	SMaterial m_Material;
 	std::vector<SMesh> m_MeshList;
 
 	D3DXMATRIX m_matAnim;

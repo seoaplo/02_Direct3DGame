@@ -99,14 +99,14 @@ BOOL SParser::GetData(VOID* pData, INT DataType)
 }
 void SParser::GetNextLine()
 {
-	_fgetts(m_pBuffer, 256, m_pStream);
+	_fgetts(m_pBuffer, MAX_PATH, m_pStream);
 }
 BOOL SParser::GetDataFromFileNext(const TCHAR* pString, VOID* pData, INT DataType)
 {
 
 	if (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, 256, m_pStream);
+		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
 		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
 		if (!_tcsicmp(m_pString, pString))
 		{
@@ -127,7 +127,7 @@ BOOL SParser::GetDataFromFile(const TCHAR* pString, VOID* pData, INT DataType)
 	}
 	if (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, 256, m_pStream);
+		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
 		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
 		if (!_tcsicmp(m_pString, pString))
 		{
@@ -155,7 +155,7 @@ BOOL SParser::GetDataFromFileString(const TCHAR* pString, VOID* pData, INT DataT
 		{
 			ErrorCloseStream(_T("작업도중 파일포인터를 잃어 버렸습니다."));
 		}
-		_fgetts(m_pBuffer, 256, m_pStream);
+		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
 		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
 		if (!_tcsicmp(m_pString, pString))
 		{
@@ -182,7 +182,7 @@ BOOL SParser::GetNodeName(const TCHAR* pString, VOID* pData, INT DataType)
 	}
 	if (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, 256, m_pStream);
+		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
 		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
 		if (!_tcsicmp(m_pString, pString))
 		{
@@ -249,7 +249,7 @@ BOOL SParser::GetDataFromFileLoop(const TCHAR* pString, VOID* pData, INT DataTyp
 {
 	while (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, 256, m_pStream);
+		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
 		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
 		if (!_tcsicmp(m_pString, pString))
 		{

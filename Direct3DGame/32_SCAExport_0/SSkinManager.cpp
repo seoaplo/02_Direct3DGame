@@ -548,10 +548,9 @@ bool SSkinManager::ExportObject(FILE* pStream)
 	for (int iObj = 0; iObj < m_ObjectList.size(); iObj++)
 	{
 
-		_ftprintf(pStream, _T("\n%s %s %d %d %d"),
+		_ftprintf(pStream, _T("\n%s %s %d %d"),
 			m_ObjectList[iObj].name,
 			m_ObjectList[iObj].ParentName,
-			m_ObjectList[iObj].m_ClassType,
 			m_ObjectList[iObj].m_Mesh.iMaterialID,
 			m_ObjectList[iObj].m_Mesh.iSubNum);
 

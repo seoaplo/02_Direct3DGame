@@ -6,11 +6,10 @@
 #include "SDXShape.h"
 #include "SMesh.h"
 #include "SSSFileLoader.h"
+#include "SkinFileLoader.h"
 
 class Sample : public SCore
 {
-	friend class Singleton<SSSFileLoader>;
-	friend class SSSFileLoader;
 public:
 	//===================================================================
 	// 각종 지원 객체
@@ -18,13 +17,13 @@ public:
 	shared_ptr<SCamera > m_pMainCamera;
 	
 	std::vector<SDrawObject*> m_ObjList;
+	std::vector<SSkinObject*> m_SkinObjList;
 
 	DXGame::SDxHelperEX		dxObj;
 	bool					m_bDebugRender;
 	D3DXMATRIX				m_matInitWorld;
 	D3DXMATRIX				m_matWorld;
 
-	vector<vector<PNCT_VERTEX>> VertexList;
 public:
 	//====================================================================
 	// 재정의 함수

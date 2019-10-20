@@ -1,11 +1,11 @@
-#include "SMesh.h"
+#include "SSkinMesh.h"
 
 const TCHAR BoxShader[] = L"../../shader/Shape/Box.hlsl";
 
 //----------------------------------------------------------------------------------------------------------
 // Create
 //----------------------------------------------------------------------------------------------------------
-bool SMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, STextureList* pLoadTextureList, const TCHAR* pLoadShaderFile)
+bool SSkinMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, STextureList* pLoadTextureList, const TCHAR* pLoadShaderFile)
 {
 	if (pDevice == nullptr)
 	{
@@ -20,7 +20,7 @@ bool SMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, STextur
 
 	m_pDevice = pDevice;
 	m_pContext = pContext;
-	if (pLoadTextureList != nullptr) m_TextureList = *pLoadTextureList;
+	if(pLoadTextureList != nullptr) m_TextureList = *pLoadTextureList;
 
 	if (pLoadShaderFile == nullptr) pLoadShaderFile = BoxShader;
 
@@ -77,14 +77,14 @@ bool SMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, STextur
 
 	return true;
 }
-bool SMesh::CreateVertexData()
+bool SSkinMesh::CreateVertexData()
 {
 	m_dxobj.m_iNumVertex = m_VertexList.size();
 	m_dxobj.m_iVertexSize = sizeof(PNCT_VERTEX);
 
 	return true;
 }
-bool SMesh::CreateIndexData()
+bool SSkinMesh::CreateIndexData()
 {
 
 	m_dxobj.m_iNumIndex = m_IndexList.size();
@@ -92,7 +92,7 @@ bool SMesh::CreateIndexData()
 
 	return true;
 }
-HRESULT SMesh::CreateVertexBuffer()
+HRESULT SSkinMesh::CreateVertexBuffer()
 {
 	HRESULT hr = S_OK;
 
@@ -104,10 +104,16 @@ HRESULT SMesh::CreateVertexBuffer()
 		pData,
 		m_dxobj.m_iNumVertex,
 		m_dxobj.m_iVertexSize));
+	
+	if (m_IW_VertexList.size() > 0) pData = (void**)&m_VertexList.at(0);
+	m_pVertexBuffer = DXGame::CreateVertexBuffer(m_pDevice,
+		pData,
+		m_IW_VertexList.size(),
+		sizeof(IW_VERTEX));
 
 	return hr;
 }
-HRESULT SMesh::CreateIndexBuffer()
+HRESULT SSkinMesh::CreateIndexBuffer()
 {
 	HRESULT hr = S_OK;
 	if (m_dxobj.m_iNumIndex <= 0) return hr;
@@ -121,7 +127,7 @@ HRESULT SMesh::CreateIndexBuffer()
 
 	return hr;
 }
-HRESULT SMesh::CreateResource()
+HRESULT SSkinMesh::CreateResource()
 {
 	HRESULT hr = S_OK;
 	m_dxobj.g_pConstantBuffer.Attach(DXGame::CreateConstantBuffer(m_pDevice, &m_cbData, 1, sizeof(VS_CONSTANT_BUFFER)));
@@ -131,16 +137,17 @@ HRESULT SMesh::CreateResource()
 // Load
 //----------------------------------------------------------------------------------------------------------
 
-bool SMesh::Load(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* szLoadName, const TCHAR* pLoadShaderFile, bool bThread)
+bool SSkinMesh::Load(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const TCHAR* szLoadName, const TCHAR* pLoadShaderFile, bool bThread)
 {
 	return true;
 }
-HRESULT SMesh::LoadTextures(ID3D11Device* pDevice)
+HRESULT SSkinMesh::LoadTextures(ID3D11Device* pDevice)
 {
 	HRESULT hr = S_OK;
+	m_dxobj.g_pTextureSRV = nullptr;
 	return hr;
 }
-HRESULT SMesh::SetInputLayout()
+HRESULT SSkinMesh::SetInputLayout()
 {
 	HRESULT hr = S_OK;
 	D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -148,7 +155,12 @@ HRESULT SMesh::SetInputLayout()
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+
+		{"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 64, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 80, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 96, D3D11_INPUT_PER_VERTEX_DATA, 0  },
 	};
 	UINT numElements = sizeof(layout) / sizeof(layout[0]);
 	m_dxobj.g_pInputlayout.Attach(DXGame::CreateInputlayout(m_pDevice, m_dxobj.g_pVSBlob.Get()->GetBufferSize(),
@@ -156,7 +168,7 @@ HRESULT SMesh::SetInputLayout()
 	return hr;
 }
 
-void SMesh::SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView, D3DXMATRIX* pProj)
+void SSkinMesh::SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView, D3DXMATRIX* pProj)
 {
 	if (pWorld != NULL)
 	{
@@ -178,18 +190,21 @@ void SMesh::SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView, D3DXMATRIX* pProj)
 //----------------------------------------------------------------------------------------------------------
 // Frame Work
 //----------------------------------------------------------------------------------------------------------
-bool SMesh::Init()
+bool SSkinMesh::Init()
 {
 	return true;
 }
-bool SMesh::Frame()
+bool SSkinMesh::Frame()
 {
 	return true;
 }
-bool SMesh::PreRender(ID3D11DeviceContext* pContext)
+bool SSkinMesh::PreRender(ID3D11DeviceContext* pContext)
 {
 	pContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)m_dxobj.m_iPrimitiveType);
 	m_dxobj.PreRender(pContext, m_dxobj.m_iVertexSize);
+	UINT stride = sizeof(IW_VERTEX);
+	UINT offset = 1;
+	pContext->IASetVertexBuffers(1, 1, m_pVertexBuffer.GetAddressOf(), &stride, &offset);
 	for (int iCount = 0; iCount < TexType_Size; iCount++)
 	{
 		if (m_TextureList.List[iCount] != nullptr)
@@ -200,20 +215,29 @@ bool SMesh::PreRender(ID3D11DeviceContext* pContext)
 
 	return true;
 }
-bool SMesh::Render(ID3D11DeviceContext*		pContext)
+bool SSkinMesh::Render(ID3D11DeviceContext*		pContext)
 {
 	PreRender(pContext);
 	PostRender(pContext);
 	return true;
 
 }
-bool SMesh::PostRender(ID3D11DeviceContext* pContext)
+bool SSkinMesh::PostRender(ID3D11DeviceContext* pContext)
 {
 	UpdateConstantBuffer(pContext);
 	m_dxobj.PostRender(pContext, m_dxobj.m_iNumIndex);
 	return true;
 }
-bool SMesh::Release()
+bool SSkinMesh::Release()
 {
 	return true;
+}
+
+SSkinMesh::SSkinMesh()
+{
+}
+
+
+SSkinMesh::~SSkinMesh()
+{
 }

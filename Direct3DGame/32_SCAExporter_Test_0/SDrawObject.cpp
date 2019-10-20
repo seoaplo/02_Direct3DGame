@@ -19,7 +19,7 @@ bool SDrawObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, c
 	{
 		if (bMaterial && m_iClassType == CLASS_GEOM)
 		{
-			STextureList& TargetTexList = m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			STextureList& TargetTexList = m_Material.m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
 			TargetMesh.Create(pDevice, pContext, &TargetTexList, pShaderFile);
 		}
 		else
@@ -246,32 +246,37 @@ bool SDrawObject::SetParent(T_STR ParentName)
 
 bool SDrawObject::SetMaterial(SMaterial* pMaterial)
 {
-	m_pMaterial = pMaterial;
-	if (m_pMaterial == nullptr) return false;
-	else m_iMaterialID = m_pMaterial->m_iIndex;
+	if (pMaterial == nullptr) return false;
+	else if (pMaterial->m_SubMaterialList.size() <= 0) return false;
+	else m_iMaterialID = m_Material.m_iIndex;
+	m_Material = *pMaterial;
 
 	for (auto& TargetMesh : m_MeshList)
 	{
-		if (m_pMaterial != nullptr && m_iClassType == CLASS_GEOM)
+		if (m_iClassType == CLASS_GEOM)
 		{
-			STextureList& TargetTexList = m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
-			TargetMesh.m_pTextureList = &m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			if (m_Material.m_SubMaterialList.size() <= TargetMesh.iSubMtrlIndex) break;
+			STextureList& TargetTexList = m_Material.m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			TargetMesh.m_TextureList = m_Material.m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
 		}
 	}
 	return true;
 }
 bool SDrawObject::SetMaterial(T_STR MaterialName)
 {
-	m_pMaterial = I_MaterialManager.GetMaterial(MaterialName);
-	if (m_pMaterial == nullptr) return false;
-	else m_iMaterialID = m_pMaterial->m_iIndex;
+	SMaterial* pMaterial = I_MaterialManager.GetMaterial(MaterialName);
+	if (pMaterial == nullptr) return false;
+	else if (pMaterial->m_SubMaterialList.size() <= 0) return false;
 
+	m_iMaterialID = m_Material.m_iIndex;
+	m_Material = *pMaterial;
 	for (auto& TargetMesh : m_MeshList)
 	{
-		if (m_pMaterial != nullptr && m_iClassType == CLASS_GEOM)
+		if (m_iClassType == CLASS_GEOM)
 		{
-			STextureList& TargetTexList = m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
-			TargetMesh.m_pTextureList = &m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			if (m_Material.m_SubMaterialList.size() <= TargetMesh.iSubMtrlIndex) break;
+			STextureList& TargetTexList = m_Material.m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			TargetMesh.m_TextureList = m_Material.m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
 		}
 	}
 	return true;
@@ -279,15 +284,20 @@ bool SDrawObject::SetMaterial(T_STR MaterialName)
 bool SDrawObject::SetMaterial(int iMaterialNumber)
 {
 	m_iMaterialID = iMaterialNumber;
-	m_pMaterial = I_MaterialManager.GetMaterial(iMaterialNumber);
-	if (m_pMaterial == nullptr) return false;
+	SMaterial* pMaterial = I_MaterialManager.GetMaterial(iMaterialNumber);
 
+	if (pMaterial == nullptr) return false;
+	else if (pMaterial->m_SubMaterialList.size() <= 0) return false;
+
+	m_Material = *pMaterial;
 	for (auto& TargetMesh : m_MeshList)
 	{
-		if (m_pMaterial != nullptr && m_iClassType == CLASS_GEOM)
+		if ( m_iClassType == CLASS_GEOM)
 		{
-			STextureList& TargetTexList = m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
-			TargetMesh.m_pTextureList = &m_pMaterial->m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			if (m_Material.m_SubMaterialList.size() <= TargetMesh.iSubMtrlIndex) break;
+
+			STextureList& TargetTexList = m_Material.m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
+			TargetMesh.m_TextureList = m_Material.m_SubMaterialList[TargetMesh.iSubMtrlIndex].m_TextureList;
 		}
 	}
 	return true;
@@ -298,7 +308,6 @@ SDrawObject::SDrawObject()
 	m_iMaterialID = -1;
 	m_ObjectName = L"none";
 	m_ParentName = L"none";
-	m_pMaterial = nullptr;
 	m_pParentObject = nullptr;
 
 	D3DXMatrixIdentity(&m_matWorld);

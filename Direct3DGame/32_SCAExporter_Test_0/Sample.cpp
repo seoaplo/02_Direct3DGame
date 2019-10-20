@@ -21,10 +21,11 @@ int Sample::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 bool Sample::Init()
 {
 	int iKey;
-	I_SSSFileLoaderManeger.Init(GetDevice(), GetContext());
-	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestSOA.SOA");
 
-	
+	I_SkinFileLoaderManeger.Init(GetDevice(), GetContext());
+	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin.skm");
+	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin1.skm");
+	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin2.skm");
 
 	//--------------------------------------------------------------------------------------
 	// 월드  행렬
@@ -36,9 +37,9 @@ bool Sample::Init()
 	//--------------------------------------------------------------------------------------	
 	m_pMainCamera = make_shared<SCamera>();
 
-	for (int iCount = 0; iCount < I_DrawObjectManager.GetSize(); iCount++)
+	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
 	{
-		m_ObjList.push_back(I_DrawObjectManager.GetDrawObject(iCount));
+		m_SkinObjList.push_back(I_SkinObjectManager.GetSkinObject(iCount));
 	}
 
 	float fAspectRatio = m_nWindowWidth / (FLOAT)m_nWindowHeight;
@@ -56,9 +57,9 @@ bool Sample::Frame()
 
 	// 2초당 1회전( 1 초 * D3DX_PI = 3.14 )
 
-	for (int iCount = 0; iCount < I_DrawObjectManager.GetSize(); iCount++)
+	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
 	{
-		m_ObjList[iCount]->Frame();
+		m_SkinObjList[iCount]->Frame();
 	}
 
 	//m_pObj->Frame();
@@ -75,10 +76,11 @@ bool Sample::Render()
 
 	D3DXMatrixIdentity(&m_matWorld);
 	//D3DXMatrixScaling(&m_matWorld, 100, 100, 100);
-	for (int iCount = 0; iCount < I_DrawObjectManager.GetSize(); iCount++)
+
+	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
 	{
-		m_ObjList[iCount]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-		m_ObjList[iCount]->Render(GetContext());
+		m_SkinObjList[iCount]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+		m_SkinObjList[iCount]->Render(GetContext());
 	}
 
 	return true;

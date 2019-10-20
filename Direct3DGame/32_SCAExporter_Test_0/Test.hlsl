@@ -14,7 +14,12 @@ struct VS_INPUT
 	float3 p : POSITION;
 	float3 n : NORMAL;
 	float4 c : COLOR;
-	float2 t : TEXCOORD;
+	float2 t : TEXCOORD0;
+
+	float4 i1 : TEXCOORD1;
+	float4 w1 : TEXCOORD2;
+	float4 i2 : TEXCOORD3;
+	float4 w2 : TEXCOORD4;
 };
 struct VS_OUTPUT
 {
