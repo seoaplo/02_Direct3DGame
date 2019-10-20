@@ -271,6 +271,8 @@ struct PNCTIW_VERTEX
 	PNCTIW_VERTEX()
 	{
 		memset(this, -1.0f, sizeof(PNCTIW_VERTEX));
+		memset(w, -1.0f, sizeof(float) * 8);
+		memset(i, -1.0f, sizeof(float) * 8);
 	}
 	PNCTIW_VERTEX(Point3 Pos, Point3 Normal, Point4 Color, Point2 Coord)
 	{
@@ -279,6 +281,8 @@ struct PNCTIW_VERTEX
 		c = Color;
 		t = Coord;
 
+		memset(w, -1.0f, sizeof(float) * 8);
+		memset(i, -1.0f, sizeof(float) * 8);
 	}
 	PNCTIW_VERTEX(Point3 Pos, Point3 Normal, Point4 Color, Point2 Coord,
 		float w0, float w1, float w2, float w3, float w4, float w5, float w6, float w7,
@@ -307,14 +311,31 @@ struct SCATriangle
 	}
 };
 
+struct SCATriangleList
+{
+	int iSize;
+	std::vector<SCATriangle> List;
+	SCATriangleList()
+	{
+		iSize = 0;
+	}
+	~SCATriangleList()
+	{
+		List.clear();
+	}
+};
+
 struct SCASubMesh
 {
-	bool bUse;
+	int iVertexSize;
+	int iIndexSize;
 	std::vector<PNCTIW_VERTEX>			VertexList;
-	std::vector<DWORD>					IndexList;
+	std::vector<DWORD>			IndexList;
+
 	SCASubMesh()
 	{
-		bUse = false;
+		iVertexSize = 0;
+		iIndexSize = 0;
 	}
 };
 
@@ -323,7 +344,9 @@ struct SCAMesh
 	int				iMaterialID;
 	int				iSubNum;
 	Box3			m_box;
-	SCASubMesh		SubMeshList[SUBMATERIAL_SIZE];
+
+	std::vector<SCASubMesh>	SubMeshList;
+
 	SCAMesh()
 	{
 		iMaterialID = -1;
@@ -353,3 +376,5 @@ struct SCAObject
 		ParentName = L"none";
 	}
 };
+
+typedef std::map<INode*, DWORD> NodeList;

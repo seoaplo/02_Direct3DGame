@@ -26,8 +26,12 @@
     <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="SAExporter.cpp" />
     <ClCompile Include="SAMaterialManager.cpp" />
+    <ClCompile Include="SMatrixExporter.cpp" />
+    <ClCompile Include="SMatrixManager.cpp" />
     <ClCompile Include="SOAExporter.cpp" />
     <ClCompile Include="SOAManager.cpp" />
+    <ClCompile Include="SSkinExporter.cpp" />
+    <ClCompile Include="SSkinManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h" />
@@ -35,8 +39,12 @@
     <ClInclude Include="SAExporter.h" />
     <ClInclude Include="SAMaterialManager.h" />
     <ClInclude Include="SAGlobal.h" />
+    <ClInclude Include="SMatrixExporter.h" />
+    <ClInclude Include="SMatrixManager.h" />
     <ClInclude Include="SOAExporter.h" />
     <ClInclude Include="SOAManager.h" />
+    <ClInclude Include="SSkinExporter.h" />
+    <ClInclude Include="SSkinManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SCAExport.aps" />

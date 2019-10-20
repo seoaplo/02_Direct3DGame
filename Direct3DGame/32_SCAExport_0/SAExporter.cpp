@@ -1,7 +1,7 @@
 #include "SAExporter.h"
 
 int						SAExporter::g_iNodeMaxNum;
-std::map<DWORD, INode*>	SAExporter::g_NodeList;
+NodeList				SAExporter::g_NodeList;
 INode*					SAExporter::g_pRootNode;
 SAScene					SAExporter::g_Scene;			
 Interval					SAExporter::g_Interval;			
@@ -55,6 +55,7 @@ TCHAR* SAExporter::SaveFileDiallog(TCHAR* szName, TCHAR* szTitle)
 }
 void SAExporter::Set(const TCHAR* name, Interface* pMax)
 {
+	SAExporter::Release();
 	m_pMax = pMax;
 	m_filename = name;
 	SAExporter::g_pRootNode = m_pMax->GetRootNode();		// 최상단 노드를 저장해둔다.
@@ -93,7 +94,7 @@ void  SAExporter::PreProcess(INode* pNode)
 		case GEOMOBJECT_CLASS_ID:
 		case HELPER_CLASS_ID:
 			// 노드 저장
-			SAExporter::g_NodeList.insert(std::make_pair(g_iNodeMaxNum, pNode));
+			SAExporter::g_NodeList.insert(std::make_pair(pNode, g_iNodeMaxNum));
 			SAExporter::g_iNodeMaxNum++;
 			break;
 		default:
@@ -119,12 +120,10 @@ int	SAExporter::FindMaterial(INode* pNode)
 }
 bool SAExporter::CreateMaterialList()
 {
-	for (int iNodeNum = 0; iNodeNum < SAExporter::g_iNodeMaxNum; iNodeNum++)
+	for (auto pNode : SAExporter::g_NodeList)
 	{
-		INode* pNode = SAExporter::g_NodeList.find(iNodeNum)->second;
-		SAExporter::g_MaterialManager.AddMaterial(pNode);
+		SAExporter::g_MaterialManager.AddMaterial(pNode.first);
 	}
-
 	return true;
 }
 bool SAExporter::Release()

@@ -14,6 +14,12 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{69b93308-f257-45f9-90aa-9813ac956bd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SSkinExporter">
+      <UniqueIdentifier>{244f75a1-88ec-41ca-b3e0-744153264dcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SMatrixExporter">
+      <UniqueIdentifier>{d45c664e-bb79-4dd6-863c-e5fbf0c84256}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SCAExport.rc">
@@ -35,6 +41,18 @@
     <ClCompile Include="SAMaterialManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="SSkinManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="SSkinExporter.cpp">
+      <Filter>SSkinExporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixExporter.cpp">
+      <Filter>SMatrixExporter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h" />
@@ -51,6 +69,18 @@
     </ClInclude>
     <ClInclude Include="SAMaterialManager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinExporter.h">
+      <Filter>SSkinExporter</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixExporter.h">
+      <Filter>SMatrixExporter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

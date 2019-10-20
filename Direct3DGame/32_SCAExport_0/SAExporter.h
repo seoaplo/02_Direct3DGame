@@ -10,7 +10,7 @@ public:
 // Union Data
 //============================================================================
 	static int						g_iNodeMaxNum;
-	static std::map<DWORD, INode*>	g_NodeList;
+	static NodeList					g_NodeList;
 	static INode*					g_pRootNode;		// Interface Node
 	static SAScene					g_Scene;			// Scene Data
 	static Interval					g_Interval;			// Time

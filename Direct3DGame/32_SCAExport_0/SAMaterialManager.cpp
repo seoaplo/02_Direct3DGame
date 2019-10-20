@@ -17,9 +17,9 @@ int	SAMaterialManager::AddMaterial(INode* pNode)
 	Material.szName = SAGlobal::FixupName(pMtl->GetName());	// material 이름에 오류가 날 문자를 없애거나 바꿔야 한다.
 	// sub-material
 	Material.SubMaterialNum = pMtl->NumSubMtls();
-	Material.SubMaterialList.resize(Material.SubMaterialNum);
 	if (Material.SubMaterialNum > 0)
 	{
+		Material.SubMaterialList.resize(Material.SubMaterialNum);
 		for (int iSub = 0; iSub < Material.SubMaterialNum; iSub++)
 		{
 			Mtl* pSubMtl = pMtl->GetSubMtl(iSub);
@@ -32,6 +32,7 @@ int	SAMaterialManager::AddMaterial(INode* pNode)
 	else
 	{
 		Material.SubMaterialNum = 1;
+		Material.SubMaterialList.resize(Material.SubMaterialNum);
 		Material.SubMaterialList[0].szName = Material.szName;
 		GetTexture(pMtl, Material.SubMaterialList[0]);
 	}

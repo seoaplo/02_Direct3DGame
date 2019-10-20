@@ -1,15 +1,24 @@
-#include "SOAManager.h"
+#include "SSkinManager.h"
 
-void SOAManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, int iObjectNum, int iMaterialID)
+struct BipAscendingSort
+{
+	bool operator()(SCABiped& rpStart, SCABiped& rpEnd)
+	{
+		return rpStart.m_fWeight < rpEnd.m_fWeight;
+	}
+};
+
+void SSkinManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, int iObjectNum, int iMaterialID, NodeList& MatrixNodeList)
 {
 	ObjectState os = pNode->EvalWorldState(interval.Start());
 	Object* CheckID = nullptr;
 	int ChildNum = pNode->NumChildren();
 	int iObjectNumber = -1;
 
-	SOAObject& Object = m_ObjectList[iObjectNum];
+	SCAObject& Object = m_ObjectList[iObjectNum];
 	iObjectNumber = iObjectNum;
 	CheckID = pNode->GetObjectRef();
+	Control* pControl = pNode->GetTMController();
 
 	if (os.obj)
 	{
@@ -37,6 +46,16 @@ void SOAManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, int
 			{
 				Object.m_ClassType = CLASS_GEOM;
 			}
+			if (pControl && pControl->ClassID()
+				== BIPBODY_CONTROL_CLASS_ID)
+			{
+				Object.m_ClassType = CLASS_BIPED;
+			}
+			if (pControl && pControl->ClassID()
+				== BIPSLAVE_CONTROL_CLASS_ID)
+			{
+				Object.m_ClassType = CLASS_BIPED;
+			}
 			break;
 		default:
 			return;
@@ -52,33 +71,33 @@ void SOAManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, int
 		Object.ParentName = SAGlobal::FixupName(pParentNode->GetName());
 	}
 	Object.name = SAGlobal::FixupName(pNode->GetName());
+	Object.pINode = pNode;
 	Matrix3 wtm = pNode->GetNodeTM(interval.Start());
+	Matrix3 Invwtm = Inverse(wtm);
 	SAGlobal::DumpMatrix3(Object.matWorld, &wtm);
+	SAGlobal::DumpMatrix3(Object.matInvWorld, &Invwtm);
 
 	Object.m_Mesh.iMaterialID = iMaterialID;
-	GetMesh(pNode, Object.m_Mesh, interval);
-
-	GetAnimation(pNode, Object.m_AnimTrack, Scene, interval);
+	GetMesh(pNode, Object.m_Mesh, interval, MatrixNodeList);
 }
-void SOAManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
+void SSkinManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval, NodeList& MatrixNodeList)
 {
 	m_TriLists.clear();
 
 	// 로컬 좌표계이면 월드 행렬, 아니면 단위 행렬
 	Matrix3 tm = pNode->GetObjTMAfterWSM(interval.Start());
-	Matrix3 ParentTM = pNode->GetParentTM(interval.Start());
-	Matrix3 LocalTM = pNode->GetNodeTM(interval.Start()) * Inverse(ParentTM);
-
-	D3D_MATRIX Parent;
-	D3D_MATRIX Local;
-
-	SAGlobal::DumpMatrix3(Parent, &ParentTM);
-	SAGlobal::DumpMatrix3(Local, &LocalTM);
 
 	bool deleteit = false;
 	// 트라이앵글 오브젝트
 	TriObject* tri = GetTriObjectFromNode(pNode, interval.Start(), deleteit);
-	if (tri == nullptr) return;
+	if (tri == nullptr)
+	{
+		Object* helperObj = pNode->EvalWorldState(interval.Start()).obj;
+		helperObj->GetDeformBBox(0,
+			sMesh.m_box,
+			&pNode->GetObjectTM(0));
+		return;
+	}
 	// 메쉬 오브젝트
 	Mesh* mesh = &tri->GetMesh();
 	mesh->buildBoundingBox();
@@ -95,7 +114,10 @@ void SOAManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 	if (negScale) { v0 = 2; v1 = 1; v2 = 0; }
 	else { v0 = 0; v1 = 1; v2 = 2; }
 
+	SetBippedInfo(pNode, sMesh, MatrixNodeList);
+
 	int iSubMtlSize = pNode->GetMtl()->NumSubMtls();
+	if (iSubMtlSize <= 0) iSubMtlSize = 1;
 	m_TriLists.resize(iSubMtlSize);
 	sMesh.SubMeshList.resize(iSubMtlSize);
 	std::vector<DWORD> SubMeshNumList;
@@ -136,7 +158,11 @@ void SOAManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 			continue;
 		}
 
-		SOATriangleList& TriangleList = m_TriLists[iSubIndex];
+		int iV0 = mesh->faces[iFace].v[v0];
+		int iV1 = mesh->faces[iFace].v[v2];
+		int iV2 = mesh->faces[iFace].v[v1];
+
+		SCATriangleList& TriangleList = m_TriLists[iSubIndex];
 		int iFaceNum = TriangleList.iSize;
 		TriangleList.iSize++;
 
@@ -198,6 +224,48 @@ void SOAManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 		rVertex = mesh->getRVertPtr(vert);
 		vn = GetVertexNormal(mesh, iFace, rVertex);
 		SAGlobal::DumpPoint3(TriangleList.List[iFaceNum].v[v2].n, vn);
+
+		//biped index & weight save
+		if (m_bipedList.size() <= 0) continue;
+		if (m_bipedList[iV0].m_BipedList.size() > 0)
+		{
+			for (int iWeight = 0;
+				iWeight <
+				m_bipedList[iV0].m_dwNumWeight;
+				iWeight++)
+			{
+				TriangleList.List[iFaceNum].v[v0].i[iWeight] =
+					m_bipedList[iV0].m_BipedList[iWeight].BipID;
+				TriangleList.List[iFaceNum].v[v0].w[iWeight] =
+					m_bipedList[iV0].m_BipedList[iWeight].m_fWeight;
+			}
+		}
+		if (m_bipedList[iV2].m_BipedList.size() > 0)
+		{
+			for (int iWeight = 0;
+				iWeight <
+				m_bipedList[iV2].m_dwNumWeight;
+				iWeight++)
+			{
+				TriangleList.List[iFaceNum].v[v1].i[iWeight] =
+					m_bipedList[iV2].m_BipedList[iWeight].BipID;
+				TriangleList.List[iFaceNum].v[v1].w[iWeight] =
+					m_bipedList[iV2].m_BipedList[iWeight].m_fWeight;
+			}
+		}
+		if (m_bipedList[iV1].m_BipedList.size() > 0)
+		{
+			for (int iWeight = 0;
+				iWeight <
+				m_bipedList[iV1].m_dwNumWeight;
+				iWeight++)
+			{
+				TriangleList.List[iFaceNum].v[v2].i[iWeight] =
+					m_bipedList[iV1].m_BipedList[iWeight].BipID;
+				TriangleList.List[iFaceNum].v[v2].w[iWeight] =
+					m_bipedList[iV1].m_BipedList[iWeight].m_fWeight;
+			}
+		}
 	}
 
 	// vb, ib
@@ -205,22 +273,22 @@ void SOAManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 
 	if (deleteit) delete tri;
 }
-void SOAManager::SetUniqueBuffer(SOAMesh& sMesh)
+void SSkinManager::SetUniqueBuffer(SCAMesh& sMesh)
 {
 
 	for (int iSub = 0; iSub < sMesh.SubMeshList.size(); iSub++)
 	{
 		if (m_TriLists[iSub].iSize <= 0) continue;
 
-		std::vector<PNCT>& vList = sMesh.SubMeshList[iSub].VertexList;
+		std::vector<PNCTIW_VERTEX>& vList = sMesh.SubMeshList[iSub].VertexList;
 		std::vector<DWORD>& iList = sMesh.SubMeshList[iSub].IndexList;
 		int& iVertexSize = sMesh.SubMeshList[iSub].iVertexSize;
 		int& iIndexSize = sMesh.SubMeshList[iSub].iIndexSize;
 
 		for (int iFace = 0; iFace < m_TriLists[iSub].iSize; iFace++)
 		{
-			SOATriangleList& triArray = m_TriLists[iSub];
-			SOATriangle& tri = triArray.List[iFace];
+			SCATriangleList& triArray = m_TriLists[iSub];
+			SCATriangle& tri = triArray.List[iFace];
 
 			for (int iVer = 0; iVer < 3; iVer++)
 			{
@@ -237,7 +305,7 @@ void SOAManager::SetUniqueBuffer(SOAMesh& sMesh)
 		}
 	}
 }
-int	SOAManager::IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList, int iVertexMax)
+int	SSkinManager::IsEqulVerteList(PNCTIW_VERTEX& vertex, std::vector<PNCTIW_VERTEX>& vList, int iVertexMax)
 {
 	for (int iVer = iVertexMax - 1; iVer >= 0; iVer--)
 	{
@@ -251,7 +319,7 @@ int	SOAManager::IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList, int iVer
 	}
 	return -1;
 }
-Point3	SOAManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
+Point3	SSkinManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
 {
 	Face* f = &mesh->faces[iFace];
 	DWORD smGroup = f->smGroup;
@@ -285,7 +353,7 @@ Point3	SOAManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
 	}
 	return vertexNormal;
 }
-TriObject* SOAManager::GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit)
+TriObject* SSkinManager::GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit)
 {
 	// 오브젝트를 받는다.
 	Object* obj = pNode->EvalWorldState(time).obj;
@@ -299,92 +367,177 @@ TriObject* SOAManager::GetTriObjectFromNode(INode* pNode, TimeValue time, bool& 
 	return nullptr;
 }
 
-
-void SOAManager::GetAnimation(INode* pNode, SAAnimationTrack& AnimTrack, SAScene& Scene, Interval& interval)
+void SSkinManager::SetBippedInfo(INode* pNode, SCAMesh& sMesh, NodeList& MatrixNodeList)
 {
-
-
-	//-------------------> 중요
-	TimeValue startFrame = interval.Start();
-	// tm = selfTm * parentTm * Inverse(parentTm);
-	Matrix3 tm = pNode->GetNodeTM(startFrame)
-		* Inverse(pNode->GetParentTM(startFrame));
-	// 행렬 분해
-	AffineParts StartAP;
-	decomp_affine(tm, &StartAP);
-	// quaternion -> axis, angle 변환
-	Point3  Start_RotAxis;
-	float   Start_RotValue;
-	AngAxisFromQ(StartAP.q, &Start_RotValue, Start_RotAxis);
-	//<----------------------------
-
-	SAPositionAnim	PosTrack;
-	SARotationAnim	RotTrack;
-	SAScaleAnim		ScaleTrack;
-
-	ZeroMemory(&PosTrack, sizeof(PosTrack));
-	ZeroMemory(&RotTrack, sizeof(RotTrack));
-	ZeroMemory(&ScaleTrack, sizeof(ScaleTrack));
-
-
-	TimeValue start = interval.Start();
-	TimeValue end = interval.End();
-	// 시작+1프레임
-	for (TimeValue t = start; t <= end; t += GetTicksPerFrame())
+	// 에니메이션 제작 도구
+	Modifier* Pointer_Physique = FindModifier(pNode,
+		Class_ID(PHYSIQUE_CLASS_ID_A, PHYSIQUE_CLASS_ID_B));
+	if (Pointer_Physique)
 	{
-		Matrix3 tm = pNode->GetNodeTM(t)
-			* Inverse(pNode->GetParentTM(t));
-
-		AffineParts FrameAP;
-		decomp_affine(tm, &FrameAP);
-
-		PosTrack.i = t;
-		PosTrack.p = FrameAP.t;
-		AnimTrack.PositionTrack.push_back(PosTrack);
-
-		RotTrack.i = t;
-		RotTrack.q = FrameAP.q;
-		AnimTrack.RotationTrack.push_back(RotTrack);
-
-		ScaleTrack.p = FrameAP.k;
-		ScaleTrack.q = FrameAP.u;
-		AnimTrack.ScaleTrack.push_back(ScaleTrack);
-
-		Point3  Frame_RotAxis;
-		float   Frame_RotValue;
-		AngAxisFromQ(FrameAP.q, &Frame_RotValue, Frame_RotAxis);
-
-
-		if (!AnimTrack.bPosition) {
-			if (!SAGlobal::EqualPoint3(StartAP.t, FrameAP.t))
-			{
-				AnimTrack.bPosition = true;
-			}
-		}
-
-		if (!AnimTrack.bRotation) {
-			if (!SAGlobal::EqualPoint3(Start_RotAxis, Frame_RotAxis))
-			{
-				AnimTrack.bRotation = true;
-			}
-			else
-			{
-				if (Start_RotValue != Frame_RotValue)
-				{
-					AnimTrack.bRotation = true;
-				}
-			}
-		}
-
-		if (!AnimTrack.bScale) {
-			if (!SAGlobal::EqualPoint3(StartAP.k, FrameAP.k))
-			{
-				AnimTrack.bScale = true;
-			}
-		}
+		PhysiqueData(pNode, Pointer_Physique, sMesh, MatrixNodeList);
+		return;
+	}
+	Modifier* skinMod = FindModifier(pNode,
+		SKIN_CLASSID);
+	if (skinMod)
+	{
+		SkinData(pNode, skinMod, sMesh, MatrixNodeList);
+		return;
 	}
 }
-bool SOAManager::ExportObject(FILE* pStream)
+Modifier*  SSkinManager::FindModifier(
+	INode* pNode, Class_ID classID)
+
+{
+	Object *ObjectPtr = pNode->GetObjectRef();
+	if (!ObjectPtr)
+	{
+		return nullptr;
+	}
+	while (ObjectPtr->SuperClassID() == GEN_DERIVOB_CLASS_ID && ObjectPtr)
+	{
+		IDerivedObject *DerivedObjectPtr = (IDerivedObject *)(ObjectPtr);
+
+		int ModStackIndex = 0;
+		while (ModStackIndex < DerivedObjectPtr->NumModifiers())
+		{
+			Modifier* ModifierPtr = DerivedObjectPtr->GetModifier(ModStackIndex);
+
+			if (ModifierPtr->ClassID() == classID)
+			{
+				return ModifierPtr;
+			}
+
+			ModStackIndex++;
+		}
+		ObjectPtr = DerivedObjectPtr->GetObjRef();
+	}
+	return nullptr;
+}
+void SSkinManager::PhysiqueData(INode* pNode, Modifier* Pointer_Physique, SCAMesh& sMesh, NodeList& MatrixNodeList)
+{
+	IPhysiqueExport *phyExport =
+		(IPhysiqueExport*)Pointer_Physique->GetInterface(I_PHYINTERFACE);
+	IPhyContextExport *contextExport =
+		(IPhyContextExport *)phyExport->GetContextInterface(pNode);
+
+	contextExport->ConvertToRigid(true);
+	contextExport->AllowBlending(true);
+
+	// mesh 정점개수와 동일해야 함.
+	int iNumVert = contextExport->GetNumberVertices();
+	m_bipedList.resize(iNumVert);
+
+	for (int iVertex = 0; iVertex < iNumVert; iVertex++)
+	{
+		IPhyVertexExport *vtxExport =
+			(IPhyVertexExport *)contextExport->GetVertexInterface(iVertex);
+		if (vtxExport)
+		{
+			int iVertexType = vtxExport->GetVertexType();
+			switch (iVertexType)
+			{
+			case RIGID_NON_BLENDED_TYPE:
+			{
+				IPhyRigidVertex* pVertex =
+					(IPhyRigidVertex*)vtxExport;
+				INode* node = pVertex->GetNode();
+
+				NodeList::iterator itor = MatrixNodeList.find(node);
+
+				if (itor != MatrixNodeList.end())
+				{
+					SCABiped Biped;
+					Biped.BipID = itor->second;
+					Biped.m_fWeight = 1.0f;
+					m_bipedList[iVertex].m_BipedList.push_back(Biped);
+					m_bipedList[iVertex].m_dwNumWeight = 1;
+				}
+				else
+				{
+					return;
+				}
+
+			}break;
+			case RIGID_BLENDED_TYPE:
+			{
+				IPhyBlendedRigidVertex* pVertex =
+					(IPhyBlendedRigidVertex*)vtxExport;
+				for (int iWeight = 0;
+					iWeight < pVertex->GetNumberNodes();
+					iWeight++)
+				{
+					INode* node = pVertex->GetNode(iWeight);
+
+					NodeList::iterator itor = MatrixNodeList.find(node);
+					if (itor != MatrixNodeList.end())
+					{
+						SCABiped Biped;
+						Biped.BipID = itor->second;
+						Biped.m_fWeight = pVertex->GetWeight(iWeight);
+
+						if (ALMOST_ZERO > Biped.m_fWeight) continue;
+						else m_bipedList[iVertex].m_BipedList.push_back(Biped);
+					}
+					else
+					{
+						break;
+					}
+				}
+				std::sort(m_bipedList[iVertex].m_BipedList.begin(),
+					m_bipedList[iVertex].m_BipedList.end(),
+					BipAscendingSort());
+				if (m_bipedList[iVertex].m_BipedList.size() > MAX_WEIGHT_BIPED)
+				{
+					m_bipedList[iVertex].m_BipedList.resize(MAX_WEIGHT_BIPED);
+				}
+				m_bipedList[iVertex].m_dwNumWeight =
+					m_bipedList[iVertex].m_BipedList.size();
+
+			}break;
+			default:break;
+			}
+		}
+		contextExport->ReleaseVertexInterface(vtxExport);
+	}
+	phyExport->ReleaseContextInterface(contextExport);
+	Pointer_Physique->ReleaseInterface(I_PHYINTERFACE, phyExport);
+}
+void SSkinManager::SkinData(INode* pNode, Modifier* Pointer_Skin, SCAMesh& sMesh, NodeList& MatrixNodeList)
+{
+	ISkin* skin = (ISkin*)Pointer_Skin->GetInterface(I_SKIN);
+	ISkinContextData* skinData = skin->GetContextInterface(pNode);
+
+	if (!skin || !skinData) return;
+
+	int iNumVertex = skinData->GetNumPoints();
+	m_bipedList.resize(iNumVertex);
+
+	for (int iVertex = 0; iVertex < iNumVertex; iVertex++)
+	{
+		m_bipedList[iVertex].m_dwNumWeight =
+			skinData->GetNumAssignedBones(iVertex);
+		for (int iWeight = 0; iWeight < m_bipedList[iVertex].m_dwNumWeight; iWeight++)
+		{
+			int iBoneID = skinData->GetAssignedBone(iVertex, iWeight);
+			INode* node = skin->GetBone(iBoneID);
+			NodeList::iterator itor = MatrixNodeList.find(node);
+			SCABiped Biped;
+			if (itor != MatrixNodeList.end())
+			{
+				Biped.BipID = itor->second;
+				Biped.m_fWeight = skinData->GetBoneWeight(iVertex, iWeight);
+			}
+
+			if (ALMOST_ZERO > Biped.m_fWeight) continue;
+			else m_bipedList[iVertex].m_BipedList.push_back(Biped);
+		}
+		std::sort(m_bipedList[iVertex].m_BipedList.begin(),
+			m_bipedList[iVertex].m_BipedList.end(),
+			BipAscendingSort());
+	}
+}
+bool SSkinManager::ExportObject(FILE* pStream)
 {
 	if (pStream == nullptr)
 	{
@@ -425,22 +578,20 @@ bool SOAManager::ExportObject(FILE* pStream)
 			m_ObjectList[iObj].matWorld._44);
 
 		ExportMesh(pStream, m_ObjectList[iObj].m_Mesh);
-		ExportAnimation(pStream, m_ObjectList[iObj].m_AnimTrack);
 	}
-
 	return true;
 }
-bool SOAManager::ExportMesh(FILE* pStream, SOAMesh& sMesh)
+bool SSkinManager::ExportMesh(FILE* pStream, SCAMesh& sMesh)
 {
 	if (pStream == nullptr)
 	{
 		return false;
 	}
-	
+
 	for (int iSubMesh = 0; iSubMesh < sMesh.SubMeshList.size(); iSubMesh++)
 	{
 		if (sMesh.SubMeshList[iSubMesh].iVertexSize <= 0) continue;
-		std::vector<PNCT>& vList = sMesh.SubMeshList[iSubMesh].VertexList;
+		std::vector<PNCTIW_VERTEX>& vList = sMesh.SubMeshList[iSubMesh].VertexList;
 		std::vector<DWORD>& iList = sMesh.SubMeshList[iSubMesh].IndexList;
 		int& iVertexSize = sMesh.SubMeshList[iSubMesh].iVertexSize;
 		int& iIndexSize = sMesh.SubMeshList[iSubMesh].iIndexSize;
@@ -466,6 +617,26 @@ bool SOAManager::ExportMesh(FILE* pStream, SOAMesh& sMesh)
 			_ftprintf(pStream, _T("%10.4f %10.4f"),
 				vList[iVer].t.x,
 				vList[iVer].t.y);
+
+			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
+				vList[iVer].i[0],
+				vList[iVer].i[1],
+				vList[iVer].i[2],
+				vList[iVer].i[3],
+				vList[iVer].i[4],
+				vList[iVer].i[5],
+				vList[iVer].i[6],
+				vList[iVer].i[7]);
+
+			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
+				vList[iVer].w[0],
+				vList[iVer].w[1],
+				vList[iVer].w[2],
+				vList[iVer].w[3],
+				vList[iVer].w[4],
+				vList[iVer].w[5],
+				vList[iVer].w[6],
+				vList[iVer].w[7]);
 		}
 
 		for (int iIndex = 0; iIndex < iIndexSize; iIndex += 3)
@@ -478,72 +649,17 @@ bool SOAManager::ExportMesh(FILE* pStream, SOAMesh& sMesh)
 	}
 	return true;
 }
-bool SOAManager::ExportAnimation(FILE* pStream, SAAnimationTrack& AnimTrack)
-{
-	if (pStream == nullptr)
-	{
-		return false;
-	}
-
-	_ftprintf(pStream, _T("\n%s %d %d %d"),
-		L"#AnimationData",
-		(AnimTrack.bPosition) ? AnimTrack.PositionTrack.size() : 0,
-		(AnimTrack.bRotation) ? AnimTrack.RotationTrack.size() : 0,
-		(AnimTrack.bScale) ? AnimTrack.ScaleTrack.size() : 0);
-	if (AnimTrack.bPosition)
-	{
-		for (int iTrack = 0; iTrack < AnimTrack.PositionTrack.size(); iTrack++)
-		{
-			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f"),
-				iTrack,
-				AnimTrack.PositionTrack[iTrack].i,
-				AnimTrack.PositionTrack[iTrack].p.x,
-				AnimTrack.PositionTrack[iTrack].p.z,
-				AnimTrack.PositionTrack[iTrack].p.y);
-		}
-	}
-	if (AnimTrack.bRotation)
-	{
-		for (int iTrack = 0; iTrack < AnimTrack.RotationTrack.size(); iTrack++)
-		{
-			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f"),
-				iTrack,
-				AnimTrack.RotationTrack[iTrack].i,
-				AnimTrack.RotationTrack[iTrack].q.x,
-				AnimTrack.RotationTrack[iTrack].q.z,
-				AnimTrack.RotationTrack[iTrack].q.y,
-				AnimTrack.RotationTrack[iTrack].q.w);
-		}
-	}
-	if (AnimTrack.bScale)
-	{
-		for (int iTrack = 0; iTrack < AnimTrack.ScaleTrack.size(); iTrack++)
-		{
-			_ftprintf(pStream, _T("\n%d %d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
-				iTrack,
-				AnimTrack.ScaleTrack[iTrack].i,
-				AnimTrack.ScaleTrack[iTrack].p.x,
-				AnimTrack.ScaleTrack[iTrack].p.z,
-				AnimTrack.ScaleTrack[iTrack].p.y,
-				AnimTrack.ScaleTrack[iTrack].q.x,
-				AnimTrack.ScaleTrack[iTrack].q.z,
-				AnimTrack.ScaleTrack[iTrack].q.y,
-				AnimTrack.ScaleTrack[iTrack].q.w);
-		}
-	}
-	return true;
-}
-void SOAManager::Release()
+void SSkinManager::Release()
 {
 	m_ObjectList.clear();
 	m_TriLists.clear();
 }
 
-SOAManager::SOAManager()
+SSkinManager::SSkinManager()
 {
 }
 
 
-SOAManager::~SOAManager()
+SSkinManager::~SSkinManager()
 {
 }

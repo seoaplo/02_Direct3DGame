@@ -5,6 +5,8 @@
 #include "resource.h"
 #include "SAExporter.h"
 #include "SOAExporter.h"
+#include "SSkinExporter.h"
+#include "SMatrixExporter.h"
 
 #define SAExport_CLASS_ID Class_ID(0x3e493ddb, 0x77855ad9)
 
@@ -42,13 +44,12 @@ public:
 		int iNumSelect = Pointer_interface->GetSelNodeCount();
 
 		if (iNumSelect <= 0) return;
-		//else I_SkinExporter.Clear();
+		else I_SSkinExporter.ClearSelectNodeList();
 
-		for (int iSelObj = 0; iSelObj < iNumSelect;
-			iSelObj++)
+		for (int iSelObj = 0; iSelObj < iNumSelect; iSelObj++)
 		{
-			//INode* Pointer_INode = Pointer_interface->GetSelNode(iSelObj);
-			//I_SkinExporter.m_SelectNodeList.push_back(Pointer_INode);
+			INode* Pointer_INode = Pointer_interface->GetSelNode(iSelObj);
+			I_SSkinExporter.GetSelectNode(Pointer_INode);
 		}
 	}
 public:
@@ -100,33 +101,42 @@ INT_PTR CALLBACK DlgProc(HWND hWnd,
 		{
 		case IDC_SKINEXP:
 		{
-			//TSTR szExpFile = SCASkinExp::Get().SaveFileDiallog(L"skm", L"SkinWriter");
-			//if (szExpFile != NULL)
-			//{
-			//	I_Writer.Clear();
-			//	I_Writer.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
-			//	I_SkinExporter.Set(szExpFile,
-			//		SAExport::GetInstance()->My_Pointer_interface);
-			//	I_SkinExporter.Export();
-			//}
+			TSTR szExpFile = I_SSkinExporter.SaveFileDiallog(L"skm", L"SkinWriter");
+			if (szExpFile != NULL)
+			{
+				I_SSkinExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+				I_SSkinExporter.Convert();
+				I_SSkinExporter.Export();
+			}
 
 		}break;
 		case IDC_MATRIXEXP:
 		{
-			MessageBox(GetActiveWindow(), _T("Exp!"),
-				_T("IDC_MATRIXEXP!"), MB_OK);
+			TSTR szExpFile = I_SMatrixExporter.SaveFileDiallog(L"mat", L"MatrixWriter");
+			if (szExpFile != NULL)
+			{
+				I_SMatrixExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+				I_SMatrixExporter.Convert();
+				I_SMatrixExporter.Export();
+			}
 
 		}break;
 		case IDC_SCAEXP:
 		{
-			//TSTR szExpFile = SCAWriter::Get().SaveFileDiallog(L"sca", L"SCAWriter");
-			//if (szExpFile != NULL)
-			//{
-			//	I_Writer.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
-			//	I_SkinExporter.Set(szExpFile,
-			//		SAExport::GetInstance()->My_Pointer_interface);
-			//	I_SkinExporter.Export();
-			//}
+			TSTR szExpFile = I_SSkinExporter.SaveFileDiallog(L"skm", L"SkinWriter");
+			if (szExpFile != NULL)
+			{
+				I_SSkinExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+				I_SSkinExporter.Convert();
+				I_SSkinExporter.Export();
+			}
+			szExpFile = I_SMatrixExporter.SaveFileDiallog(L"mat", L"MatrixWriter");
+			if (szExpFile != NULL)
+			{
+				I_SMatrixExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+				I_SMatrixExporter.Convert();
+				I_SMatrixExporter.Export();
+			}
 
 		}break;
 		case IDC_SOAEXP:

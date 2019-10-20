@@ -6,3 +6,7 @@ output/
 Direct3DGame/\.vs/
 
 doc/
+
+testData/3DMax/
+
+testData/Export/
