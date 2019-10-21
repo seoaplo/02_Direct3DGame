@@ -19,7 +19,6 @@ bool SMatrixExporter::Export()
 	if (m_pStream == nullptr) return false;
 
 	ExportHeader(m_pStream);
-	SAExporter::ExportMaterial(m_pStream);
 	m_MatrixManager.ExportObject(m_pStream);
 
 	fclose(m_pStream);
@@ -40,15 +39,14 @@ void SMatrixExporter::ExportHeader(FILE* pStream)
 	if (m_pStream == nullptr) return;
 	g_Scene.iNumMaterials = g_MaterialManager.m_MaterialList.size();
 	g_Scene.iNumObjects = m_MatrixManager.m_ObjectList.size();
-	_ftprintf(m_pStream, _T("%s"), _T("SOAExporter100"));
-	_ftprintf(m_pStream, _T("\n%s %d %d %d %d %d %d"),
+	_ftprintf(m_pStream, _T("%s"), _T("MatrixExporter100"));
+	_ftprintf(m_pStream, _T("\n%s %d %d %d %d %d"),
 		L"#HEADERINFO",
 		g_Scene.iFirstFrame,
 		g_Scene.iLastFrame,
 		g_Scene.iFrameSpeed,
 		g_Scene.iTickPerFrame,
-		g_Scene.iNumObjects,
-		g_Scene.iNumMaterials);
+		g_Scene.iNumObjects);
 }
 
 SMatrixExporter::SMatrixExporter()

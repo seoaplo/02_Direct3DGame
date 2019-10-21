@@ -53,7 +53,9 @@ void SOAManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, int
 	}
 	Object.name = SAGlobal::FixupName(pNode->GetName());
 	Matrix3 wtm = pNode->GetNodeTM(interval.Start());
+	Matrix3 Invwtm = Inverse(wtm);
 	SAGlobal::DumpMatrix3(Object.matWorld, &wtm);
+	SAGlobal::DumpMatrix3(Object.InvmatWorld, &Invwtm);
 
 	Object.m_Mesh.iMaterialID = iMaterialID;
 	GetMesh(pNode, Object.m_Mesh, interval);

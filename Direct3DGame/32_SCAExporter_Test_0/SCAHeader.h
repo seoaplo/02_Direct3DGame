@@ -11,6 +11,11 @@ struct SScene
 	int   iNumMaterials;
 };
 
+struct BoundingBox
+{
+
+};
+
 struct SAnimTrack
 {
 	int					iTick;

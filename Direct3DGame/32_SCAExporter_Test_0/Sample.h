@@ -7,6 +7,8 @@
 #include "SMesh.h"
 #include "SSSFileLoader.h"
 #include "SkinFileLoader.h"
+#include "SMatrixFileLoader.h"
+#include "SCAObject.h"
 
 class Sample : public SCore
 {
@@ -18,6 +20,9 @@ public:
 	
 	std::vector<SDrawObject*> m_ObjList;
 	std::vector<SSkinObject*> m_SkinObjList;
+	std::vector<SMatrixObjectList*> m_MatObjLists;
+
+	SCAObject				m_SCAObject;
 
 	DXGame::SDxHelperEX		dxObj;
 	bool					m_bDebugRender;

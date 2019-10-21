@@ -17,9 +17,19 @@
     <Filter Include="SSkinObject">
       <UniqueIdentifier>{899aae6b-04d0-40e1-849a-6e8f9e841eb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SMaxtrixObject">
+      <UniqueIdentifier>{c8dcb9b4-d1fd-4589-b6f6-a9d99ff6389e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAObject">
+      <UniqueIdentifier>{9a286f19-b030-4edb-9a97-7213a6772e61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SAObject">
+      <UniqueIdentifier>{e1958e18-e06b-4661-b312-8b0bbf891cff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Test.hlsl" />
+    <FxCompile Include="Debug.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
@@ -52,6 +62,21 @@
     </ClCompile>
     <ClCompile Include="SkinFileLoader.cpp">
       <Filter>FileLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixFileLoader.cpp">
+      <Filter>FileLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixObject.cpp">
+      <Filter>SMaxtrixObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixMesh.cpp">
+      <Filter>SMaxtrixObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAObject.cpp">
+      <Filter>SCAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SAObject.cpp">
+      <Filter>SAObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,5 +112,26 @@
     <ClInclude Include="SkinFileLoader.h">
       <Filter>FileLoader</Filter>
     </ClInclude>
+    <ClInclude Include="SMatrixFileLoader.h">
+      <Filter>FileLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixObject.h">
+      <Filter>SMaxtrixObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixMesh.h">
+      <Filter>SMaxtrixObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAObject.h">
+      <Filter>SCAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SAObject.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="32_SCAExporter_Test_0.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

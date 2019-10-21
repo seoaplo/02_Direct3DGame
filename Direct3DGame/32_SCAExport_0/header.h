@@ -22,6 +22,8 @@
 #define ALMOST_ZERO			1.0e-3f
 #define SUBMATERIAL_SIZE	15
 #define MAX_WEIGHT_BIPED	8
+#define BOX_VERTEX			24
+#define BOX_INDEX			36
 
 const enum MaterialTextureType
 {
@@ -231,6 +233,7 @@ struct SOAObject
 
 	Matrix3    wtm;
 	D3D_MATRIX matWorld;
+	D3D_MATRIX InvmatWorld;
 
 	SOAMesh			m_Mesh;
 	SAAnimationTrack	m_AnimTrack;

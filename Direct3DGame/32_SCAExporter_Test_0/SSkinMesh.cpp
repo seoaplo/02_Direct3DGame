@@ -105,11 +105,13 @@ HRESULT SSkinMesh::CreateVertexBuffer()
 		m_dxobj.m_iNumVertex,
 		m_dxobj.m_iVertexSize));
 	
+	int iIW_VERTEX_Size = sizeof(IW_VERTEX);
+	int iIW_VERTEX_Num = m_IW_VertexList.size();
 	if (m_IW_VertexList.size() > 0) pData = (void**)&m_VertexList.at(0);
 	m_pVertexBuffer = DXGame::CreateVertexBuffer(m_pDevice,
 		pData,
-		m_IW_VertexList.size(),
-		sizeof(IW_VERTEX));
+		iIW_VERTEX_Num,
+		iIW_VERTEX_Size);
 
 	return hr;
 }

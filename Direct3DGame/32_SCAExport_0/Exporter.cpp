@@ -112,7 +112,7 @@ INT_PTR CALLBACK DlgProc(HWND hWnd,
 		}break;
 		case IDC_MATRIXEXP:
 		{
-			TSTR szExpFile = I_SMatrixExporter.SaveFileDiallog(L"mat", L"MatrixWriter");
+			TSTR szExpFile = I_SMatrixExporter.SaveFileDiallog(L"smc", L"MatrixWriter");
 			if (szExpFile != NULL)
 			{
 				I_SMatrixExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
@@ -130,7 +130,7 @@ INT_PTR CALLBACK DlgProc(HWND hWnd,
 				I_SSkinExporter.Convert();
 				I_SSkinExporter.Export();
 			}
-			szExpFile = I_SMatrixExporter.SaveFileDiallog(L"mat", L"MatrixWriter");
+			szExpFile = I_SMatrixExporter.SaveFileDiallog(L"smc", L"MatrixWriter");
 			if (szExpFile != NULL)
 			{
 				I_SMatrixExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);

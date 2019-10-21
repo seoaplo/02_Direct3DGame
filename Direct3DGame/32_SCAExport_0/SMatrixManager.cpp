@@ -38,7 +38,6 @@ void SMatrixManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval,
 			else
 			{
 				Object.m_ClassType = CLASS_GEOM;
-				bGeom = true;
 			}
 			if (pControl && pControl->ClassID()
 				== BIPBODY_CONTROL_CLASS_ID)
@@ -66,13 +65,21 @@ void SMatrixManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval,
 	}
 	Object.name = SAGlobal::FixupName(pNode->GetName());
 	Matrix3 wtm = pNode->GetNodeTM(interval.Start());
+	Matrix3 Invwtm = Inverse(wtm);
 	SAGlobal::DumpMatrix3(Object.matWorld, &wtm);
+	SAGlobal::DumpMatrix3(Object.InvmatWorld, &Invwtm);
 
+	Object.pINode = pNode;
 	Object.m_Mesh.iMaterialID = iMaterialID;
-	GetMesh(pNode, Object.m_Mesh, interval, bGeom);
+	if (Object.m_ClassType == CLASS_GEOM
+		|| Object.m_ClassType == CLASS_BIPED)
+	{
+		GetBox(Object.m_Mesh);
+	}
+	else GetMesh(pNode, Object.m_Mesh, interval);
 	GetAnimation(pNode, Object.m_AnimTrack, Scene, interval);
 }
-void SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval, bool bGeom)
+void SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 {
 	m_TriLists.clear();
 
@@ -107,55 +114,20 @@ void SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval, b
 	}
 	m_TriLists.resize(iSubMtlSize);
 	sMesh.SubMeshList.resize(iSubMtlSize);
-	std::vector<DWORD> SubMeshNumList;
-	SubMeshNumList.resize(iSubMtlSize);
-	ZeroMemory(SubMeshNumList.data(), sizeof(DWORD) * iSubMtlSize);
 
 	int iNumFace = mesh->getNumFaces();
 	//================================================================
 	// 서브 메시의 할당의 수를 확실하게 판단하기 위한 반복문
 	//================================================================
-	if (bGeom)
-	{
-		for (int iFace = 0; iFace < iNumFace; iFace++)
-		{
-			int iSubmeshNum = mesh->faces[iFace].getMatID();
-			if (iSubmeshNum >= iSubMtlSize ||
-				iSubmeshNum < 0)
-			{
-				continue;
-			}
-			SubMeshNumList[iSubmeshNum]++;
-		}
-		sMesh.iSubNum = 0;
-		for (int iSub = 0; iSub < iSubMtlSize; iSub++)
-		{
-			if (SubMeshNumList[iSub] <= 0) continue;
-
-			sMesh.iSubNum++;
-			m_TriLists[iSub].List.resize(SubMeshNumList[iSub]);
-			sMesh.SubMeshList[iSub].VertexList.resize(SubMeshNumList[iSub] * 3);
-			sMesh.SubMeshList[iSub].IndexList.resize(SubMeshNumList[iSub] * 3);
-		}
-	}
-	else
-	{
-		sMesh.iSubNum = 1;
-		m_TriLists[0].List.resize(iNumFace);
-		sMesh.SubMeshList[0].VertexList.resize(iNumFace * 3);
-		sMesh.SubMeshList[0].IndexList.resize(iNumFace * 3);
-	}
+	sMesh.iSubNum = 1;
+	m_TriLists[0].List.resize(iNumFace);
+	sMesh.SubMeshList[0].VertexList.resize(iNumFace * 3);
+	sMesh.SubMeshList[0].IndexList.resize(iNumFace * 3);
 
 	for (int iFace = 0; iFace < iNumFace; iFace++)
 	{
-		int iSubIndex = mesh->faces[iFace].getMatID();
-		if (iSubIndex >= iSubMtlSize ||
-			iSubIndex < 0)
-		{
-			if(bGeom) continue;
-		}
 
-		SOATriangleList& TriangleList = m_TriLists[iSubIndex];
+		SOATriangleList& TriangleList = m_TriLists[0];
 		int iFaceNum = TriangleList.iSize;
 		TriangleList.iSize++;
 
@@ -223,6 +195,70 @@ void SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval, b
 	SetUniqueBuffer(sMesh);
 
 	if (deleteit) delete tri;
+}
+void SMatrixManager::GetBox(SOAMesh& sMesh)
+{
+	m_TriLists.clear();
+
+	sMesh.iSubNum = 1;
+	sMesh.SubMeshList.resize(sMesh.iSubNum);
+	sMesh.SubMeshList[0].iVertexSize = BOX_VERTEX;
+	sMesh.SubMeshList[0].iIndexSize = BOX_INDEX;
+	sMesh.SubMeshList[0].VertexList.resize(BOX_VERTEX);
+	sMesh.SubMeshList[0].IndexList.resize(BOX_INDEX);
+
+	sMesh.m_box.pmax.x = 0.0f;
+	sMesh.m_box.pmax.y = 0.0f;
+	sMesh.m_box.pmax.z = 0.0f;
+
+	sMesh.m_box.pmin.x = 0.0f;
+	sMesh.m_box.pmin.y = 0.0f;
+	sMesh.m_box.pmin.z = 0.0f;
+
+	// VertexList
+	sMesh.SubMeshList[0].VertexList[0] = PNCT(Point3(-0.1f, 0.1f, -0.1f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[1] = PNCT(Point3(0.1f, 0.1f, -0.1f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[2] = PNCT(Point3(0.1f, -0.1f, -0.1f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
+	sMesh.SubMeshList[0].VertexList[3] = PNCT(Point3(-0.1f, -0.1f, -0.1f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
+	// 뒷면
+	sMesh.SubMeshList[0].VertexList[4] = PNCT(Point3(0.1f, 0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[5] = PNCT(Point3(-0.1f, 0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[6] = PNCT(Point3(-0.1f, -0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
+	sMesh.SubMeshList[0].VertexList[7] = PNCT(Point3(0.1f, -0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
+
+	// 오른쪽
+	sMesh.SubMeshList[0].VertexList[8] = PNCT(Point3(0.1f, 0.1f, -0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[9] = PNCT(Point3(0.1f, 0.1f, 0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[10] = PNCT(Point3(0.1f, -0.1f, 0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
+	sMesh.SubMeshList[0].VertexList[11] = PNCT(Point3(0.1f, -0.1f, -0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
+
+	// 왼쪽
+	sMesh.SubMeshList[0].VertexList[12] = PNCT(Point3(-0.1f, 0.1f, 0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[13] = PNCT(Point3(-0.1f, 0.1f, -0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[14] = PNCT(Point3(-0.1f, -0.1f, -0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
+	sMesh.SubMeshList[0].VertexList[15] = PNCT(Point3(-0.1f, -0.1f, 0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
+
+	// 윗면
+	sMesh.SubMeshList[0].VertexList[16] = PNCT(Point3(-0.1f, 0.1f, 0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[17] = PNCT(Point3(0.1f, 0.1f, 0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[18] = PNCT(Point3(0.1f, 0.1f, -0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
+	sMesh.SubMeshList[0].VertexList[19] = PNCT(Point3(-0.1f, 0.1f, -0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
+
+	// 아랫면
+	sMesh.SubMeshList[0].VertexList[20] = PNCT(Point3(-0.1f, -0.1f, -0.1f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[21] = PNCT(Point3(0.1f, -0.1f, -0.1f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
+	sMesh.SubMeshList[0].VertexList[22] = PNCT(Point3(0.1f, -0.1f, 0.1f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
+	sMesh.SubMeshList[0].VertexList[23] = PNCT(Point3(-0.1f, -0.1f, 0.1f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
+
+	// IndexList
+	int iIndex = 0;
+	sMesh.SubMeshList[0].IndexList[iIndex++] = 0; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 1; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 2; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 0;	sMesh.SubMeshList[0].IndexList[iIndex++] = 2; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 3;
+	sMesh.SubMeshList[0].IndexList[iIndex++] = 4; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 5; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 6; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 4;	sMesh.SubMeshList[0].IndexList[iIndex++] = 6; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 7;
+	sMesh.SubMeshList[0].IndexList[iIndex++] = 8; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 9; 	sMesh.SubMeshList[0].IndexList[iIndex++] = 10; sMesh.SubMeshList[0].IndexList[iIndex++] = 8;	sMesh.SubMeshList[0].IndexList[iIndex++] = 10; sMesh.SubMeshList[0].IndexList[iIndex++] = 11;
+	sMesh.SubMeshList[0].IndexList[iIndex++] = 12; sMesh.SubMeshList[0].IndexList[iIndex++] = 13; sMesh.SubMeshList[0].IndexList[iIndex++] = 14; sMesh.SubMeshList[0].IndexList[iIndex++] = 12;	sMesh.SubMeshList[0].IndexList[iIndex++] = 14; sMesh.SubMeshList[0].IndexList[iIndex++] = 15;
+	sMesh.SubMeshList[0].IndexList[iIndex++] = 16; sMesh.SubMeshList[0].IndexList[iIndex++] = 17; sMesh.SubMeshList[0].IndexList[iIndex++] = 18; sMesh.SubMeshList[0].IndexList[iIndex++] = 16;	sMesh.SubMeshList[0].IndexList[iIndex++] = 18; sMesh.SubMeshList[0].IndexList[iIndex++] = 19;
+	sMesh.SubMeshList[0].IndexList[iIndex++] = 20; sMesh.SubMeshList[0].IndexList[iIndex++] = 21; sMesh.SubMeshList[0].IndexList[iIndex++] = 22; sMesh.SubMeshList[0].IndexList[iIndex++] = 20;	sMesh.SubMeshList[0].IndexList[iIndex++] = 22; sMesh.SubMeshList[0].IndexList[iIndex++] = 23;
+
 }
 void SMatrixManager::SetUniqueBuffer(SOAMesh& sMesh)
 {
@@ -326,8 +362,7 @@ void SMatrixManager::GetAnimation(INode* pNode, SAAnimationTrack& AnimTrack, SAS
 	//-------------------> 중요
 	TimeValue startFrame = interval.Start();
 	// tm = selfTm * parentTm * Inverse(parentTm);
-	Matrix3 tm = pNode->GetNodeTM(startFrame)
-		* Inverse(pNode->GetParentTM(startFrame));
+	Matrix3 tm = pNode->GetNodeTM(startFrame);
 	// 행렬 분해
 	AffineParts StartAP;
 	decomp_affine(tm, &StartAP);
@@ -414,12 +449,8 @@ bool SMatrixManager::ExportObject(FILE* pStream)
 	for (int iObj = 0; iObj < m_ObjectList.size(); iObj++)
 	{
 
-		_ftprintf(pStream, _T("\n%s %s %d %d %d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
+		_ftprintf(pStream, _T("\n%s %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f"),
 			m_ObjectList[iObj].name,
-			m_ObjectList[iObj].ParentName,
-			m_ObjectList[iObj].m_ClassType,
-			m_ObjectList[iObj].m_Mesh.iMaterialID,
-			m_ObjectList[iObj].m_Mesh.iSubNum,
 			m_ObjectList[iObj].m_Mesh.m_box.pmax.x,
 			m_ObjectList[iObj].m_Mesh.m_box.pmax.z,
 			m_ObjectList[iObj].m_Mesh.m_box.pmax.y,
@@ -449,6 +480,27 @@ bool SMatrixManager::ExportObject(FILE* pStream)
 			m_ObjectList[iObj].matWorld._43,
 			m_ObjectList[iObj].matWorld._44);
 
+		_ftprintf(pStream, _T("\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f\n\t%10.4f %10.4f %10.4f %10.4f"),
+			m_ObjectList[iObj].InvmatWorld._11,
+			m_ObjectList[iObj].InvmatWorld._12,
+			m_ObjectList[iObj].InvmatWorld._13,
+			m_ObjectList[iObj].InvmatWorld._14,
+
+			m_ObjectList[iObj].InvmatWorld._21,
+			m_ObjectList[iObj].InvmatWorld._22,
+			m_ObjectList[iObj].InvmatWorld._23,
+			m_ObjectList[iObj].InvmatWorld._24,
+
+			m_ObjectList[iObj].InvmatWorld._31,
+			m_ObjectList[iObj].InvmatWorld._32,
+			m_ObjectList[iObj].InvmatWorld._33,
+			m_ObjectList[iObj].InvmatWorld._34,
+
+			m_ObjectList[iObj].InvmatWorld._41,
+			m_ObjectList[iObj].InvmatWorld._42,
+			m_ObjectList[iObj].InvmatWorld._43,
+			m_ObjectList[iObj].InvmatWorld._44);
+
 		ExportMesh(pStream, m_ObjectList[iObj].m_Mesh);
 		ExportAnimation(pStream, m_ObjectList[iObj].m_AnimTrack);
 	}
@@ -462,44 +514,41 @@ bool SMatrixManager::ExportMesh(FILE* pStream, SOAMesh& sMesh)
 		return false;
 	}
 
-	for (int iSubMesh = 0; iSubMesh < sMesh.SubMeshList.size(); iSubMesh++)
+	if (sMesh.SubMeshList[0].iVertexSize <= 0) return true;
+	std::vector<PNCT>& vList = sMesh.SubMeshList[0].VertexList;
+	std::vector<DWORD>& iList = sMesh.SubMeshList[0].IndexList;
+	int& iVertexSize = sMesh.SubMeshList[0].iVertexSize;
+	int& iIndexSize = sMesh.SubMeshList[0].iIndexSize;
+
+	_ftprintf(pStream, _T("\nSubMesh %d %d"),
+		 iVertexSize, iIndexSize);
+
+	for (int iVer = 0; iVer < iVertexSize; iVer++)
 	{
-		if (sMesh.SubMeshList[iSubMesh].iVertexSize <= 0) continue;
-		std::vector<PNCT>& vList = sMesh.SubMeshList[iSubMesh].VertexList;
-		std::vector<DWORD>& iList = sMesh.SubMeshList[iSubMesh].IndexList;
-		int& iVertexSize = sMesh.SubMeshList[iSubMesh].iVertexSize;
-		int& iIndexSize = sMesh.SubMeshList[iSubMesh].iIndexSize;
+		_ftprintf(pStream, _T("\n%10.4f %10.4f %10.4f"),
+			vList[iVer].p.x,
+			vList[iVer].p.y,
+			vList[iVer].p.z);
+		_ftprintf(pStream, _T("%10.4f %10.4f %10.4f"),
+			vList[iVer].n.x,
+			vList[iVer].n.y,
+			vList[iVer].n.z);
+		_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f"),
+			vList[iVer].c.x,
+			vList[iVer].c.y,
+			vList[iVer].c.z,
+			vList[iVer].c.w);
+		_ftprintf(pStream, _T("%10.4f %10.4f"),
+			vList[iVer].t.x,
+			vList[iVer].t.y);
+	}
 
-		_ftprintf(pStream, _T("\nSubMesh %d %d %d"),
-			iSubMesh, iVertexSize, iIndexSize);
-
-		for (int iVer = 0; iVer < iVertexSize; iVer++)
-		{
-			_ftprintf(pStream, _T("\n%10.4f %10.4f %10.4f"),
-				vList[iVer].p.x,
-				vList[iVer].p.y,
-				vList[iVer].p.z);
-			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f"),
-				vList[iVer].n.x,
-				vList[iVer].n.y,
-				vList[iVer].n.z);
-			_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f"),
-				vList[iVer].c.x,
-				vList[iVer].c.y,
-				vList[iVer].c.z,
-				vList[iVer].c.w);
-			_ftprintf(pStream, _T("%10.4f %10.4f"),
-				vList[iVer].t.x,
-				vList[iVer].t.y);
-		}
-
-		for (int iIndex = 0; iIndex < iIndexSize; iIndex += 3)
-		{
-			_ftprintf(pStream, _T("\n%d %d %d"),
-				iList[iIndex + 0],
-				iList[iIndex + 1],
-				iList[iIndex + 2]);
-		}
+	for (int iIndex = 0; iIndex < iIndexSize; iIndex += 3)
+	{
+		_ftprintf(pStream, _T("\n%d %d %d"),
+			iList[iIndex + 0],
+			iList[iIndex + 1],
+			iList[iIndex + 2]);
 	}
 	return true;
 }

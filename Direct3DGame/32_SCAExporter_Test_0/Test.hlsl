@@ -1,3 +1,4 @@
+#define MAX_BONE_MATRIX 255
 Texture2D	g_txDiffuse : register (t0);
 SamplerState g_samLinear: register (s0);
 
@@ -7,6 +8,10 @@ cbuffer cb0 : register(b0)
 	matrix	g_matView		: packoffset(c4);
 	matrix	g_matProj		: packoffset(c8);
 	float4  g_MeshColor     : packoffset(c12);
+};
+cbuffer cb1 : register(b1)
+{
+	matrix g_matAnim[MAX_BONE_MATRIX];
 };
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
@@ -33,8 +38,31 @@ VS_OUTPUT VS(VS_INPUT vIn)
 {
 	VS_OUTPUT vOut = (VS_OUTPUT)0;
 
-	vOut.p = float4(vIn.p.xyz, 1.0f);
-	vOut.p = mul(vOut.p, g_matWorld);
+	float4x4  matMatrix;
+	float4 vLocal = float4(vIn.p, 1.0f);
+	float4 vAnim;
+	for (int ibiped = 0; ibiped < 8; ibiped++)
+	{
+		uint iBone;
+		float fWeight;
+		if (ibiped < 4)
+		{
+			iBone = vIn.i1[ibiped];
+			fWeight = vIn.w1[ibiped];
+		}
+		else
+		{
+			iBone = vIn.i2[ibiped - 4];
+			fWeight = vIn.w2[ibiped - 4];
+		}
+		if (iBone < 0) break;
+
+		matMatrix = g_matAnim[iBone];
+		vAnim += fWeight * mul(vLocal, matMatrix);
+		vOut.n += fWeight * mul(vLocal, matMatrix);
+	}
+
+	vOut.p = mul(vLocal, g_matWorld);
 	vOut.p = mul(vOut.p, g_matView);
 	vOut.p = mul(vOut.p, g_matProj);
 	vOut.c = vIn.c;

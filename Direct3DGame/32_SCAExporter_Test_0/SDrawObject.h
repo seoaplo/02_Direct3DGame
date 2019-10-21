@@ -65,7 +65,7 @@ public:
 	bool SetMatrix(D3DXMATRIX* pWorld, D3DXMATRIX* pView = nullptr, D3DXMATRIX* pProj = nullptr);
 public:
 	SDrawObject();
-	~SDrawObject();
+	virtual ~SDrawObject();
 };
 
 class SDrawObjectManager : public Singleton<SDrawObjectManager>

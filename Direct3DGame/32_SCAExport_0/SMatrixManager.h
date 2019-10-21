@@ -8,7 +8,8 @@ public:
 	std::vector<SOATriangleList>		m_TriLists;
 public:
 	void	AddObject(INode* pNode, SAScene& Scene, Interval& interval, int iObjectNum, int iMaterialID);
-	void	GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval, bool bGeom = false);
+	void	GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval);
+	void	GetBox(SOAMesh& sMesh);
 	void	SetUniqueBuffer(SOAMesh& tMesh);
 	int		IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList, int iVertexMax);
 	Point3	GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex);

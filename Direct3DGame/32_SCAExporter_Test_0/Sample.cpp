@@ -23,9 +23,13 @@ bool Sample::Init()
 	int iKey;
 
 	I_SkinFileLoaderManeger.Init(GetDevice(), GetContext());
+	I_MatrixFileLoader.Init(GetDevice(), GetContext());
+	I_MatrixObjectListManager.Init(GetDevice(), GetContext());
+
 	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin.skm");
 	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin1.skm");
 	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin2.skm");
+	iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/TestMatrix.smc");
 
 	//--------------------------------------------------------------------------------------
 	// 월드  행렬
@@ -37,10 +41,19 @@ bool Sample::Init()
 	//--------------------------------------------------------------------------------------	
 	m_pMainCamera = make_shared<SCamera>();
 
-	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
+	/*for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
 	{
 		m_SkinObjList.push_back(I_SkinObjectManager.GetSkinObject(iCount));
 	}
+	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
+	{
+		m_MatObjLists.push_back(I_MatrixObjectListManager.GetMatrixObjectList(iCount));
+	}*/
+	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
+	{
+		m_SCAObject.SetSkinObject(iCount);
+	}
+	m_SCAObject.SetMatrixObjectList(0);
 
 	float fAspectRatio = m_nWindowWidth / (FLOAT)m_nWindowHeight;
 	m_pMainCamera->SetViewMatrix(D3DXVECTOR3(0.0f, 0.0f, -10.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -57,11 +70,17 @@ bool Sample::Frame()
 
 	// 2초당 1회전( 1 초 * D3DX_PI = 3.14 )
 
-	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
-	{
-		m_SkinObjList[iCount]->Frame();
-	}
+	//for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
+	//{
+	//	m_SkinObjList[iCount]->Frame();
+	//}
 
+	//for (int iCount = 0; iCount < I_MatrixObjectListManager.GetSize(); iCount++)
+	//{
+	//	m_MatObjLists[iCount]->Frame();
+	//}
+
+	m_SCAObject.Frame();
 	//m_pObj->Frame();
 	m_pMainCamera->Frame();
 	return true;
@@ -77,12 +96,18 @@ bool Sample::Render()
 	D3DXMatrixIdentity(&m_matWorld);
 	//D3DXMatrixScaling(&m_matWorld, 100, 100, 100);
 
-	for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
+	/*for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
 	{
 		m_SkinObjList[iCount]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 		m_SkinObjList[iCount]->Render(GetContext());
 	}
-
+	for (int iCount = 0; iCount < I_MatrixObjectListManager.GetSize(); iCount++)
+	{
+		m_MatObjLists[iCount]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+		m_MatObjLists[iCount]->Render(GetContext());
+	}*/
+	m_SCAObject.SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	m_SCAObject.Render(GetContext());
 	return true;
 }
 bool Sample::Release()
