@@ -83,7 +83,7 @@ void SSkinManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, i
 void SSkinManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval, NodeList& MatrixNodeList)
 {
 	m_TriLists.clear();
-
+	m_bipedList.clear();
 	// 로컬 좌표계이면 월드 행렬, 아니면 단위 행렬
 	Matrix3 tm = pNode->GetObjTMAfterWSM(interval.Start());
 
@@ -159,8 +159,8 @@ void SSkinManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval, Nod
 		}
 
 		int iV0 = mesh->faces[iFace].v[v0];
-		int iV1 = mesh->faces[iFace].v[v2];
-		int iV2 = mesh->faces[iFace].v[v1];
+		int iV1 = mesh->faces[iFace].v[v1];
+		int iV2 = mesh->faces[iFace].v[v2];
 
 		SCATriangleList& TriangleList = m_TriLists[iSubIndex];
 		int iFaceNum = TriangleList.iSize;

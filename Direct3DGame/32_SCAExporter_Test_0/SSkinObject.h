@@ -15,6 +15,7 @@ public:
 	SScene	m_Scene;
 	SMaterial m_Material;
 	std::vector<SSkinMesh> m_MeshList;
+	ID3D11Buffer*	m_pConstMatrixBuffer;
 
 	D3DXMATRIX  m_matObject;
 	D3DXMATRIX  m_matWorld;

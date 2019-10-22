@@ -107,8 +107,8 @@ HRESULT SSkinMesh::CreateVertexBuffer()
 	
 	int iIW_VERTEX_Size = sizeof(IW_VERTEX);
 	int iIW_VERTEX_Num = m_IW_VertexList.size();
-	if (m_IW_VertexList.size() > 0) pData = (void**)&m_VertexList.at(0);
-	m_pVertexBuffer = DXGame::CreateVertexBuffer(m_pDevice,
+	if (m_IW_VertexList.size() > 0) pData = (void**)&m_IW_VertexList.at(0);
+	m_pIW_VertexBuffer = DXGame::CreateVertexBuffer(m_pDevice,
 		pData,
 		iIW_VERTEX_Num,
 		iIW_VERTEX_Size);
@@ -157,12 +157,12 @@ HRESULT SSkinMesh::SetInputLayout()
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0  },
 
-		{"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 64, D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 80, D3D11_INPUT_PER_VERTEX_DATA, 0  },
-		{"TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 96, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_VERTEX_DATA, 0  },
+		{"TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_VERTEX_DATA, 0  },
 	};
 	UINT numElements = sizeof(layout) / sizeof(layout[0]);
 	m_dxobj.g_pInputlayout.Attach(DXGame::CreateInputlayout(m_pDevice, m_dxobj.g_pVSBlob.Get()->GetBufferSize(),
@@ -204,9 +204,12 @@ bool SSkinMesh::PreRender(ID3D11DeviceContext* pContext)
 {
 	pContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)m_dxobj.m_iPrimitiveType);
 	m_dxobj.PreRender(pContext, m_dxobj.m_iVertexSize);
-	UINT stride = sizeof(IW_VERTEX);
-	UINT offset = 1;
-	pContext->IASetVertexBuffers(1, 1, m_pVertexBuffer.GetAddressOf(), &stride, &offset);
+
+	ID3D11Buffer* Buffer[2] = { m_dxobj.g_pVertexBuffer.Get(), m_pIW_VertexBuffer.Get() };
+	UINT stride[2] = { sizeof(PNCT_VERTEX), sizeof(IW_VERTEX) };
+	UINT offset[2] = { 0, 0 };
+
+	pContext->IASetVertexBuffers(0, 2, Buffer, stride, offset);
 	for (int iCount = 0; iCount < TexType_Size; iCount++)
 	{
 		if (m_TextureList.List[iCount] != nullptr)

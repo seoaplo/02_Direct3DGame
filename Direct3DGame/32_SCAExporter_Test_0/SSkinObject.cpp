@@ -35,7 +35,7 @@ bool SSkinObject::Render(ID3D11DeviceContext* pContext)
 {
 	for (auto& TargetMesh : m_MeshList)
 	{
-		TargetMesh.SetMatrix(nullptr, &m_matView, &m_matProj);
+		TargetMesh.SetMatrix(&m_matWorld, &m_matView, &m_matProj);
 		TargetMesh.Render(pContext);
 	}
 	return true;
@@ -121,6 +121,7 @@ SSkinObject::SSkinObject()
 	m_iIndex = -1;
 	m_iMaterialID = -1;
 	m_ObjectName = L"none";
+	m_pConstMatrixBuffer = nullptr;
 
 	D3DXMatrixIdentity(&m_matWorld);
 	D3DXMatrixIdentity(&m_matView);

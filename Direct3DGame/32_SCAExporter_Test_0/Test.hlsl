@@ -41,10 +41,11 @@ VS_OUTPUT VS(VS_INPUT vIn)
 	float4x4  matMatrix;
 	float4 vLocal = float4(vIn.p, 1.0f);
 	float4 vAnim;
+	uint iBone;
+	float fWeight;
+
 	for (int ibiped = 0; ibiped < 8; ibiped++)
 	{
-		uint iBone;
-		float fWeight;
 		if (ibiped < 4)
 		{
 			iBone = vIn.i1[ibiped];
@@ -55,14 +56,14 @@ VS_OUTPUT VS(VS_INPUT vIn)
 			iBone = vIn.i2[ibiped - 4];
 			fWeight = vIn.w2[ibiped - 4];
 		}
-		if (iBone < 0) break;
+		if (iBone < 0 || fWeight < 0) break;
 
 		matMatrix = g_matAnim[iBone];
 		vAnim += fWeight * mul(vLocal, matMatrix);
-		vOut.n += fWeight * mul(vLocal, matMatrix);
+		//vOut.n += fWeight * mul(vLocal, matMatrix);
 	}
 
-	vOut.p = mul(vLocal, g_matWorld);
+	vOut.p = mul(vAnim, g_matWorld);
 	vOut.p = mul(vOut.p, g_matView);
 	vOut.p = mul(vOut.p, g_matProj);
 	vOut.c = vIn.c;

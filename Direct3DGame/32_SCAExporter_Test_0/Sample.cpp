@@ -26,10 +26,12 @@ bool Sample::Init()
 	I_MatrixFileLoader.Init(GetDevice(), GetContext());
 	I_MatrixObjectListManager.Init(GetDevice(), GetContext());
 
-	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin.skm");
-	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin1.skm");
-	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin2.skm");
-	iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/TestMatrix.smc");
+	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/GreyStone.skm");
+	iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/GreyStoneAttack.smc");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin1.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin2.skm");
+	//iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/TestMatrix.smc");
 
 	//--------------------------------------------------------------------------------------
 	// 월드  행렬
@@ -94,7 +96,7 @@ bool Sample::Render()
 	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 
 	D3DXMatrixIdentity(&m_matWorld);
-	//D3DXMatrixScaling(&m_matWorld, 100, 100, 100);
+	D3DXMatrixScaling(&m_matWorld, 100.0f, 100.0f, 100.0f);
 
 	/*for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
 	{
@@ -106,7 +108,7 @@ bool Sample::Render()
 		m_MatObjLists[iCount]->SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 		m_MatObjLists[iCount]->Render(GetContext());
 	}*/
-	m_SCAObject.SetMatrix(nullptr, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	m_SCAObject.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	m_SCAObject.Render(GetContext());
 	return true;
 }

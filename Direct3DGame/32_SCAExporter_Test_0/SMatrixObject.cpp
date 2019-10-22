@@ -19,9 +19,6 @@ bool SMatrixObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
 	}
 
 	m_matAnimSelf = m_matAnim;
-	D3DXMatrixInverse(
-		&m_matAnimInv, NULL,
-		&m_matAnim);
 
 	D3DXMatrixDecompose(
 		&m_vScaleTrack,
@@ -148,7 +145,7 @@ void SMatrixObject::Interpolate( float fElapseTime)
 	matAnim._42 = matAnimPos._42;
 	matAnim._43 = matAnimPos._43;
 
-	D3DXMatrixMultiply(&m_matCalculation, &m_matAnimInv, &matAnim);
+	m_matCalculation = m_matAnimInv * matAnim;
 	return;
 }
 
@@ -209,6 +206,7 @@ bool SMatrixObjectList::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 {
 	HRESULT hr = S_OK;
 	ID3D11Buffer* pBuffer = nullptr;
+	/*
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	D3D11_SUBRESOURCE_DATA InitData;
@@ -220,6 +218,22 @@ bool SMatrixObjectList::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	InitData.pSysMem = m_MatrixList;
 	hr = pDevice->CreateBuffer(&bd, &InitData, &pBuffer);
+	if (FAILED(hr))
+	{
+		HRESULT_FAILE_MESSAGE(hr);
+		return false;
+	}
+	m_pMatListConstantBuffer = pBuffer;
+	*/
+
+	D3D11_BUFFER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.ByteWidth = sizeof(m_MatrixList);
+	hr = pDevice->CreateBuffer(&desc, nullptr, &pBuffer);
 	if (FAILED(hr))
 	{
 		HRESULT_FAILE_MESSAGE(hr);
@@ -254,7 +268,15 @@ bool SMatrixObjectList::Render(ID3D11DeviceContext* pContext)
 			TargetObject.Render(pContext);
 		}
 	}
-	pContext->UpdateSubresource(m_pMatListConstantBuffer.Get(), 0, nullptr, m_MatrixList, 0, 0);
+	/*pContext->UpdateSubresource(m_pMatListConstantBuffer.Get(), 0, nullptr, m_MatrixList, 0, 0);
+	pContext->VSSetConstantBuffers(1, 1, m_pMatListConstantBuffer.GetAddressOf());*/
+
+	D3D11_MAPPED_SUBRESOURCE mapRes;
+	pContext->Map(m_pMatListConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD,
+		0, &mapRes);
+	memcpy(mapRes.pData, m_MatrixList, sizeof(m_MatrixList));
+	pContext->Unmap(m_pMatListConstantBuffer.Get(), 0);
+
 	pContext->VSSetConstantBuffers(1, 1, m_pMatListConstantBuffer.GetAddressOf());
 	return true;
 }

@@ -5,7 +5,7 @@ class SSkinMesh : public SMesh
 {
 public:
 	vector<IW_VERTEX>								m_IW_VertexList;
-	Microsoft::WRL::ComPtr<ID3D11Buffer>			m_pVertexBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer>			m_pIW_VertexBuffer;
 public:
 	//----------------------------------------------------------------------------------------------------------
 	// Create

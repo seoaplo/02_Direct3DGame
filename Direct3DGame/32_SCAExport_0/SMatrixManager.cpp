@@ -71,15 +71,20 @@ void SMatrixManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval,
 
 	Object.pINode = pNode;
 	Object.m_Mesh.iMaterialID = iMaterialID;
-	if (Object.m_ClassType == CLASS_GEOM
-		|| Object.m_ClassType == CLASS_BIPED)
+	if (Object.m_ClassType == CLASS_GEOM)
 	{
 		GetBox(Object.m_Mesh);
 	}
-	else GetMesh(pNode, Object.m_Mesh, interval);
+	else
+	{
+		if (!GetMesh(pNode, Object.m_Mesh, interval))
+		{
+			GetBox(Object.m_Mesh);
+		}
+	}
 	GetAnimation(pNode, Object.m_AnimTrack, Scene, interval);
 }
-void SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
+bool SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 {
 	m_TriLists.clear();
 
@@ -89,17 +94,18 @@ void SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 	bool deleteit = false;
 	// 트라이앵글 오브젝트
 	TriObject* tri = GetTriObjectFromNode(pNode, interval.Start(), deleteit);
-	if (tri == nullptr) return;
+	if (tri == nullptr) return false;
 	// 메쉬 오브젝트
 	Mesh* mesh = &tri->GetMesh();
-	mesh->buildBoundingBox();
-	sMesh.m_box = mesh->getBoundingBox(&tm);
 
 	if (mesh == nullptr)
 	{
 		if (deleteit) delete tri;
-		return;
+		return false;
 	}
+	mesh->buildBoundingBox();
+	sMesh.m_box = mesh->getBoundingBox(&tm);
+
 	bool negScale = SAGlobal::TMNegParity(tm);
 
 	int v0, v1, v2;
@@ -195,6 +201,8 @@ void SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 	SetUniqueBuffer(sMesh);
 
 	if (deleteit) delete tri;
+
+	return true;
 }
 void SMatrixManager::GetBox(SOAMesh& sMesh)
 {
@@ -386,8 +394,7 @@ void SMatrixManager::GetAnimation(INode* pNode, SAAnimationTrack& AnimTrack, SAS
 	// 시작+1프레임
 	for (TimeValue t = start; t <= end; t += GetTicksPerFrame())
 	{
-		Matrix3 tm = pNode->GetNodeTM(t)
-			* Inverse(pNode->GetParentTM(t));
+		Matrix3 tm = pNode->GetNodeTM(t);
 
 		AffineParts FrameAP;
 		decomp_affine(tm, &FrameAP);
