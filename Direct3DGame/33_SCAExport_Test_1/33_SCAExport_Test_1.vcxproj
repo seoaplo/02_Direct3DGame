@@ -42,7 +42,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -58,15 +58,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PropertySheets\00_Direct3D\0_Direct3DLib_0_Debug_x86.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PropertySheets\00_Direct3D\2_Direct3DLib_0_Release_x86.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PropertySheets\00_Direct3D\1_Direct3DLib_0_Debug_x64.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\PropertySheets\00_Direct3D\3_Direct3DLib_0_Release_x64.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -115,6 +119,71 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="32_SCAExporter_Test_0.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="32_SCAExporter_Test_0.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="CSBoneVertex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Debug.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Test.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SAObject.h" />
+    <ClInclude Include="SArcBall.h" />
+    <ClInclude Include="SCAHeader.h" />
+    <ClInclude Include="SCamera.h" />
+    <ClInclude Include="SCAObject.h" />
+    <ClInclude Include="SDrawObject.h" />
+    <ClInclude Include="SFrustum.h" />
+    <ClInclude Include="SkinFileLoader.h" />
+    <ClInclude Include="SMaterial.h" />
+    <ClInclude Include="SMatrixFileLoader.h" />
+    <ClInclude Include="SMatrixMesh.h" />
+    <ClInclude Include="SMatrixObject.h" />
+    <ClInclude Include="SMesh.h" />
+    <ClInclude Include="SModelViewCamera.h" />
+    <ClInclude Include="SParser.h" />
+    <ClInclude Include="SSkinMesh.h" />
+    <ClInclude Include="SSkinObject.h" />
+    <ClInclude Include="SSSFileLoader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SAObject.cpp" />
+    <ClCompile Include="SArcBall.cpp" />
+    <ClCompile Include="SCamera.cpp" />
+    <ClCompile Include="SCAObject.cpp" />
+    <ClCompile Include="SDrawObject.cpp" />
+    <ClCompile Include="SFrustum.cpp" />
+    <ClCompile Include="SkinFileLoader.cpp" />
+    <ClCompile Include="SMaterial.cpp" />
+    <ClCompile Include="SMatrixFileLoader.cpp" />
+    <ClCompile Include="SMatrixMesh.cpp" />
+    <ClCompile Include="SMatrixObject.cpp" />
+    <ClCompile Include="SMesh.cpp" />
+    <ClCompile Include="SModelViewCamera.cpp" />
+    <ClCompile Include="SParser.cpp" />
+    <ClCompile Include="SSkinMesh.cpp" />
+    <ClCompile Include="SSkinObject.cpp" />
+    <ClCompile Include="SSSFileLoader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

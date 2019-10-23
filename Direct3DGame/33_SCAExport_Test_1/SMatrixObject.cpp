@@ -254,7 +254,7 @@ bool SMatrixObjectList::Frame()
 	for(int iMesh = 0; iMesh < m_MatrixObjectList.size(); iMesh++)
 	{
 		m_MatrixObjectList[iMesh].Frame(m_fAnimElapseTime);
-		m_MatrixList[iMesh] = m_MatrixObjectList[iMesh].m_matCalculation;
+		D3DXMatrixTranspose(&m_MatrixList[iMesh], &m_MatrixObjectList[iMesh].m_matCalculation);
 	}
 	return true;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "S3DGameLib.h"
 
+#define AnimationMatrixList 255
 struct SScene
 {
 	int   iFirstFrame;  // 0

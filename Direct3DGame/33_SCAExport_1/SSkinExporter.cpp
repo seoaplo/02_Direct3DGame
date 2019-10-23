@@ -20,8 +20,8 @@ bool SSkinExporter::Export()
 
 	ExportHeader(m_pStream);
 	SAExporter::ExportMaterial(m_pStream);
-	m_SkinManager.ExportObject(m_pStream);
 	ExportInverseMatrix(m_pStream);
+	m_SkinManager.ExportObject(m_pStream);
 
 	fclose(m_pStream);
 	MessageBox(GetActiveWindow(), m_filename.c_str(),

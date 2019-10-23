@@ -26,8 +26,8 @@ bool Sample::Init()
 	I_MatrixFileLoader.Init(GetDevice(), GetContext());
 	I_MatrixObjectListManager.Init(GetDevice(), GetContext());
 
-	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/GreyStone.skm");
-	iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/GreyStoneAttack.smc");
+	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/Swat.skm");
+	iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/Swat.smc");
 	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin.skm");
 	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin1.skm");
 	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin2.skm");
@@ -96,7 +96,7 @@ bool Sample::Render()
 	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 
 	D3DXMatrixIdentity(&m_matWorld);
-	D3DXMatrixScaling(&m_matWorld, 100.0f, 100.0f, 100.0f);
+	D3DXMatrixScaling(&m_matWorld, 1.0f, 1.0f, 1.0f);
 
 	/*for (int iCount = 0; iCount < I_SkinObjectManager.GetSize(); iCount++)
 	{

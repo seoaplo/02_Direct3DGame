@@ -1,17 +1,137 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <None Include="32_SCAExporter_Test_0.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="32_SCAExporter_Test_0.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Debug.hlsl" />
+    <FxCompile Include="Test.hlsl" />
+    <FxCompile Include="CSBoneVertex.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SCAHeader.h" />
+    <ClInclude Include="SParser.h" />
+    <ClInclude Include="SAObject.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAObject.h">
+      <Filter>SCAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SArcBall.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinFileLoader.h">
+      <Filter>SCAObject\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixFileLoader.h">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixMesh.h">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixObject.h">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinMesh.h">
+      <Filter>SCAObject\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinObject.h">
+      <Filter>SCAObject\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelViewCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SMaterial.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SSSFileLoader.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SDrawObject.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SMesh.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SParser.cpp" />
+    <ClCompile Include="SAObject.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAObject.cpp">
+      <Filter>SCAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinFileLoader.cpp">
+      <Filter>SCAObject\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixFileLoader.cpp">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixMesh.cpp">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixObject.cpp">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="SSkinMesh.cpp">
+      <Filter>SCAObject\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="SSkinObject.cpp">
+      <Filter>SCAObject\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="SModelViewCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SMaterial.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SSSFileLoader.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SDrawObject.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SMesh.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SAObject">
+      <UniqueIdentifier>{f3d26ff3-3b68-4854-8bc9-e95d31d10bf8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="SCAObject">
+      <UniqueIdentifier>{b4156efa-85a6-4d31-b7d5-9e854512627e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{a6db2c9f-6c41-4f1a-9f9c-89c20ea76fac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAObject\Matrix">
+      <UniqueIdentifier>{1be5b5be-1b7e-47e8-abe0-e093c23fd456}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAObject\Skin">
+      <UniqueIdentifier>{c1ddaccc-0fa8-43a2-a59f-172cf01af293}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
