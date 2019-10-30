@@ -504,8 +504,16 @@ HRESULT SBox::LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pLoadShaderFile
 	if (pLoadShaderFile == nullptr) ShaderFile = L"../../shader/Shape/Box.hlsl";
 	else							ShaderFile = pLoadShaderFile;
 
+	if (m_dxobj.g_pTextureSRV == nullptr)
+	{
+		m_dxobj.g_pPixelShader.Attach(DXGame::LoadPixelShaderFile(pDevice, ShaderFile.c_str(), "PS_Color"));
+	}
+	else
+	{
+		m_dxobj.g_pPixelShader.Attach(DXGame::LoadPixelShaderFile(pDevice, ShaderFile.c_str()));
+	}
+
 	m_dxobj.g_pVertexShader.Attach(DXGame::LoadVertexShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pVSBlob.GetAddressOf()));
-	m_dxobj.g_pPixelShader.Attach(DXGame::LoadPixelShaderFile(pDevice, ShaderFile.c_str()));
 	m_dxobj.g_pGeometryShader.Attach(DXGame::LoadGeometryShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pGSBlob.GetAddressOf()));
 	m_dxobj.g_pHullShader.Attach(DXGame::LoadHullShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pHSBlob.GetAddressOf()));
 	m_dxobj.g_pDomainShader.Attach(DXGame::LoadDomainShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pDSBlob.GetAddressOf()));

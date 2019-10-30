@@ -31,7 +31,7 @@ LRESULT SWindow::WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 			{
 				UINT width = (LOWORD(lParam));
 				UINT height = (HIWORD(lParam));
-				ReSizeDevice(width, height);
+				g_pWindow->ReSizeDevice(width, height);
 				m_nWindowHeight = height;
 				m_nWindowWidth = width;
 				GetClientRect(hWnd, &m_rcClientRect);
@@ -72,12 +72,14 @@ bool SWindow::InitWindow(HINSTANCE hInstance, int nCmdShow, TCHAR* lpszClientNam
 	wcex.hInstance = hInstance;
 	wcex.hbrBackground = (HBRUSH)COLOR_BACKGROUND + 1;
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
+	wcex.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION));
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
 	wcex.lpfnWndProc = StaticWndProc;
 	wcex.lpszClassName = lpszClientName;
 	wcex.lpszMenuName = lpszClientName;
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
 
 	// 윈도우 등록
 	if (!RegisterClassEx(&wcex))
@@ -89,7 +91,7 @@ bool SWindow::InitWindow(HINSTANCE hInstance, int nCmdShow, TCHAR* lpszClientNam
 	AdjustWindowRect(&ClientRect, WS_OVERLAPPEDWINDOW, FALSE);
 
 	// 윈도우 생성
-	m_hWnd = CreateWindowEx(WS_EX_TOPMOST, lpszClientName, lpszClientName, WS_OVERLAPPEDWINDOW,
+	m_hWnd = CreateWindow(lpszClientName, lpszClientName, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
 		NULL, NULL, m_hInstance, NULL);
 
@@ -105,8 +107,11 @@ bool SWindow::InitWindow(HINSTANCE hInstance, int nCmdShow, TCHAR* lpszClientNam
 	CenterWindow(m_hWnd);
 	UpdateWindow(m_hWnd);
 
-	m_nWindowWidth = m_rcClientRect.right - m_rcClientRect.left;
-	m_nWindowHeight = m_rcClientRect.bottom - m_rcClientRect.top;
+	m_nWindowWidth = m_rcWindowBounds.right - m_rcWindowBounds.left;
+	m_nWindowHeight = m_rcWindowBounds.bottom - m_rcWindowBounds.top;
+
+	m_nClientWidth = m_rcClientRect.right - m_rcClientRect.left;
+	m_nClientHeight = m_rcClientRect.bottom - m_rcClientRect.top;
 
 	ShowWindow(m_hWnd, nCmdShow);
 

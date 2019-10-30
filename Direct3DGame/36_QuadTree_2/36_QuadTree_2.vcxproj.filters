@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SBaseObj.h" />
+    <ClInclude Include="SMiniMap.h" />
+    <ClInclude Include="SArcBall.h">
+      <Filter>SCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="SCamera.h">
+      <Filter>SCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>SCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelViewCamera.h">
+      <Filter>SCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\16_HeightMap\SMap.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\16_HeightMap\SHeightMap.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTree.h">
+      <Filter>QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTreeMap.h">
+      <Filter>QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SNode.h">
+      <Filter>QuadTree</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SBaseObj.cpp" />
+    <ClCompile Include="SMiniMap.cpp" />
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>SCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="SCamera.cpp">
+      <Filter>SCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>SCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="SModelViewCamera.cpp">
+      <Filter>SCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\16_HeightMap\SHeightMap.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\16_HeightMap\SMap.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTree.cpp">
+      <Filter>QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTreeMap.cpp">
+      <Filter>QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SNode.cpp">
+      <Filter>QuadTree</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SCamera">
+      <UniqueIdentifier>{e60433a7-cbff-4091-af68-da0ffce4fbc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{79e0034e-0739-4cea-a99d-c53028435ed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QuadTree">
+      <UniqueIdentifier>{b190198a-0fa2-4117-bff0-47d14db43b0c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

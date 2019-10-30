@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="SQuadTree.h" />
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SBaseObj.h" />
+    <ClInclude Include="SMiniMap.h" />
+    <ClInclude Include="SNode.h" />
+    <ClInclude Include="SModelViewCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SArcBall.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SBaseObj.cpp" />
+    <ClCompile Include="SMiniMap.cpp" />
+    <ClCompile Include="SNode.cpp" />
+    <ClCompile Include="SQuadTree.cpp" />
+    <ClCompile Include="SModelViewCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{130a32c5-b492-4c04-b424-54337d125e41}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

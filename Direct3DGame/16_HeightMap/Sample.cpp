@@ -63,7 +63,7 @@ bool Sample::Init()
 	}
 
 	m_HeightMap.Init(GetDevice(), m_pImmediateContext);
-	if (m_HeightMap.CreateHeightMap(L"../../data/heightMap513.bmp") == false)
+	if (m_HeightMap.CreateHeightMap(L"../../data/map/heightMap513.bmp") == false)
 	{
 		return false;
 	}
@@ -71,7 +71,7 @@ bool Sample::Init()
 	SMapDesc MapDesc = { m_HeightMap.m_iNumRows,
 							m_HeightMap.m_iNumCols,
 							1.0f, 1.0f,
-							L"../../data/baseColor.jpg",
+							L"../../data/map/baseColor.jpg",
 							L"../../shader/16_HeightMap/HeightMap.hlsl" };
 	if (!m_HeightMap.Load(MapDesc))
 	{

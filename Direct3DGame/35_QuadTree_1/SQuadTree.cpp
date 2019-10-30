@@ -1,0 +1,262 @@
+#include "SQuadTree.h"
+
+
+bool SQuadTree::Init()
+{
+	return true;
+}
+bool SQuadTree::Frame()
+{
+	m_DrawObjList.clear();
+	if (!m_pCamera) return false;
+	DrawFindNode(m_pRootNode);
+	return true;
+}
+bool SQuadTree::Render()
+{
+	return true;
+}
+bool SQuadTree::Release()
+{
+	return true;
+}
+void SQuadTree::Update(ID3D11Device* pDevice, SCamera* pCamera)
+{
+	m_pDevice = pDevice;
+	m_pCamera = pCamera;
+}
+
+bool SQuadTree::Build(float fWidth, float fHeight)
+{
+	m_fWidth = fWidth;
+	m_fHeight = fHeight;
+
+	m_pRootNode = CreateNode(nullptr, -fWidth / 2, fWidth / 2, -fHeight / 2, fHeight / 2);
+
+	if (BuildTree(m_pRootNode))	return true;
+	else						return false;
+}
+
+bool SQuadTree::BuildTree(SNode* pNode)
+{
+	if (SubDivide(pNode))
+	{
+		for (int iNode = 0; iNode < 4; iNode++)
+		{
+			BuildTree(pNode->m_ChildList[iNode]);
+		}
+	}
+	return true;
+}
+bool SQuadTree::SubDivide(SNode* pNode)
+{
+	assert(pNode);
+	if ((DWORD)m_iMaxDepthLimit <= pNode->m_dwDepth)
+	{
+		pNode->m_IsLeaf = TRUE;
+		return false;
+	}
+
+	float fWidthSplit = (pNode->m_CornerList[TopRight].x - pNode->m_CornerList[TopLeft].x) / 2;
+	float fHeightSplit = (pNode->m_CornerList[TopLeft].z - pNode->m_CornerList[BottomRight].z) / 2;
+
+	if (fWidthSplit < m_fMinDivideSize || fHeightSplit < m_fMinDivideSize)
+	{
+		pNode->m_IsLeaf = true;
+		return false;
+	}
+	SNode* pCreateNode = nullptr;
+	
+	// 왼쪽 상단 노드 (0번 노드)
+	pCreateNode = CreateNode(pNode,
+							pNode->m_CornerList[TopLeft].x,
+							pNode->m_CornerList[TopLeft].x + fWidthSplit,
+							pNode->m_CornerList[TopLeft].z - fHeightSplit,
+							pNode->m_CornerList[TopLeft].z);
+	pNode->m_ChildList.push_back(pCreateNode);
+
+	// 오른쪽 상단 노드 (1번 노드)
+	pCreateNode = CreateNode(pNode,
+							pNode->m_CornerList[TopLeft].x + fWidthSplit,
+							pNode->m_CornerList[TopRight].x,
+							pNode->m_CornerList[TopLeft].z - fHeightSplit,
+							pNode->m_CornerList[TopLeft].z);
+	pNode->m_ChildList.push_back(pCreateNode);
+
+	// 왼쪽 하단 노드 (2번 노드)
+	pCreateNode = CreateNode(pNode,
+							pNode->m_CornerList[TopLeft].x,
+							pNode->m_CornerList[TopLeft].x +fWidthSplit,
+							pNode->m_CornerList[BottomLeft].z,
+							pNode->m_CornerList[TopLeft].z - fHeightSplit);
+	pNode->m_ChildList.push_back(pCreateNode);
+
+	// 오른쪽 하단 노드 (2번 노드)
+	pCreateNode = CreateNode(pNode,
+							pNode->m_CornerList[TopLeft].x + fWidthSplit,
+							pNode->m_CornerList[TopRight].x,
+							pNode->m_CornerList[BottomRight].z,
+							pNode->m_CornerList[TopLeft].z - fHeightSplit);
+	pNode->m_ChildList.push_back(pCreateNode);
+
+	return true;
+}
+
+SNode* SQuadTree::CreateNode(
+				SNode* pParentNode, 
+				float fTopLeft, float fTopRight,
+				float fBottomLeft, float fBottomRight)
+{
+	SNode* pNode = nullptr;
+	SAFE_NEW(pNode, SNode);
+	assert(pNode);
+
+	pNode->m_ChildList.reserve(4);
+	pNode->m_CornerList.reserve(4);
+
+	S_BOX& TargetBox = pNode->m_sBox;
+
+	TargetBox.vMin = D3DXVECTOR3(fTopLeft, 0.0f, fBottomLeft);
+	TargetBox.vMax = D3DXVECTOR3(fTopRight, 0.0f, fBottomRight);
+
+	TargetBox.vCenter = (TargetBox.vMax + TargetBox.vMin) / 2.0f;
+
+	TargetBox.fExtent[0] = TargetBox.vMax.x - TargetBox.vCenter.x;
+	TargetBox.fExtent[1] = TargetBox.vMax.y - TargetBox.vCenter.y;
+	TargetBox.fExtent[2] = TargetBox.vMax.z - TargetBox.vCenter.z;
+
+	pNode->m_CornerList.push_back(D3DXVECTOR3(TargetBox.vMin.x, 0.0f, TargetBox.vMax.z));
+	pNode->m_CornerList.push_back(TargetBox.vMax);
+	pNode->m_CornerList.push_back(TargetBox.vMin);
+	pNode->m_CornerList.push_back(D3DXVECTOR3(TargetBox.vMax.x, 0.0f, TargetBox.vMin.z));
+
+	if (pParentNode)
+	{
+		pNode->m_dwDepth = pParentNode->m_dwDepth + 1;
+		if ((DWORD)m_iMaxDepthLimit < pNode->m_dwDepth)
+		{
+			m_iMaxDepthLimit = pNode->m_dwDepth;
+		}
+	}
+	return pNode;
+}
+SNode* SQuadTree::FindNode(SNode* pNode, SBaseObj* pObj)
+{
+	assert(pNode);
+	do
+	{
+		// 4개의 자식 중에서 찾는다
+		for (int iChild = 0; iChild < pNode->m_ChildList.size(); iChild++)
+		{
+			if (pNode->m_ChildList[iChild] && CheckRect(pNode->m_ChildList[iChild], pObj))
+			{
+				m_QuadTreeQueue.push(pNode->m_ChildList[iChild]);
+				break;
+			}
+		}
+		// 큐에 들어 있는 리스트가 없다면 pNode가 완전히 포함하는 노드가 된다.
+		if (m_QuadTreeQueue.empty()) break;
+		// 완전히 오브젝트가 포함된 부모노드를 꺼애온다
+		pNode = m_QuadTreeQueue.front();
+		m_QuadTreeQueue.pop();
+	} 
+	while (pNode);
+	return pNode;
+}
+
+void SQuadTree::DrawFindNode(SNode* pNode)
+{
+	assert(pNode);
+
+	S_POSITION t_Pos = m_pCamera->CheckPoitionOBBInPlane(&pNode->m_sBox);
+	if (pNode->m_dwDepth < (DWORD)m_iRenderDepth) return;
+
+	// 리프노드 일 경우는 완전히 제외되지 않았다면(걸쳐 있거나 완전 포함)추가한다.
+	if (pNode->m_IsLeaf &&  t_Pos != P_BACK)
+	{
+		//m_DrawNodeList.push_back(pNode);
+		VisibleObject(pNode);
+		return;
+	}
+	// 완전히 포함되어 있으면 자식을 탐색하지 않고 노드를 추가한다.
+	if (t_Pos == P_FRONT)
+	{
+		//m_DrawNodeList.push_back(pNode);
+		VisibleNode(pNode);
+		return;
+	}
+
+	// 걸쳐져 있는 노드에 포함된 오브젝트 체크
+	if (t_Pos == P_SPANNING)
+	{
+		VisibleObject(pNode);
+	}
+
+	for (int iNode = 0; iNode < pNode->m_ChildList.size(); iNode++)
+	{
+		DrawFindNode(pNode->m_ChildList[iNode]);
+	}
+}
+
+void SQuadTree::VisibleNode(SNode* pNode)
+{
+	assert(m_pCamera);
+	if (pNode->m_dwDepth < m_iRenderDepth) return;
+
+	if (m_pCamera->CheckOBBInPlane(&pNode->m_sBox))
+	{
+		VisibleObject(pNode);
+		for (auto& ChildNode : pNode->m_ChildList)
+		{
+			VisibleNode(ChildNode);
+		}
+	}
+}
+void SQuadTree::VisibleObject(SNode* pNode)
+{
+	for (auto& Object : pNode->m_ObjectList)
+	{
+		S_BOX& CheckBox = Object->m_Box;
+		if (m_pCamera->CheckOBBInPlane(&CheckBox))
+		{
+			m_DrawObjList.push_back(Object);
+		}
+	}
+}
+int	SQuadTree::AddObject(SBaseObj* pObj)
+{
+	if (CheckRect(m_pRootNode, pObj))
+	{
+		SNode* pNode = FindNode(m_pRootNode, pObj);
+		if (pNode)
+		{
+			pNode->m_ObjectList.push_back(pObj);
+		}
+		return 1;
+	}
+	return 0;
+}
+int	SQuadTree::CheckRect(SNode* pNode, SBaseObj* pObj)
+{
+	if (pNode == nullptr || pObj == nullptr) return -1;
+
+	S_BOX& NodeBox = pNode->m_sBox;
+	S_BOX& ObjectBox = pObj->m_Box;
+
+	if (NodeBox.vMin.x <= ObjectBox.vMin.x && NodeBox.vMax.x >= ObjectBox.vMax.x)
+	{
+		if (NodeBox.vMin.z <= ObjectBox.vMin.z && NodeBox.vMax.z >= ObjectBox.vMax.z)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+SQuadTree::SQuadTree()
+{
+}
+
+
+SQuadTree::~SQuadTree()
+{
+}

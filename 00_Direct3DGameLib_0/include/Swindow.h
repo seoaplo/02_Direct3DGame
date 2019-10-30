@@ -16,13 +16,15 @@ public:
 	TCHAR*		m_lpszClientName;		// Window Name String
 	DWORD		m_dwWindowStyle;		// WIndow Style
 	RECT		m_rcWindowBounds;		// WIndow Size;
+	UINT		m_nWindowWidth;			// Window Width Size
+	UINT		m_nWindowHeight;		// Window Height Size
 
 	//=================================================================================================
 	// Client Size
 	//=================================================================================================
 	RECT		m_rcClientRect;			// Client Size
-	UINT		m_nWindowWidth;			// Window Width Size
-	UINT		m_nWindowHeight;		// Window Height Size
+	UINT		m_nClientWidth;			// Client Width Size
+	UINT		m_nClientHeight;		// Client Height Size
 
 public:
 	//=================================================================================================

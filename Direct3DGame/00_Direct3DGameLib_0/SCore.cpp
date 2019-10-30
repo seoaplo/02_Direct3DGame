@@ -14,7 +14,7 @@ SCore::~SCore()
 // CoreFrameWork
 bool	SCore::CoreInit()
 {
-	if (FAILED(InitDevice(m_hWnd, m_nWindowWidth, m_nWindowHeight, false)))
+	if (FAILED(InitDevice(m_hWnd, m_nClientWidth, m_nClientHeight, false)))
 	{
 		MessageBox(0, L"Create Device 실패", L"Fatal error", MB_OK);
 		return false;
@@ -177,7 +177,7 @@ HRESULT SCore::CreateDxResource()
 
 	IDXGISurface1*		pBackBuffer = NULL;
 	HRESULT hr = GetSwapChain()->GetBuffer(0, __uuidof(IDXGISurface), (LPVOID*)&pBackBuffer);
-	I_DirectWrite.Set(m_hWnd, m_nWindowWidth, m_nWindowHeight, pBackBuffer);
+	I_DirectWrite.Set(m_hWnd, m_nClientWidth, m_nClientHeight, pBackBuffer);
 	if (pBackBuffer)	pBackBuffer->Release();
 
 	hr = GetSwapChain()->GetDesc(&m_SwapChainDesc);
@@ -208,7 +208,7 @@ bool SCore::DrawDebug()
 	memset(pBuffer, 0, sizeof(TCHAR) * 256);
 	_stprintf_s(pBuffer, _T("FPS:%d"), I_Timer.GetFPS());
 
-	RECT rc1 = { 0,0, m_nWindowWidth, m_nWindowHeight };
+	RECT rc1 = { 0,0, m_nClientWidth, m_nClientHeight };
 	I_DirectWrite.DrawText(rc1, pBuffer, D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.5));
 
 	//-----------------------------------------------------------------------
@@ -216,36 +216,27 @@ bool SCore::DrawDebug()
 	//-----------------------------------------------------------------------	
 	RECT rc;
 	rc.top = 30;
-	rc.bottom = m_nWindowWidth;
+	rc.bottom = m_nClientWidth;
 	rc.left = 0;
-	rc.right = m_nWindowHeight;
+	rc.right = m_nClientHeight;
 	I_DirectWrite.DrawText(rc, SDxState::RSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
 
 	//-----------------------------------------------------------------------
 	// 적용된 SamplerState 타입 표시
 	//-----------------------------------------------------------------------	
 	rc.top = 50;
-	rc.bottom = m_nWindowWidth;
-	rc.left = 0;
-	rc.right = m_nWindowHeight;
 	I_DirectWrite.DrawText(rc, SDxState::SSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
 
 	//-----------------------------------------------------------------------
 	// 적용된 DepthStencilState 타입 표시
 	//-----------------------------------------------------------------------	
 	rc.top = 70;
-	rc.bottom = m_nWindowWidth;
-	rc.left = 0;
-	rc.right = m_nWindowHeight;
 	I_DirectWrite.DrawText(rc, SDxState::DSSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
 
 	//-----------------------------------------------------------------------
 	// 적용된 BlendState 타입 표시
 	//-----------------------------------------------------------------------	
 	rc.top = 90;
-	rc.bottom = m_nWindowWidth;
-	rc.left = 0;
-	rc.right = m_nWindowHeight;
 	I_DirectWrite.DrawText(rc, SDxState::BSDebugString.c_str(), D2D1::ColorF(0.0f, 0.0f, 1.0f, 1.0f));
 
 	m_Direction.Render(m_pImmediateContext);

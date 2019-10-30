@@ -12,6 +12,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <queue>
 #include <algorithm>
 #include <bitset>
 #include <limits>
