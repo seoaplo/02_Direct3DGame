@@ -66,6 +66,7 @@ namespace DXGame
 
 #if defined(DEBUG) || defined(_DEBUG)
 		dwShaderFlags |= D3DCOMPILE_DEBUG;
+		dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 		ID3DBlob*	pErrorBlob = nullptr;
 		hr = D3DX11CompileFromFile(szFileName, NULL, NULL, szEntryPoint, szShaderModel,
@@ -621,6 +622,7 @@ namespace DXGame
 		g_pGeometryShader = nullptr;
 		g_pInputlayout = nullptr;
 		g_pVSBlob = nullptr;
+		g_pTextureSRV = nullptr;
 		m_iPrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		m_iCullMode = 1;
 		m_iSamplerMode = 0;
@@ -652,7 +654,10 @@ namespace DXGame
 		pContext->GSSetShader(g_pGeometryShader.Get(), nullptr, 0);
 		pContext->HSSetShader(g_pHullShader.Get(), nullptr, 0);
 		pContext->DSSetShader(g_pDomainShader.Get(), nullptr, 0);
-		pContext->PSSetShaderResources(0, 1, &g_pTextureSRV);
+		if (g_pTextureSRV != nullptr)
+		{
+			pContext->PSSetShaderResources(0, 1, &g_pTextureSRV);
+		}
 	}
 
 	void SDxHelperEX::PostRender(ID3D11DeviceContext* pContext, UINT iCount)

@@ -12,7 +12,7 @@
       <AdditionalLibraryDirectories>../../FMOD/lib;../../$(ProjectName)/lib/Release/;../../DX/Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../DX/Include;../../FMOD/inc;../../$(ProjectName)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WindowsSDK_IncludePath);../../DX/Include;../../FMOD/inc;../../$(ProjectName)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

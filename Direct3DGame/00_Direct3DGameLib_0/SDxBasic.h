@@ -11,12 +11,11 @@
 #include <math.h>
 
 // Direct 3D Headers
+#include <D3Dcompiler.h>
 #include <d3dx11.h>
 #include <d3d11.h>
-#include <d3dx11.h>
 #include <d3dx9.h>
 #include <dxgi.h> 
-#include <d3dcompiler.h>
 #include <dinput.h>
 
 // Direct 2D Headers

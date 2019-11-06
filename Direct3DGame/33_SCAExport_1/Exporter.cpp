@@ -108,7 +108,6 @@ INT_PTR CALLBACK DlgProc(HWND hWnd,
 				I_SSkinExporter.Convert();
 				I_SSkinExporter.Export();
 			}
-
 		}break;
 		case IDC_MATRIXEXP:
 		{
@@ -142,11 +141,13 @@ INT_PTR CALLBACK DlgProc(HWND hWnd,
 		case IDC_SOAEXP:
 		{
 			TSTR szExpFile = I_SOAExporter.SaveFileDiallog(L"SOA", L"SAExporter");
-			if(szExpFile != NULL)
-			I_SOAExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
-			I_SOAExporter.Convert();
-			I_SOAExporter.Export();
-		}
+			if (szExpFile != NULL)
+			{
+				I_SOAExporter.Set(szExpFile, SAExport::GetInstance()->My_Pointer_interface);
+				I_SOAExporter.Convert();
+				I_SOAExporter.Export();
+			}
+		}break;
 		}
 	}
 	case WM_LBUTTONDOWN:

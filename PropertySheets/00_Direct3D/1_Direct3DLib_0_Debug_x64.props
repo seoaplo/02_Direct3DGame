@@ -12,7 +12,7 @@
       <AdditionalLibraryDirectories>../../FMOD/lib;../../00_Direct3DGameLib_0/lib/Debug/;../../DX/Lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../DX/Include;../../FMOD/inc;../../00_Direct3DGameLib_0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WindowsSDK_IncludePath);../../DX/Include;../../FMOD/inc;../../00_Direct3DGameLib_0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <PreBuildEvent>
       <Command>

@@ -15,7 +15,7 @@ void SMatrixManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval,
 
 	if (os.obj)
 	{
-		// ºÒÇÊ¿äÇÑ ³ëµå(½Ã¾ßÀÇ ¹æÇâ µî¿¡ ¾²ÀÌ´Â ³ëµå)
+		// ï¿½ï¿½ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½(ï¿½Ã¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½î¿¡ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½)
 		if (os.obj->ClassID() == Class_ID(TARGET_CLASS_ID, 0))
 		{
 			return;
@@ -23,15 +23,15 @@ void SMatrixManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval,
 
 		switch (os.obj->SuperClassID())
 		{
-			// ÇØ´ç ³ëµåÀÌ¸é ÀúÀå
+			// ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 		case GEOMOBJECT_CLASS_ID:
 		case HELPER_CLASS_ID:
 
-			if (CheckID->ClassID() == Class_ID(BONE_CLASS_ID, 0))// º» ¿ÀºêÁ§Æ®   
+			if (CheckID->ClassID() == Class_ID(BONE_CLASS_ID, 0))// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®   
 			{
 				Object.m_ClassType = CLASS_BONE;
 			}
-			else if (CheckID->ClassID() == Class_ID(DUMMY_CLASS_ID, 0))  // ´õ¹Ì ¿ÀºêÁ§Æ®
+			else if (CheckID->ClassID() == Class_ID(DUMMY_CLASS_ID, 0))  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 			{
 				Object.m_ClassType = CLASS_DUMMY;
 			}
@@ -88,14 +88,14 @@ bool SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 {
 	m_TriLists.clear();
 
-	// ·ÎÄÃ ÁÂÇ¥°èÀÌ¸é ¿ùµå Çà·Ä, ¾Æ´Ï¸é ´ÜÀ§ Çà·Ä
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½, ï¿½Æ´Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 	Matrix3 tm = pNode->GetObjTMAfterWSM(interval.Start());
 
 	bool deleteit = false;
-	// Æ®¶óÀÌ¾Þ±Û ¿ÀºêÁ§Æ®
+	// Æ®ï¿½ï¿½ï¿½Ì¾Þ±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 	TriObject* tri = GetTriObjectFromNode(pNode, interval.Start(), deleteit);
 	if (tri == nullptr) return false;
-	// ¸Þ½¬ ¿ÀºêÁ§Æ®
+	// ï¿½Þ½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 	Mesh* mesh = &tri->GetMesh();
 
 	if (mesh == nullptr)
@@ -109,8 +109,18 @@ bool SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 	bool negScale = SAGlobal::TMNegParity(tm);
 
 	int v0, v1, v2;
-	if (negScale) { v0 = 2; v1 = 1; v2 = 0; }
-	else { v0 = 0; v1 = 1; v2 = 2; }
+	if (negScale) 
+	{ 
+		v0 = 2;
+		v1 = 1;
+		v2 = 0;
+	}
+	else 
+	{ 
+		v0 = 0;
+		v1 = 1;
+		v2 = 2;
+	}
 	
 	int iSubMtlSize = 1;
 	if (pNode->GetMtl() != nullptr)
@@ -123,7 +133,7 @@ bool SMatrixManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 
 	int iNumFace = mesh->getNumFaces();
 	//================================================================
-	// ¼­ºê ¸Þ½ÃÀÇ ÇÒ´çÀÇ ¼ö¸¦ È®½ÇÇÏ°Ô ÆÇ´ÜÇÏ±â À§ÇÑ ¹Ýº¹¹®
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½Ç´ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ýºï¿½ï¿½ï¿½
 	//================================================================
 	sMesh.iSubNum = 1;
 	m_TriLists[0].List.resize(iNumFace);
@@ -228,31 +238,31 @@ void SMatrixManager::GetBox(SOAMesh& sMesh)
 	sMesh.SubMeshList[0].VertexList[1] = PNCT(Point3(0.1f, 0.1f, -0.1f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[2] = PNCT(Point3(0.1f, -0.1f, -0.1f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
 	sMesh.SubMeshList[0].VertexList[3] = PNCT(Point3(-0.1f, -0.1f, -0.1f), Point3(0.0f, 0.0f, -1.0f), Point4(1.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
-	// µÞ¸é
+	// ï¿½Þ¸ï¿½
 	sMesh.SubMeshList[0].VertexList[4] = PNCT(Point3(0.1f, 0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 0.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[5] = PNCT(Point3(-0.1f, 0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[6] = PNCT(Point3(-0.1f, -0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
 	sMesh.SubMeshList[0].VertexList[7] = PNCT(Point3(0.1f, -0.1f, 0.1f), Point3(0.0f, 0.0f, 1.0f), Point4(0.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
 
-	// ¿À¸¥ÂÊ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	sMesh.SubMeshList[0].VertexList[8] = PNCT(Point3(0.1f, 0.1f, -0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[9] = PNCT(Point3(0.1f, 0.1f, 0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[10] = PNCT(Point3(0.1f, -0.1f, 0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
 	sMesh.SubMeshList[0].VertexList[11] = PNCT(Point3(0.1f, -0.1f, -0.1f), Point3(1.0f, 0.0f, 0.0f), Point4(0.0f, 0.0f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
 
-	// ¿ÞÂÊ
+	// ï¿½ï¿½ï¿½ï¿½
 	sMesh.SubMeshList[0].VertexList[12] = PNCT(Point3(-0.1f, 0.1f, 0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[13] = PNCT(Point3(-0.1f, 0.1f, -0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[14] = PNCT(Point3(-0.1f, -0.1f, -0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(1.0f, 1.0f));
 	sMesh.SubMeshList[0].VertexList[15] = PNCT(Point3(-0.1f, -0.1f, 0.1f), Point3(-1.0f, 0.0f, 0.0f), Point4(1.0f, 1.0f, 0.0f, 1.0f), Point2(0.0f, 1.0f));
 
-	// À­¸é
+	// ï¿½ï¿½ï¿½ï¿½
 	sMesh.SubMeshList[0].VertexList[16] = PNCT(Point3(-0.1f, 0.1f, 0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[17] = PNCT(Point3(0.1f, 0.1f, 0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[18] = PNCT(Point3(0.1f, 0.1f, -0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
 	sMesh.SubMeshList[0].VertexList[19] = PNCT(Point3(-0.1f, 0.1f, -0.1f), Point3(0.0f, 1.0f, 0.0f), Point4(1.0f, 0.5f, 1.0f, 1.0f), Point2(0.0f, 1.0f));
 
-	// ¾Æ·§¸é
+	// ï¿½Æ·ï¿½ï¿½ï¿½
 	sMesh.SubMeshList[0].VertexList[20] = PNCT(Point3(-0.1f, -0.1f, -0.1f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(0.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[21] = PNCT(Point3(0.1f, -0.1f, -0.1f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(1.0f, 0.0f));
 	sMesh.SubMeshList[0].VertexList[22] = PNCT(Point3(0.1f, -0.1f, 0.1f), Point3(0.0f, -1.0f, 0.0f), Point4(0.0f, 1.0f, 1.0f, 1.0f), Point2(1.0f, 1.0f));
@@ -350,9 +360,9 @@ Point3	SMatrixManager::GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex)
 }
 TriObject* SMatrixManager::GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit)
 {
-	// ¿ÀºêÁ§Æ®¸¦ ¹Þ´Â´Ù.
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Þ´Â´ï¿½.
 	Object* obj = pNode->EvalWorldState(time).obj;
-	// º¯È¯ °¡´ÉÇÏ¸é ½ÇÇà
+	// ï¿½ï¿½È¯ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (obj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0)))
 	{
 		TriObject* tri = (TriObject*)obj->ConvertToType(time, Class_ID(TRIOBJ_CLASS_ID, 0));
@@ -367,14 +377,13 @@ void SMatrixManager::GetAnimation(INode* pNode, SAAnimationTrack& AnimTrack, SAS
 {
 
 
-	//-------------------> Áß¿ä
+	//-------------------> ï¿½ß¿ï¿½
 	TimeValue startFrame = interval.Start();
-	// tm = selfTm * parentTm * Inverse(parentTm);
-	Matrix3 tm = pNode->GetNodeTM(startFrame);
-	// Çà·Ä ºÐÇØ
+	Matrix3 StartTM = pNode->GetNodeTM(startFrame);
+	// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	AffineParts StartAP;
-	decomp_affine(tm, &StartAP);
-	// quaternion -> axis, angle º¯È¯
+	decomp_affine(StartTM, &StartAP);
+	// quaternion -> axis, angle ï¿½ï¿½È¯
 	Point3  Start_RotAxis;
 	float   Start_RotValue;
 	AngAxisFromQ(StartAP.q, &Start_RotValue, Start_RotAxis);
@@ -391,7 +400,7 @@ void SMatrixManager::GetAnimation(INode* pNode, SAAnimationTrack& AnimTrack, SAS
 
 	TimeValue start = interval.Start();
 	TimeValue end = interval.End();
-	// ½ÃÀÛ+1ÇÁ·¹ÀÓ
+	// ï¿½ï¿½ï¿½ï¿½+1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for (TimeValue t = start; t <= end; t += GetTicksPerFrame())
 	{
 		Matrix3 tm = pNode->GetNodeTM(t);
@@ -430,7 +439,7 @@ void SMatrixManager::GetAnimation(INode* pNode, SAAnimationTrack& AnimTrack, SAS
 			}
 			else
 			{
-				if (Start_RotValue != Frame_RotValue)
+				if (fabs(Frame_RotValue-Start_RotValue) > ALMOST_ZERO  )
 				{
 					AnimTrack.bRotation = true;
 				}

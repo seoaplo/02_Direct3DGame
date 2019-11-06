@@ -234,9 +234,9 @@ void SSkinManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval, Nod
 				m_bipedList[iV0].m_dwNumWeight;
 				iWeight++)
 			{
-				TriangleList.List[iFaceNum].v[v0].i[iWeight] =
+				TriangleList.List[iFaceNum].v[0].i[iWeight] =
 					m_bipedList[iV0].m_BipedList[iWeight].BipID;
-				TriangleList.List[iFaceNum].v[v0].w[iWeight] =
+				TriangleList.List[iFaceNum].v[0].w[iWeight] =
 					m_bipedList[iV0].m_BipedList[iWeight].m_fWeight;
 			}
 		}
@@ -247,9 +247,9 @@ void SSkinManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval, Nod
 				m_bipedList[iV2].m_dwNumWeight;
 				iWeight++)
 			{
-				TriangleList.List[iFaceNum].v[v1].i[iWeight] =
+				TriangleList.List[iFaceNum].v[1].i[iWeight] =
 					m_bipedList[iV2].m_BipedList[iWeight].BipID;
-				TriangleList.List[iFaceNum].v[v1].w[iWeight] =
+				TriangleList.List[iFaceNum].v[1].w[iWeight] =
 					m_bipedList[iV2].m_BipedList[iWeight].m_fWeight;
 			}
 		}
@@ -260,9 +260,9 @@ void SSkinManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval, Nod
 				m_bipedList[iV1].m_dwNumWeight;
 				iWeight++)
 			{
-				TriangleList.List[iFaceNum].v[v2].i[iWeight] =
+				TriangleList.List[iFaceNum].v[2].i[iWeight] =
 					m_bipedList[iV1].m_BipedList[iWeight].BipID;
-				TriangleList.List[iFaceNum].v[v2].w[iWeight] =
+				TriangleList.List[iFaceNum].v[2].w[iWeight] =
 					m_bipedList[iV1].m_BipedList[iWeight].m_fWeight;
 			}
 		}
@@ -476,17 +476,14 @@ void SSkinManager::PhysiqueData(INode* pNode, Modifier* Pointer_Physique, SCAMes
 						Biped.BipID = itor->second;
 						Biped.m_fWeight = pVertex->GetWeight(iWeight);
 
-						if (ALMOST_ZERO > Biped.m_fWeight) continue;
-						else m_bipedList[iVertex].m_BipedList.push_back(Biped);
-					}
-					else
-					{
-						break;
+						//if (ALMOST_ZERO > Biped.m_fWeight) continue;
+						//else m_bipedList[iVertex].m_BipedList.push_back(Biped);
+						m_bipedList[iVertex].m_BipedList.push_back(Biped);
 					}
 				}
-				std::sort(m_bipedList[iVertex].m_BipedList.begin(),
+				/*std::sort(m_bipedList[iVertex].m_BipedList.begin(),
 					m_bipedList[iVertex].m_BipedList.end(),
-					BipAscendingSort());
+					BipAscendingSort());*/
 				if (m_bipedList[iVertex].m_BipedList.size() > MAX_WEIGHT_BIPED)
 				{
 					m_bipedList[iVertex].m_BipedList.resize(MAX_WEIGHT_BIPED);
@@ -529,12 +526,13 @@ void SSkinManager::SkinData(INode* pNode, Modifier* Pointer_Skin, SCAMesh& sMesh
 				Biped.m_fWeight = skinData->GetBoneWeight(iVertex, iWeight);
 			}
 
-			if (ALMOST_ZERO > Biped.m_fWeight) continue;
-			else m_bipedList[iVertex].m_BipedList.push_back(Biped);
+			//if (ALMOST_ZERO > Biped.m_fWeight) continue;
+			//else m_bipedList[iVertex].m_BipedList.push_back(Biped);
+			m_bipedList[iVertex].m_BipedList.push_back(Biped);
 		}
-		std::sort(m_bipedList[iVertex].m_BipedList.begin(),
+		/*std::sort(m_bipedList[iVertex].m_BipedList.begin(),
 			m_bipedList[iVertex].m_BipedList.end(),
-			BipAscendingSort());
+			BipAscendingSort());*/
 	}
 }
 bool SSkinManager::ExportObject(FILE* pStream)

@@ -22,7 +22,7 @@ bool Sample::Init()
 {
 	int iKey;
 	I_SSSFileLoaderManeger.Init(GetDevice(), GetContext());
-	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestGreyStone.SSS");
+	iKey = I_SSSFileLoaderManeger.Load( L"../../testData/3DMax/TestAnim6.SSS");
 
 	
 

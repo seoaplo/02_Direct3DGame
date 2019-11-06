@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{cce9030a-5ef8-4b28-9270-547458c71965}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SAObject">
+      <UniqueIdentifier>{76af6cbf-466a-4154-b8ae-1f27fbf16ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAObject">
+      <UniqueIdentifier>{e4fce1f2-da24-4230-a520-d3edb74c4f02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAObject\Skin">
+      <UniqueIdentifier>{617e04d9-1b8a-4e78-8625-456248abc5a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SCAObject\Matrix">
+      <UniqueIdentifier>{3e0bbfec-bfde-45d3-b79d-fcf0e3d4d303}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="32_SCAExporter_Test_0.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="32_SCAExporter_Test_0.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Test.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="SCAHeader.h" />
+    <ClInclude Include="SParser.h" />
+    <ClInclude Include="SArcBall.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelViewCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SAObject.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SCAObject.h">
+      <Filter>SCAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SDrawObject.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinFileLoader.h">
+      <Filter>SCAObject\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="SMaterial.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixFileLoader.h">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixMesh.h">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="SMatrixObject.h">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="SMesh.h">
+      <Filter>SCAObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinMesh.h">
+      <Filter>SCAObject\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="SSkinObject.h">
+      <Filter>SCAObject\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="SSSFileLoader.h">
+      <Filter>SAObject</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="SParser.cpp" />
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SModelViewCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SAObject.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SCAObject.cpp">
+      <Filter>SCAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SDrawObject.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinFileLoader.cpp">
+      <Filter>SCAObject\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="SMaterial.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixFileLoader.cpp">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixMesh.cpp">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="SMatrixObject.cpp">
+      <Filter>SCAObject\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="SMesh.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SSkinMesh.cpp">
+      <Filter>SCAObject\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="SSkinObject.cpp">
+      <Filter>SCAObject\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="SSSFileLoader.cpp">
+      <Filter>SAObject</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

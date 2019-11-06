@@ -80,6 +80,7 @@
   <ItemGroup>
     <None Include="SCAExport.aps" />
     <None Include="Source.def" />
+    <None Include="SAExporter.cd" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SCAExport.rc">

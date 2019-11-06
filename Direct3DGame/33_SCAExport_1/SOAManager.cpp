@@ -68,14 +68,6 @@ void SOAManager::GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval)
 
 	// 로컬 좌표계이면 월드 행렬, 아니면 단위 행렬
 	Matrix3 tm = pNode->GetObjTMAfterWSM(interval.Start());
-	Matrix3 ParentTM = pNode->GetParentTM(interval.Start());
-	Matrix3 LocalTM = pNode->GetNodeTM(interval.Start()) * Inverse(ParentTM);
-
-	D3D_MATRIX Parent;
-	D3D_MATRIX Local;
-
-	SAGlobal::DumpMatrix3(Parent, &ParentTM);
-	SAGlobal::DumpMatrix3(Local, &LocalTM);
 
 	bool deleteit = false;
 	// 트라이앵글 오브젝트

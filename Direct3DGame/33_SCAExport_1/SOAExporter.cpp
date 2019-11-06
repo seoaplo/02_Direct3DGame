@@ -2,6 +2,7 @@
 
 void SOAExporter::Convert()
 {
+	m_SOAManager.Release();
 	SAExporter::CreateMaterialList();
 	m_SOAManager.SetSize(g_iNodeMaxNum);
 	for (auto& pNode : SAExporter::g_NodeList)

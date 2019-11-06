@@ -24,10 +24,10 @@ void CS( uint3 DTid : SV_DispatchThreadID )
 {
 	float4x4  matMatrix;
 	float4 vLocal = float4(SkinVertex[DTid.x].p, 1.0f);
-	float4 vAnim;
-	uint iBone;
+	float4 vAnim = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	int iBone;
 	float fWeight;
-	
+
 	for (int ibiped = 0; ibiped < 8; ibiped++)
 	{
 		if (ibiped < 4)
@@ -40,11 +40,13 @@ void CS( uint3 DTid : SV_DispatchThreadID )
 			iBone = SkinVertexIW[DTid.x].i2[ibiped - 4];
 			fWeight = SkinVertexIW[DTid.x].w2[ibiped - 4];
 		}
-		if (iBone < 0 || fWeight < 0) break;
+		//if (iBone < 0 || fWeight < 0) break;
+		if (iBone < 0) break;
 
 		matMatrix = SkinInvMatrix[iBone];
 		vAnim += fWeight * mul(vLocal, matMatrix);
 	}
+	vAnim.w = 1.0f;
 	BoneVertex[DTid.x] = SkinVertex[DTid.x];
 	BoneVertex[DTid.x].p = vAnim.xyz;
 }

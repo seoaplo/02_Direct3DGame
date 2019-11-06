@@ -27,11 +27,18 @@ bool Sample::Init()
 	I_MatrixObjectListManager.Init(GetDevice(), GetContext());
 
 	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/Swat.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/Swat2.skm");
+	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/Swat3.skm");
 	//iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/Swat.smc");
-	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin.skm");
-	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin1.skm");
-	iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin2.skm");
-	iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/TestMatrix.smc");
+	//iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/Swat_DressPose.smc");
+	iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/Test_Swat.smc");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin1.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin2.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin3.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin4.skm");
+	//iKey = I_SkinFileLoaderManeger.Load(L"../../testData/3DMax/TestSkin5.skm");
+	//iKey = I_MatrixFileLoader.Load(L"../../testData/3DMax/TestMatrix.smc");
 
 	//--------------------------------------------------------------------------------------
 	// 월드  행렬

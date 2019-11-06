@@ -3,6 +3,7 @@
 
 void SMatrixExporter::Convert()
 {
+	m_MatrixManager.Release();
 	SAExporter::CreateMaterialList();
 	m_MatrixManager.SetSize(g_iNodeMaxNum);
 	for (auto& pNode : SAExporter::g_NodeList)

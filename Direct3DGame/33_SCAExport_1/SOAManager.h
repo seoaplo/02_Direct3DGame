@@ -9,7 +9,7 @@ public:
 public:
 	void	AddObject(INode* pNode, SAScene& Scene, Interval& interval, int iObjectNum, int iMaterialID);
 	void	GetMesh(INode* pNode, SOAMesh& sMesh, Interval& interval);
-	void	SetUniqueBuffer(SOAMesh& tMesh);
+	void	SetUniqueBuffer(SOAMesh& sMesh);
 	int		IsEqulVerteList(PNCT& vertex, std::vector<PNCT>& vList, int iVertexMax);
 	Point3	GetVertexNormal(Mesh* mesh, int iFace, RVertex* rVertex);
 	TriObject* GetTriObjectFromNode(INode* pNode, TimeValue time, bool& deleteit);

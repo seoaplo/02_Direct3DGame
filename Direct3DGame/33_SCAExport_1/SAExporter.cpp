@@ -63,8 +63,8 @@ void SAExporter::Set(const TCHAR* name, Interface* pMax)
 
 	SAExporter::g_Scene.iFirstFrame = SAExporter::g_Interval.Start() / GetTicksPerFrame();	// 시작 프레임
 	SAExporter::g_Scene.iLastFrame = SAExporter::g_Interval.End() / GetTicksPerFrame();		// 종료 프레임
-	SAExporter::g_Scene.iFrameSpeed = GetFrameRate();							// 프레임 당 속도
-	SAExporter::g_Scene.iTickPerFrame = GetTicksPerFrame();						// 틱 당 속도
+	SAExporter::g_Scene.iFrameSpeed = GetFrameRate();							// 초 당 프레임
+	SAExporter::g_Scene.iTickPerFrame = GetTicksPerFrame();						// 프레임 당 틱 
 
 	PreProcess(SAExporter::g_pRootNode);
 }
