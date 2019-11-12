@@ -40,6 +40,11 @@ protected:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	DECLARE_MESSAGE_MAP()
+	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
+	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
+	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
+public:
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };
 

@@ -22,8 +22,13 @@
 IMPLEMENT_DYNCREATE(CEtc02GameTool1View, CView)
 
 BEGIN_MESSAGE_MAP(CEtc02GameTool1View, CView)
+	// 표준 인쇄 명령입니다.
+	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CEtc02GameTool1View::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 // CEtc02GameTool1View 생성/소멸
@@ -57,6 +62,39 @@ void CEtc02GameTool1View::OnDraw(CDC* /*pDC*/)
 
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 }
+
+
+void CEtc02GameTool1View::OnFilePrintPreview()
+{
+#ifndef SHARED_HANDLERS
+	AFXPrintPreview(this);
+#endif
+}
+
+void CEtc02GameTool1View::OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	CView::OnBeginPrinting(pDC, pInfo);
+}
+
+
+BOOL CEtc02GameTool1View::OnPreparePrinting(CPrintInfo* pInfo)
+{
+
+	// TODO:  [인쇄] 대화 상자를 호출하는 DoPreparePrinting을 호출합니다.
+
+	return DoPreparePrinting(pInfo);
+}
+
+
+void CEtc02GameTool1View::OnEndPrinting(CDC* pDC, CPrintInfo* pInfo)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	CView::OnEndPrinting(pDC, pInfo);
+}
+
 
 void CEtc02GameTool1View::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
@@ -95,10 +133,20 @@ CEtc02GameTool1Doc* CEtc02GameTool1View::GetDocument() const // 디버그되지 
 
 // CEtc02GameTool1View 메시지 처리기
 
+void CEtc02GameTool1View::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	CEtc02GameTool1App* pApp = (CEtc02GameTool1App*)AfxGetApp();
+	pApp->m_Tool.ReSizeDevice(cx, cy);
+}
 
 LRESULT CEtc02GameTool1View::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-
+	CEtc02GameTool1App* pApp = (CEtc02GameTool1App*)AfxGetApp();
+	HWND hWnd = pApp->m_Tool.m_hWnd;
+	pApp->m_Tool.WindowProc(hWnd, message, wParam, lParam);
 	return CView::WindowProc(message, wParam, lParam);
 }

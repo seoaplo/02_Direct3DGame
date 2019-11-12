@@ -8,7 +8,7 @@
 #endif
 
 #include "resource.h"       // 주 기호입니다.
-
+#include "Sample.h"
 
 // CEtc02GameTool1App:
 // 이 클래스의 구현에 대해서는 Etc.02_GameTool_1.cpp을(를) 참조하세요.
@@ -18,7 +18,7 @@ class CEtc02GameTool1App : public CWinAppEx
 {
 public:
 	CEtc02GameTool1App() noexcept;
-
+	Sample m_Tool;
 
 // 재정의입니다.
 public:
@@ -35,6 +35,7 @@ public:
 
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
+	virtual BOOL OnIdle(LONG lCount);
 };
 
 extern CEtc02GameTool1App theApp;

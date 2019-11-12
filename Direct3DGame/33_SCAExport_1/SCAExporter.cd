@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SAExporter" Collapsed="true">
+    <Position X="3" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAASAAADAAAANAABAAExAQCAAACAEAIIBAAAAE=</HashCode>
+      <FileName>SAExporter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SAMaterialManager" Collapsed="true">
+    <Position X="5" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAACACAAAAAAAAAAAAAAAAQAACAABAAAAIABgAAAA=</HashCode>
+      <FileName>SAMaterialManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SMatrixExporter" Collapsed="true">
+    <Position X="3" Y="5.75" Width="1.5" />
+    <InheritanceLine Type="SAExporter" FixedFromPoint="true">
+      <Path>
+        <Point X="3" Y="1.562" />
+        <Point X="2.625" Y="1.562" />
+        <Point X="2.625" Y="6.096" />
+        <Point X="3" Y="6.096" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAABCAIIABAAABAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>SMatrixExporter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SMatrixManager" Collapsed="true">
+    <Position X="4.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAACAAAAABBAAAAAAQIEgAALAAAAgAAASAAABAAIAA=</HashCode>
+      <FileName>SMatrixManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SSkinExporter" Collapsed="true">
+    <Position X="3" Y="4" Width="1.5" />
+    <InheritanceLine Type="SAExporter" FixedFromPoint="true">
+      <Path>
+        <Point X="3" Y="1.562" />
+        <Point X="2.625" Y="1.562" />
+        <Point X="2.625" Y="4.346" />
+        <Point X="3" Y="4.346" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>QAAAAAAwAAAUAABAAIAABAgABAQQAAAAAAAAABAAAAA=</HashCode>
+      <FileName>SSkinExporter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SSkinManager" Collapsed="true">
+    <Position X="4.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAABBAAEAAAgIECABLAAAAgAAASAAABgAMAA=</HashCode>
+      <FileName>SSkinManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="SAScene" Collapsed="true">
+    <Position X="5" Y="1.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAEAIAAAAAAAABAAAAAAAAAAQAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SATextureMap" Collapsed="true">
+    <Position X="10.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAACAAAAQAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SASubMaterial" Collapsed="true">
+    <Position X="9" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAgAAAAAAAAAAAACAAAACAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SAMaterial" Collapsed="true">
+    <Position X="7.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQQAAAAAAAAAAAQAAAAAAAABAACAAEAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SOASubMesh" Collapsed="true">
+    <Position X="10.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BQAAAAQAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SOAMesh" Collapsed="true">
+    <Position X="8.25" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgABIAAAAAAAAAAAAAACAAAAAAAEAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SAPositionAnim" Collapsed="true">
+    <Position X="10.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIEAAAAAAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SARotationAnim" Collapsed="true">
+    <Position X="10.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SAScaleAnim" Collapsed="true">
+    <Position X="10.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIGAAAAAAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SAAnimationTrack" Collapsed="true">
+    <Position X="8.25" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAACgAAAAAACAAAAAAQAAEAAAAIAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SOAObject" Collapsed="true">
+    <Position X="6.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAACAAAAIEBgAAAEAAACAAAAAAIAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="PNCTIW_VERTEX" Collapsed="true">
+    <Position X="11.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABCAMEwAAAAAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SCASubMesh" Collapsed="true">
+    <Position X="10" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BQAAAAAAAAgAAAAAAAAEAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SCAMesh" Collapsed="true">
+    <Position X="8.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAgAAIAAAAAAAAAAAAAACAAAAAAAEAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SCAObject" Collapsed="true">
+    <Position X="6.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAECAACAAAAIEBAAAAEAAACAAAAgAAAAAA=</HashCode>
+      <FileName>header.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>

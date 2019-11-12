@@ -1,5 +1,14 @@
 #include "Sample.h"
 
+void   Sample::SetTool(HWND hWnd, HINSTANCE hInst)
+{
+	m_hWnd = hWnd;
+	m_hInstance = hInst;
+	GetClientRect(m_hWnd, &m_rcClientRect);
+	GetWindowRect(m_hWnd, &m_rcWindowBounds);
+	m_nClientHeight = m_rcClientRect.bottom;
+	m_nClientWidth = m_rcClientRect.right;
+}
 
 int Sample::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {

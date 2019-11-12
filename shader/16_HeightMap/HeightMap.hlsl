@@ -37,7 +37,7 @@ VS_OUTPUT VS(VS_INPUT vIn)
 	output.p = mul(output.p, WIDEN(matView));
 	output.p = mul(output.p, WIDEN(matProj));
 	output.n = vIn.n;
-	output.t = vIn.t*10;
+	output.t = vIn.t;
 	output.c = vIn.c * g_MeshColor;
 	return output;
 }

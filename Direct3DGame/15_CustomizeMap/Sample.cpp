@@ -26,7 +26,7 @@ bool Sample::Init()
 		return 0;
 	}
 
-	SMapDesc MapDesc = { 50, 50, 1.0f, 0.1f,L"../../data/castle.jpg", L"../../shader/Shape/Plane.hlsl" };
+	SMapDesc MapDesc = { 50, 50, 1.0f, 0.1f,L"../../data/map/castle.jpg", L"../../shader/Shape/Plane.hlsl" };
 	m_CustomMap.Init(GetDevice(), m_pImmediateContext);
 	if (FAILED(m_CustomMap.Load(MapDesc)))
 	{

@@ -16,14 +16,14 @@
     <Filter Include="Core">
       <UniqueIdentifier>{c7202ec9-991e-4664-b985-9f643f739dc3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Camera">
-      <UniqueIdentifier>{3d735a53-b0d7-4b28-96ca-8fa125e5194e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\QuadTree">
       <UniqueIdentifier>{98e4289f-cee9-4099-94bc-ddac9d17af78}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Map">
       <UniqueIdentifier>{d2a2f6a6-01ea-48ab-a988-cb4ed59db856}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Camera">
+      <UniqueIdentifier>{3d735a53-b0d7-4b28-96ca-8fa125e5194e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,12 +46,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="SBaseObj.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="SArcBall.h">
@@ -81,6 +75,18 @@
     <ClInclude Include="SMap.h">
       <Filter>Core\Map</Filter>
     </ClInclude>
+    <ClInclude Include="SBaseObj.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SToolForm.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SToolPane.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Etc.02_GameTool_1.cpp">
@@ -94,12 +100,6 @@
     </ClCompile>
     <ClCompile Include="Etc.02_GameTool_1View.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="SBaseObj.cpp">
-      <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="SArcBall.cpp">
       <Filter>Core\Camera</Filter>
@@ -133,6 +133,18 @@
     </ClCompile>
     <ClCompile Include="SMap.cpp">
       <Filter>Core\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="SBaseObj.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SToolForm.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SToolPane.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

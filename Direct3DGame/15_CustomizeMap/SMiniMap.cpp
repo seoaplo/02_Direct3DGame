@@ -52,7 +52,7 @@ bool SMiniMap::Frame()
 }
 bool SMiniMap::Render(ID3D11DeviceContext* pContext)
 {
-	m_pPlaneShape->_dxobj.g_pTextureSRV = m_pMiniMapRT->m_pSRV;
+	m_pPlaneShape->_dxobj.g_pTextureSRV = m_pMiniMapRT->m_pSRV.Get();
 	pContext->RSSetViewports(1, &m_vp);
 	m_pPlaneShape->SetMatrix(nullptr, nullptr, nullptr);
 	pContext->UpdateSubresource(m_pPlaneShape->_dxobj.g_pConstantBuffer.Get(), 0, nullptr, &m_pPlaneShape->_cbData, 0, 0);

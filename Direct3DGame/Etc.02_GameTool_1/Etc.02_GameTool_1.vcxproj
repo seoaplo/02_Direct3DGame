@@ -205,6 +205,8 @@
     <ClInclude Include="SQuadTree.h" />
     <ClInclude Include="SQuadTreeMap.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SToolForm.h" />
+    <ClInclude Include="SToolPane.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +232,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SToolForm.cpp" />
+    <ClCompile Include="SToolPane.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Etc02GameTool1.rc" />

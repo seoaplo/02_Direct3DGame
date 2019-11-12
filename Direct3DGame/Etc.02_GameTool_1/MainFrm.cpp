@@ -146,6 +146,22 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	CMFCToolBar::SetBasicCommands(lstBasicCommands);
 
+	DWORD dwStyle =
+		WS_CHILD | WS_VISIBLE |
+		WS_CLIPSIBLINGS | WS_CLIPCHILDREN |
+		CBRS_LEFT | CBRS_FLOAT_MULTI;
+	BOOL bRet = m_wndUITool.CreateEx(
+		NULL,
+		L"UITool",
+		this,
+		CRect(0, 0, 100, 100),
+		TRUE,
+		12345,
+		dwStyle);
+
+	m_wndUITool.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&m_wndUITool);
+
 	return 0;
 }
 
