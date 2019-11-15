@@ -136,6 +136,11 @@ bool Sample::Init()
 	//	return false;
 	//}
 
+	iRow = 4;
+	iColl = 4;
+	iNumSize = 2;
+	fDistance = 10.0f;
+	bCreateMap = true;
 	return true;
 }
 
@@ -149,7 +154,7 @@ bool Sample::Frame()
 	if (I_InputManager.KeyBoardState(DIK_1) == KEY_UP)
 	{
 		if (++m_iDrawDepth > 7) m_iDrawDepth = -1;
-		//m_QuadTree.SetRenderDepth(m_iDrawDepth);
+		m_QuadTree.SetRenderDepth(m_iDrawDepth);
 	}
 	//--------------------------------------------------------------------------------------
 	// ¹Ì´Ï¸Ê °»½Å
@@ -196,7 +201,6 @@ bool Sample::Frame()
 		{
 			m_QuadTree.AddObject(&m_pObj[iBox]);
 		}*/
-		m_QuadTree.SetRenderDepth(7);
 
 		bMap = true;
 		bCreateMap = false;
@@ -215,13 +219,20 @@ bool Sample::Frame()
 }
 bool Sample::Render()
 {
+
+	m_DefaultRT.Begin(GetContext(), D3DXVECTOR4(0.3, 0.3, 0.3, 1));
 	//--------------------------------------------------------------------------------------
 	// Direction ¿ÀºêÁ§Æ® ·£´õ¸µ
 	//--------------------------------------------------------------------------------------
 	m_Direction.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	m_Line.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
+	//=================================================================================
+	// ÄõµåÆ®¸® ±íÀÌ ´ÜÀ§ÀÇ ¶óÀÎ ·»´õ¸µ
+	//=================================================================================
+	DrawQuadLine(m_QuadTree.m_pRootNode);
 
 	DXGame::SDxState::SetDepthStencilState(GetContext(), DebugDSSDepthEnable, 0x00);
+
 	//=================================================================================
 	//ÄõµåÆ®¸®ÀÇ ÀÓÀÇÀÇ ·¹º§ ¼±ÅØ ·¹º§¸µ
 	//=================================================================================
@@ -233,8 +244,9 @@ bool Sample::Render()
 	//DrawObject();
 
 
-	//m_HeightMap.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
-	//m_HeightMap.Render(GetContext());
+	//=================================================================================
+	// ¹Ì´Ï¸ÊÀÇ ·»´õ Å¸°Ù ÅØ½ºÃÄ¿¡ Å¾ ºä ·»´õ¸µ
+	//=================================================================================
 	if (bMap)
 	{
 		m_Map.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
@@ -242,14 +254,10 @@ bool Sample::Render()
 		DrawMiniMap();
 	}
 	//m_Map.Render(GetContext());
-	//=================================================================================
-	// ÄõµåÆ®¸® ±íÀÌ ´ÜÀ§ÀÇ ¶óÀÎ ·»´õ¸µ
-	//=================================================================================
-	//DrawQuadLine(m_QuadTree.m_pRootNode);
 
-	//=================================================================================
-	// ¹Ì´Ï¸ÊÀÇ ·»´õ Å¸°Ù ÅØ½ºÃÄ¿¡ Å¾ ºä ·»´õ¸µ
-	//=================================================================================
+	DXGame::SDxState::SetDepthStencilState(GetContext(), DebugDSSDepthDisable, 0x00);
+	GetContext()->OMSetRenderTargets(1, SDevice::GetRenderTargetViewAddress(), SDevice::GetDepthStencilView());
+	m_DefaultRT.End(GetContext());
 	return true;
 }
 bool Sample::Release()
@@ -338,7 +346,10 @@ void Sample::DrawMiniMap()
 	ID3D11ShaderResourceView* const pSRV[1] = { NULL };
 	GetContext()->PSSetShaderResources(0, 1, pSRV);
 	
-	D3DXMATRIX matScale, matRotation;
+	D3DXMATRIX matWorld, matView, matProj;
+	matWorld = m_pMainCamera->_matWorld;
+	matView = m_pMainCamera->_matView;
+	matProj = m_pMainCamera->_matProj;
 	if (m_MiniMap.BeginRender(GetContext()))
 	{
 		DrawMiniMapObject(m_QuadTree.m_pRootNode);
@@ -353,6 +364,8 @@ void Sample::DrawMiniMap()
 	// ·»´õ Å¸°Ù ÅØ½ºÃÄ¸¦ ¹Ì´Ï¸Ê ¿µ¿ª¿¡ ·£´õ¸µ
 	//=================================================================================
 	m_MiniMap.Render(GetContext());
+
+	m_pMainCamera->SetMatrix(&matWorld, &matView, &matProj);
 }
 void Sample::DrawMiniMapNode(SNode* pNode)
 {

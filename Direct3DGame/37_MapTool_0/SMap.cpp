@@ -224,19 +224,6 @@ bool SMap::CreateMap(SMapDesc& MapDesc)
 	m_iNumSellRows = m_iNumRows * m_iSellNum + 1;
 	m_iNumSellCols = m_iNumCols * m_iSellNum + 1;
 
-	int iCheck = m_iNumSellRows - 1;
-	if (iCheck != (iCheck&-iCheck))
-	{
-		MessageBox(0, _T("Row가 2n의 크기가 아닙니다"), _T("Fatal error"), MB_OK);
-		return false;
-	}
-	iCheck = m_iNumSellCols - 1;
-	if (iCheck != (iCheck&-iCheck))
-	{
-		MessageBox(0, _T("Cols가 2n의 크기가 아닙니다"), _T("Fatal error"), MB_OK);
-		return false;
-	}
-
 	m_iNumVertices = m_iNumSellRows * m_iNumSellCols;
 	m_iNumFace = (m_iNumSellRows - 1) * (m_iNumSellCols - 1) * 2;
 	m_fSellDistance = MapDesc.fSellDistance;

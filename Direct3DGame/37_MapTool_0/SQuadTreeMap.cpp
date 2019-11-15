@@ -12,8 +12,8 @@ bool SQuadTreeMap::Build(SMap* pMap, int   iMaxDepth, float fMinSize)
 		m_dwWidth * (m_dwHeight - 1),
 		m_dwWidth * m_dwHeight - 1);
 
-	m_iMaxDepthLimit = iMaxDepth;
-	m_fMinDivideSize = fMinSize;
+	m_iMaxDepthLimit = log2(m_dwWidth - 1);
+	m_fMinDivideSize = (pMap->m_fSellDistance * pMap->m_iSellNum) / 2;
 	return BuildTree(m_pRootNode);
 }
 SNode* SQuadTreeMap::CreateNode(SNode* pParentNode, float fLeft, float fRight, float fBottom, float fTop)

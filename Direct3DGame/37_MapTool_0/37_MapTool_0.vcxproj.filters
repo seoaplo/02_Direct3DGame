@@ -22,6 +22,9 @@
     <Filter Include="Core\Map">
       <UniqueIdentifier>{7e92466f-a6c9-4b57-bfce-37f023960923}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\SSelect">
+      <UniqueIdentifier>{c09f30c7-0790-46ae-9ac3-d78bde09a3bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
