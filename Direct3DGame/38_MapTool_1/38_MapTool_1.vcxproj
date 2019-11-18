@@ -239,6 +239,7 @@
     <ClCompile Include="SToolPane.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="SpaceDivision.cd" />
     <None Include="res\CMapTool.rc2" />
   </ItemGroup>
   <ItemGroup>

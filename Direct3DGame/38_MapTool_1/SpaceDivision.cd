@@ -1,2 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram /> 
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Sample" Collapsed="true">
+    <Position X="8.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAkgDBAEIhBgQSCAISAIEBQgAIKAAAAgBAKAxAAIAE=</HashCode>
+      <FileName>Sample.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SHeightMap" Collapsed="true">
+    <Position X="5.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAABAAAAAEAACAAAAAAAAAAAAAAAAAACAAAAEAAAAEA=</HashCode>
+      <FileName>SHeightMap.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SMap" Collapsed="true">
+    <Position X="5.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KYCGgAAKAAAAQIggJAAEAADBIAERgBMCgTCLE1AMUAU=</HashCode>
+      <FileName>SMap.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SNode" Collapsed="true">
+    <Position X="5.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAJRAAAAAAQAAABAAAAACAAAAAIAAAAAAAAgAAE=</HashCode>
+      <FileName>SNode.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SQuadTree" Collapsed="true">
+    <Position X="3.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwEIiCAAAgDARAABAEGgAAEBgABgAIAQBACABAQAAE=</HashCode>
+      <FileName>SQuadTree.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SQuadTreeMap" Collapsed="true">
+    <Position X="3.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAEAAIAAAAQAAABGAAAAAACABgABAgBAAAAAQAAA=</HashCode>
+      <FileName>SQuadTreeMap.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SSelect" Collapsed="true">
+    <Position X="8.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BRQEARCAACAAAggAAESCAJDEAAAACAAIAACOhAgAAIA=</HashCode>
+      <FileName>SSelect.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="SMapDesc" Collapsed="true">
+    <Position X="8.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAIAAAAAAAEAABAAAAAAAAEAIgA=</HashCode>
+      <FileName>SMap.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="S_RAY" Collapsed="true">
+    <Position X="8.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAACAAAAAAEAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>SSelect.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="S_POSITION" Collapsed="true">
+    <Position X="8.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAgQAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>SFrustum.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>

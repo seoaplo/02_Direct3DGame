@@ -198,20 +198,18 @@ void SQuadTree::DrawFindNode(SNode* pNode)
 	// 리프노드 일 경우는 완전히 제외되지 않았다면(걸쳐 있거나 완전 포함)추가한다.
 	if (pNode->m_IsLeaf &&  s_Pos != P_BACK)
 	{
-		m_DrawNodeList.push_back(pNode);
-		//VisibleObject(pNode);
+		VisibleNode(pNode);
 	}
 	// 완전히 포함되어 있으면 자식을 탐색하지 않고 노드를 추가한다.
 	else if (s_Pos == P_FRONT)
 	{
-		m_DrawNodeList.push_back(pNode);
 		VisibleNode(pNode);
+		return;
 	}
 	// 걸쳐져 있는 노드에 포함된 오브젝트 체크
 	else if (s_Pos == P_SPANNING)
 	{
-		m_DrawNodeList.push_back(pNode);
-		//VisibleObject(pNode);
+		VisibleObject(pNode);
 	}
 
 	for (int iNode = 0; iNode < pNode->m_ChildList.size(); iNode++)
@@ -227,6 +225,7 @@ void SQuadTree::VisibleNode(SNode* pNode)
 
 	if (m_pCamera->CheckOBBInPlane(&pNode->m_sBox))
 	{
+		m_DrawNodeList.push_back(pNode);
 		VisibleObject(pNode);
 		for (auto& ChildNode : pNode->m_ChildList)
 		{

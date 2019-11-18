@@ -212,7 +212,6 @@ bool  SQuadTreeMap::Render(ID3D11DeviceContext*	pContext)
 		0, NULL, &m_pMap->_cbData, 0, 0);
 
 	m_pMap->PreRender(pContext);
-	m_pMap->ReLoadVBuffer();
 
 	for (int iNode = 0; iNode < m_DrawNodeList.size(); iNode++)
 	{
@@ -223,14 +222,36 @@ bool  SQuadTreeMap::Render(ID3D11DeviceContext*	pContext)
 	}
 	return true;
 }
-std::vector<PNCT_VERTEX*> SQuadTreeMap::FindVectexList(SNode& pNode, D3DXVECTOR3& vIntersection, float fDistance)
+void SQuadTreeMap::UpVectexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, float fDistance, float fHeight)
 {
 	std::vector<PNCT_VERTEX*> RetVertexList;
 
-	DWORD dwStartRow = pNode.m_CornerIndex[0] / m_dwWidth;
-	DWORD dwEndRow = (pNode.m_CornerIndex[2] / m_dwWidth) + 1;
-	DWORD dwStartCol = pNode.m_CornerIndex[0] % m_dwWidth;
-	DWORD dwEndCol = (pNode.m_CornerIndex[1] % m_dwWidth) + 1;
+	const float& fSellDistance = m_pMap->m_fSellDistance;
+
+	int iHalfCol = m_pMap->m_iNumSellCols / 2;
+	int iHalfRow = m_pMap->m_iNumSellRows / 2;
+
+
+	float fLeft = (vIntersection.x - fDistance) / fSellDistance;
+	float fTop = -(vIntersection.z - fDistance) / fSellDistance;
+	float fRight = (vIntersection.x + fDistance) / fSellDistance;
+	float fBottom = -(vIntersection.z + fDistance) / fSellDistance;
+
+
+	fLeft = fLeft + iHalfCol > 0  ? fLeft + iHalfCol : 0;
+	fBottom = fBottom + iHalfRow > 0 ? fBottom + iHalfRow : 0;
+
+	fRight = fRight + iHalfCol < m_pMap->m_iNumSellCols
+			? fRight + iHalfCol : m_pMap->m_iNumSellCols;
+	fTop = fTop + iHalfRow < m_pMap->m_iNumSellRows
+			? fTop + iHalfRow : m_pMap->m_iNumSellRows;
+
+
+
+	DWORD dwStartRow = floorf(fBottom);
+	DWORD dwEndRow = ceilf(fTop);
+	DWORD dwStartCol = floorf(fLeft);
+	DWORD dwEndCol = ceilf(fRight);
 
 	for (DWORD iRow = dwStartRow;	iRow < dwEndRow;
 		iRow++)
@@ -239,19 +260,34 @@ std::vector<PNCT_VERTEX*> SQuadTreeMap::FindVectexList(SNode& pNode, D3DXVECTOR3
 			iCol++)
 		{
 			DWORD Index = iRow * m_dwWidth + iCol;
+			if (Index < 0 || Index >= m_pMap->m_VertexList.size()) continue;
+
 			PNCT_VERTEX* TargetVertex = &m_pMap->m_VertexList[Index];
 
 			D3DXVECTOR2 LengthVector;
 			LengthVector.x = TargetVertex->p.x - vIntersection.x;
 			LengthVector.y = TargetVertex->p.z - vIntersection.z;
 
-			if (D3DXVec2Length(&LengthVector) <= fDistance)
-			{
-				RetVertexList.push_back(TargetVertex);
-			}
+			float fTargetHeight = (fDistance - D3DXVec2Length(&LengthVector)) * fHeight;
+			TargetVertex->p.y += max(fTargetHeight, 0.0f) * I_Timer.GetSPF();
 		}
 	}
-	return RetVertexList;
+
+	m_pMap->ReLoadVBuffer();
+	UpdateNode(m_pRootNode);
+}
+
+void SQuadTreeMap::UpdateNode(SNode* pNode)
+{
+	assert(pNode);
+	if (pNode->m_IsLeaf)
+	{
+		ComputeBoundingBox(pNode);
+	}
+	for (auto& pChilde : pNode->m_ChildList)
+	{
+		UpdateNode(pChilde);
+	}
 }
 SQuadTreeMap::SQuadTreeMap()
 {

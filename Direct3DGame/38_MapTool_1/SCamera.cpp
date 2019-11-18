@@ -145,6 +145,9 @@ void	SCamera::MoveUp(float fValue)
 }
 bool	SCamera::Frame()
 {
+	if (m_fSpeed < 1.0f) m_fSpeed = 1.0f;
+	float fCameraSpeed = min(I_Timer.GetSPF() * m_fSpeed, m_fSpeed);
+
 	if (I_InputManager.MouseButtonState(0) == KEY_HOLD)
 	{
 		m_fYawAngle		+= D3DXToRadian(I_InputManager.m_pMouseInput->MouseLocation().x * 0.1f);
@@ -158,14 +161,13 @@ bool	SCamera::Frame()
 	float fDistance = m_fSpeed * fValue * I_Timer.GetSPF();
 
 	// 최소값으로 고정
-	if (m_fSpeed < 1.0f) m_fSpeed = 1.0f;
 
-	if (I_InputManager.KeyBoardState(DIK_W)) MoveLook(I_Timer.GetSPF() * 5.0f * m_fSpeed);
-	if (I_InputManager.KeyBoardState(DIK_S)) MoveLook(-I_Timer.GetSPF() * 5.0f* m_fSpeed);
-	if (I_InputManager.KeyBoardState(DIK_D)) MoveSide(I_Timer.GetSPF() * 5.0f* m_fSpeed);
-	if (I_InputManager.KeyBoardState(DIK_A)) MoveSide(-I_Timer.GetSPF() * 5.0f* m_fSpeed);
-	if (I_InputManager.KeyBoardState(DIK_Q)) MoveUp(I_Timer.GetSPF() * 5.0f* m_fSpeed);
-	if (I_InputManager.KeyBoardState(DIK_E)) MoveUp(-I_Timer.GetSPF() * 5.0f* m_fSpeed);
+	if (I_InputManager.KeyBoardState(DIK_W)) MoveLook(fCameraSpeed);
+	if (I_InputManager.KeyBoardState(DIK_S)) MoveLook(-fCameraSpeed);
+	if (I_InputManager.KeyBoardState(DIK_D)) MoveSide(fCameraSpeed);
+	if (I_InputManager.KeyBoardState(DIK_A)) MoveSide(-fCameraSpeed);
+	if (I_InputManager.KeyBoardState(DIK_Q)) MoveUp(fCameraSpeed);
+	if (I_InputManager.KeyBoardState(DIK_E)) MoveUp(-fCameraSpeed);
 
 	Update(D3DXVECTOR4(m_fPitchAngle, m_fYawAngle, m_fRollAngle, fDistance));
 
@@ -197,7 +199,7 @@ D3DXMATRIX SCamera::Update(D3DXVECTOR4 vDirValue)
 										vDirValue.y,
 										vDirValue.x,
 										vDirValue.z);
-	m_vPos += m_vLook * vDirValue.w;
+//	m_vPos += m_vLook * vDirValue.w;
 	m_fRadius += vDirValue.w;
 
 	D3DXMatrixAffineTransformation(&matRotation, 1.0f, nullptr, &m_qRotation, &m_vPos);

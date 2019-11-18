@@ -187,9 +187,10 @@ bool Sample::Frame()
 		m_QuadTree.Frame();
 		m_Map.Frame();
 
-		if (I_InputManager.MouseButtonState(0) == KEY_HOLD)
+		if (I_InputManager.MouseButtonState(0) == KEY_HOLD
+			&& m_bHeightSet)
 		{
-			//SetHeightVertex(m_QuadTree.m_pRootNode, 9.0f, 100.0f * I_Timer.GetSPF());
+			SetHeightVertex(m_QuadTree.m_pRootNode, m_fHeightDistance, m_fHeightValue);
 		}
 	}
 	m_Select.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
@@ -249,7 +250,7 @@ bool Sample::Release()
 
 bool Sample::DrawQuadLine(SNode* pNode)
 {
-	if (pNode == NULL) return false;
+	/*if (pNode == NULL) return false;
 	if (m_QuadTree.m_iRenderDepth < pNode->m_dwDepth) return false;
 
 	D3DXVECTOR4 vColor = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -287,7 +288,7 @@ bool Sample::DrawQuadLine(SNode* pNode)
 	for (int iNode = 0; iNode < 4; iNode++)
 	{
 		DrawQuadLine(pNode->m_ChildList[iNode]);
-	}
+	}*/
 	return true;
 }
 void Sample::DrawObject()
@@ -411,13 +412,8 @@ void Sample::SetHeightVertex(SNode* pNode, float fDistance, float fHeight)
 	SNode* pFindeNode = FindePickingNode(pNode);
 	if (pFindeNode == nullptr) return;
 
-	std::vector<PNCT_VERTEX*> VertexList;
-	VertexList = m_QuadTree.FindVectexList(*pFindeNode, m_Select.m_vIntersection, fDistance);
-
-	for (auto& Vertex : VertexList)
-	{
-		Vertex->p.y += fHeight;
-	}
+	m_QuadTree.UpVectexHeight(*pFindeNode, m_Select.m_vIntersection, fDistance, fHeight);
+	
 }
 void Sample::DrawPickingTile(SNode* pNode)
 {
@@ -476,7 +472,10 @@ Sample::Sample()
 	m_pMainCamera = nullptr;
 	m_bDebugRender = true;
 	bMap = false;
+	m_bHeightSet = false;
 
+	m_fHeightValue = 0.0f;
+	m_fHeightDistance = 0.0f;
 	iRow = 3;
 	iColl = 3;
 	iNumSize = 3;

@@ -55,6 +55,10 @@ public:
 	int iColl;
 	int iNumSize;
 	float fDistance;
+
+	float m_fHeightDistance;
+	float m_fHeightValue;
+	bool  m_bHeightSet;
 	bool bCreateMap;
 	bool bMap;
 public:

@@ -32,6 +32,12 @@ public:
 	// Node 당 Cell의 갯수
 	int CellNumSize;
 	float CellDistance;
+	// 높이 설정 범위
+	int m_fDistance;
+	// 높이 설정 기준값
+	int m_fHeightValue;
+	afx_msg void OnBnClickedButton2();
+	afx_msg void OnBnClickedButton3();
 };
 
 
