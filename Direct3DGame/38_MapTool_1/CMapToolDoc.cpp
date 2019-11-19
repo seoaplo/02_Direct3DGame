@@ -22,6 +22,9 @@
 IMPLEMENT_DYNCREATE(CMapToolDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CMapToolDoc, CDocument)
+	ON_COMMAND(ID_FILE_SAVE, &CMapToolDoc::OnFileSave)
+//	ON_COMMAND(ID_FILE_SAVE_AS, &CMapToolDoc::OnFileSaveAs)
+	ON_COMMAND(ID_FILE_NEW, &CMapToolDoc::OnFileNew)
 END_MESSAGE_MAP()
 
 
@@ -135,3 +138,17 @@ void CMapToolDoc::Dump(CDumpContext& dc) const
 
 
 // CMapToolDoc 명령
+
+
+void CMapToolDoc::OnFileSave()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CMapToolApp* pApp = (CMapToolApp*)AfxGetApp();
+	pApp->m_Tool.bSaveMap = true;
+}
+
+void CMapToolDoc::OnFileNew()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CMapToolApp* pApp = (CMapToolApp*)AfxGetApp();
+}

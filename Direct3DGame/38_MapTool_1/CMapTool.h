@@ -36,6 +36,11 @@ public:
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnIdle(LONG lCount);
+//	afx_msg void OnFileSave();
+	afx_msg void OnFileOpen();
+//	afx_msg void OnFileNew();
+//	afx_msg void OnFileSaveAs();
+//	afx_msg void OnFileSaveCopyAs();
 };
 
 extern CMapToolApp theApp;

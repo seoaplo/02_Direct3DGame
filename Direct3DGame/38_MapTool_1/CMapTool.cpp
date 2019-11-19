@@ -21,8 +21,11 @@
 BEGIN_MESSAGE_MAP(CMapToolApp, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CMapToolApp::OnAppAbout)
 	// 표준 파일을 기초로 하는 문서 명령입니다.
-	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
+//	ON_COMMAND(ID_FILE_SAVE, &CMapToolApp::OnFileSave)
+	ON_COMMAND(ID_FILE_OPEN, &CMapToolApp::OnFileOpen)
+//	ON_COMMAND(ID_FILE_NEW, &CMapToolApp::OnFileNew)
+//	ON_COMMAND(ID_FILE_SAVE_AS, &CMapToolApp::OnFileSaveAs)
+//	ON_COMMAND(ID_FILE_SAVE_COPY_AS, &CMapToolApp::OnFileSaveCopyAs)
 END_MESSAGE_MAP()
 
 
@@ -171,6 +174,8 @@ protected:
 // 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+//	afx_msg void OnFileNew();
 };
 
 CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
@@ -183,6 +188,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+//	ON_COMMAND(ID_FILE_NEW, &CAboutDlg::OnFileNew)
 END_MESSAGE_MAP()
 
 // 대화 상자를 실행하기 위한 응용 프로그램 명령입니다.
@@ -224,3 +230,40 @@ BOOL CMapToolApp::OnIdle(LONG lCount)
 	m_Tool.CoreRender();
 	return TRUE;
 }
+
+
+//void CMapToolApp::OnFileSave()
+//{
+//	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+//
+//	int kkk;
+//	kkk = 10;
+//}
+
+
+void CMapToolApp::OnFileOpen()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	m_Tool.bLoadMap = true;
+}
+
+
+
+
+//void CMapToolApp::OnFileSaveAs()
+//{
+//	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+//
+//	int kkk;
+//	kkk = 10;
+//}
+
+
+//void CMapToolApp::OnFileSaveCopyAs()
+//{
+//	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+//
+//	int kkk;
+//	kkk = 10;
+//}

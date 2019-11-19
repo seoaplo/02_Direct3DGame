@@ -127,6 +127,7 @@ bool Sample::Init()
 
 bool Sample::Frame()
 {
+	m_Select.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	// 2초당 1회전( 1 초 * D3DX_PI = 3.14 )
 	float t = I_Timer.GetElapsedTime() * D3DX_PI;
 	m_pMainCamera->Frame();
@@ -143,6 +144,17 @@ bool Sample::Frame()
 	m_Line.Frame();
 	D3DXMatrixIdentity(&m_matWorld);
 	m_MiniMap.Frame();
+
+	if (bSaveMap)
+	{
+		SaveFile();
+		bSaveMap = false;
+	}
+	if (bLoadMap)
+	{
+		LoadFile();
+		bLoadMap = false;
+	}
 
 	if (bCreateMap)
 	{
@@ -193,7 +205,6 @@ bool Sample::Frame()
 			SetHeightVertex(m_QuadTree.m_pRootNode, m_fHeightDistance, m_fHeightValue);
 		}
 	}
-	m_Select.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 	return true;
 
 }
@@ -473,6 +484,8 @@ Sample::Sample()
 	m_bDebugRender = true;
 	bMap = false;
 	m_bHeightSet = false;
+	bLoadMap = false;
+	bSaveMap = false;
 
 	m_fHeightValue = 0.0f;
 	m_fHeightDistance = 0.0f;
@@ -485,7 +498,91 @@ Sample::~Sample()
 {
 
 }
+bool Sample::LoadFile()
+{
+	m_QuadTree.Release();
+	m_Map.Release();
 
+	TCHAR ProgramPath[MAX_PATH];
+	::GetCurrentDirectory(MAX_PATH, ProgramPath);
+	
+	TCHAR* TargetFile = SaveFileDiallog(L"stm", L"MapTool");
+	::SetCurrentDirectory(ProgramPath);
+	if (TargetFile == nullptr)
+	{
+		return false;
+	}
+	m_Map.Init(GetDevice(), GetContext());
+	m_QuadTree.Init();
+	if (m_Map.LoadFile(TargetFile))
+	{
+		m_QuadTree.Update(GetDevice(), m_pMainCamera.get());
+		m_QuadTree.Build(&m_Map, 7.0f, 10.0f);
+		return true;
+	}
+
+	return false;
+}
+bool Sample::SaveFile()
+{
+	TCHAR ProgramPath[MAX_PATH];
+	::GetCurrentDirectory(MAX_PATH, ProgramPath);
+
+	TCHAR* TargetFile = SaveFileDiallog(L"stm", L"MapTool");
+	::SetCurrentDirectory(ProgramPath);
+	if (TargetFile == nullptr)
+	{
+		return false;
+	}
+	m_Map.SaveFile(TargetFile);
+	return true; 
+}
+
+TCHAR* Sample::SaveFileDiallog(const TCHAR* szName, const TCHAR* szTitle)
+{
+	TCHAR ARRAY_TCHAR_file[MAX_PATH] = { 0, };
+	TCHAR ARRAY_TCHAR_filetitle[MAX_PATH] = { 0, };
+	static TCHAR* Static_Pointer_TCHAR_filter;
+	OPENFILENAME OPENFILENAME_filename;
+
+	//=======================================================================
+	// Initiallize
+	//=======================================================================
+	ZeroMemory(&OPENFILENAME_filename, sizeof(OPENFILENAME));
+	_tcscpy_s(ARRAY_TCHAR_file, _T("*."));
+	_tcscat_s(ARRAY_TCHAR_file, szName);
+	_tcscat_s(ARRAY_TCHAR_file, _T("\0"));
+
+	//=======================================================================
+	// Set OPENFILENAME
+	//=======================================================================
+	OPENFILENAME_filename.lStructSize = sizeof(OPENFILENAME);
+	OPENFILENAME_filename.hwndOwner = GetActiveWindow();
+	OPENFILENAME_filename.lpstrFilter = Static_Pointer_TCHAR_filter;
+	OPENFILENAME_filename.lpstrCustomFilter = NULL;
+	OPENFILENAME_filename.nMaxCustFilter = 0L;
+	OPENFILENAME_filename.nFilterIndex = 1;
+	OPENFILENAME_filename.lpstrFile = ARRAY_TCHAR_file;
+	OPENFILENAME_filename.nMaxFile = sizeof(ARRAY_TCHAR_file);
+	OPENFILENAME_filename.lpstrFileTitle = ARRAY_TCHAR_filetitle;
+	OPENFILENAME_filename.nMaxFileTitle = sizeof(ARRAY_TCHAR_filetitle);
+	OPENFILENAME_filename.lpstrInitialDir = NULL;
+	OPENFILENAME_filename.lpstrTitle = szTitle;
+	OPENFILENAME_filename.Flags = 0L;
+	OPENFILENAME_filename.nFileOffset = 0;
+	OPENFILENAME_filename.nFileExtension = 0;
+	OPENFILENAME_filename.lpstrDefExt = szName;
+
+
+	//=======================================================================
+	// Save File
+	//=======================================================================
+	if (!GetOpenFileName(&OPENFILENAME_filename))
+	{
+		return NULL;
+	}
+	return ARRAY_TCHAR_file;
+}
 
 void   Sample::SetTool(HWND hWnd, HINSTANCE hInst)
 {

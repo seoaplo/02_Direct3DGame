@@ -179,7 +179,6 @@ bool SDevice::CleanupDevice()
 {
 	// 초기 풀스크린 윈도우에서 응용프로그램이 닫히는 경우에는 윈도우 전환 후에
 	// 객체들을 소멸해야 한다.(메모리 누수를 막을 수 있다.)
-	m_pDxgiSwapChain->SetFullscreenState(false, nullptr);
 
 
 	if (FAILED(DeleteDxResource()))
@@ -193,19 +192,29 @@ bool SDevice::CleanupDevice()
 	}
 	if (m_pDxgiSwapChain)
 	{
+		m_pDxgiSwapChain->SetFullscreenState(false, nullptr);
 		m_pDxgiSwapChain->Release();
 	}
 	if (m_pImmediateContext)
 	{
 		m_pImmediateContext->Release();
 	}
-	if (m_pDevice)
-	{
-		m_pDevice->Release();
-	}
 	if (m_pDxgiFactory)
 	{
 		m_pDxgiFactory->Release();
+	}
+
+	if (m_pDevice)
+	{
+#if defined(DEBUG) || defined(_DEBUG)
+		Microsoft::WRL::ComPtr<ID3D11Debug> dxgiDebug;
+		if (SUCCEEDED(m_pDevice->QueryInterface(IID_PPV_ARGS(&dxgiDebug))))
+		{
+			dxgiDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+			dxgiDebug = nullptr;
+		}
+#endif
+		m_pDevice->Release();
 	}
 
 	m_pDevice = nullptr;

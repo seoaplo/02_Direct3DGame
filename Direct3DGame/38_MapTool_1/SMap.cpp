@@ -447,6 +447,150 @@ void SMap::CalcPerVertexNormalsFastLookup()
 	//==================================================================================
 	if (m_bStaticLight) CalcVertexColor(m_vLightDir);
 }
+
+bool SMap::LoadFile(T_STR FileString)
+{
+	bool bCheck;
+	if (m_pDevice == nullptr) return false;
+	if (m_pContext == nullptr) return false;
+
+	static TCHAR String[MAX_PATH];
+	ZeroMemory(String, _countof(String));
+
+	m_Paser.OpenStream(FileString.c_str());
+
+	bCheck = m_Paser.GetDataFromFileNext(L"MapExporter100");
+	if (bCheck == false) return false;
+
+	bCheck = m_Paser.GetDataFromFileNext(L"#HEADERINFO");
+	if (bCheck == false) return false;
+
+	_stscanf_s(m_Paser.m_pBuffer, _T("\n%s %d %d %d %d %d %f"), String, MAX_PATH,
+		&m_iNumRows,
+		&m_iNumCols,
+		&m_iSellNum,
+		&m_iNumSellRows,
+		&m_iNumSellCols,
+		&m_fSellDistance);
+	ZeroMemory(String, _countof(String));
+
+	bCheck = m_Paser.GetDataFromFileNext(L"#TEXTURE", String, STRING_DATA);
+	if (bCheck == false) return false;
+	m_MapDesc.strTextureFile = String;
+
+	LoadTextures(m_pDevice, m_MapDesc.strTextureFile.c_str());
+
+	ZeroMemory(String, _countof(String));
+
+	bCheck = m_Paser.GetDataFromFileNext(L"#VERTEX", &m_iNumVertices, INT_DATA);
+	if (bCheck == false) return false;
+	m_VertexList.resize(m_iNumVertices);
+
+
+	for (int iVertex = 0; iVertex < m_iNumVertices; iVertex++)
+	{
+		PNCT_VERTEX& Vertex = m_VertexList[iVertex];
+		m_Paser.GetNextLine();
+		_stscanf_s(m_Paser.m_pBuffer, _T("%f %f %f %f %f %f %f %f %f %f %f %f"),
+			&Vertex.p.x,
+			&Vertex.p.y,
+			&Vertex.p.z,
+			&Vertex.n.x,
+			&Vertex.n.y,
+			&Vertex.n.z,
+			&Vertex.c.x,
+			&Vertex.c.y,
+			&Vertex.c.z,
+			&Vertex.c.w,
+			&Vertex.t.x,
+			&Vertex.t.y);
+	}
+	ZeroMemory(String, _countof(String));
+
+	int iMaxIndex = 0;
+	bCheck = m_Paser.GetDataFromFileNext(L"#INDEX", &iMaxIndex, INT_DATA);
+	if (bCheck == false) return false;
+	ZeroMemory(String, _countof(String));
+
+	m_IndexList.resize(iMaxIndex);
+	for (int iIndex = 0; iIndex < iMaxIndex; iIndex += 3)
+	{
+		m_Paser.GetNextLine();
+		_stscanf_s(m_Paser.m_pBuffer, _T("%d %d %d"),
+			&m_IndexList[iIndex + 0],
+			&m_IndexList[iIndex + 1],
+			&m_IndexList[iIndex + 2]);
+	}
+
+	CreateIndexBuffer();
+	CreateVertexBuffer();
+
+	m_Paser.CloseStream();
+
+	MessageBox(GetActiveWindow(), FileString.c_str(),
+		_T("Load Succeed!"), MB_OK);
+	return true;
+}
+bool SMap::SaveFile(T_STR FileString)
+{
+	FILE* pStream = nullptr;
+	_wfopen_s(&pStream, FileString.c_str(), _T("wb"));
+	if (pStream == nullptr) return false;
+
+	_ftprintf(pStream, _T("%s"), _T("MapExporter100"));
+	_ftprintf(pStream, _T("\n%s %d %d %d %d %d %f"),
+		L"#HEADERINFO",
+		m_iNumRows,
+		m_iNumCols,
+		m_iSellNum,
+		m_iNumSellRows,
+		m_iNumSellCols,
+		m_fSellDistance);
+
+	_ftprintf(pStream, _T("\n%s %s"),
+		L"#TEXTURE",
+		m_MapDesc.strTextureFile.c_str());
+
+	_ftprintf(pStream, _T("\n%s %d"),
+		L"#VERTEX",
+		m_iNumVertices);
+	for (auto& Vertex : m_VertexList)
+	{
+		_ftprintf(pStream, _T("\n%10.4f %10.4f %10.4f"),
+			Vertex.p.x,
+			Vertex.p.y,
+			Vertex.p.z);
+		_ftprintf(pStream, _T("%10.4f %10.4f %10.4f"),
+			Vertex.n.x,
+			Vertex.n.y,
+			Vertex.n.z);
+		_ftprintf(pStream, _T("%10.4f %10.4f %10.4f %10.4f"),
+			Vertex.c.x,
+			Vertex.c.y,
+			Vertex.c.z,
+			Vertex.c.w);
+		_ftprintf(pStream, _T("%10.4f %10.4f"),
+			Vertex.t.x,
+			Vertex.t.y);
+	}
+
+	_ftprintf(pStream, _T("\n%s %d"),
+		L"#INDEX",
+		m_IndexList.size());
+
+	for (int iIndex = 0; iIndex < m_IndexList.size(); iIndex += 3)
+	{
+		_ftprintf(pStream, _T("\n%d %d %d"),
+			m_IndexList[iIndex + 0],
+			m_IndexList[iIndex + 1],
+			m_IndexList[iIndex + 2]);
+	}
+	fclose(pStream);
+
+	MessageBox(GetActiveWindow(), FileString.c_str(),
+		_T("Save Succeed!"), MB_OK);
+	return true;
+}
 SMap::SMap()
 {
 	m_iNumFace = 0;

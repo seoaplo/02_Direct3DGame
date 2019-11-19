@@ -61,6 +61,9 @@ public:
 	bool  m_bHeightSet;
 	bool bCreateMap;
 	bool bMap;
+
+	bool bLoadMap;
+	bool bSaveMap;
 public:
 	void   SetTool(HWND hWnd, HINSTANCE hInst);
 	//====================================================================
@@ -91,8 +94,12 @@ public:
 	HRESULT		DeleteResource() { return S_OK; }
 
 	//======================================================================================
-	// Load Export Data
+	// Load Data
 	//======================================================================================
+	bool		LoadFile();
+	bool		SaveFile();
+	TCHAR*		SaveFileDiallog(const TCHAR* szName, const TCHAR* szTitle);
+
 	HRESULT					CreateConstantBuffer();
 	int WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
 public:

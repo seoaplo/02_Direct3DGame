@@ -201,6 +201,7 @@
     <ClInclude Include="SMiniMap.h" />
     <ClInclude Include="SModelViewCamera.h" />
     <ClInclude Include="SNode.h" />
+    <ClInclude Include="SParser.h" />
     <ClInclude Include="SQuadTree.h" />
     <ClInclude Include="SQuadTreeMap.h" />
     <ClInclude Include="SQuadTreeMT.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="SMiniMap.cpp" />
     <ClCompile Include="SModelViewCamera.cpp" />
     <ClCompile Include="SNode.cpp" />
+    <ClCompile Include="SParser.cpp" />
     <ClCompile Include="SQuadTree.cpp" />
     <ClCompile Include="SQuadTreeMap.cpp" />
     <ClCompile Include="SQuadTreeMT.cpp" />

@@ -99,6 +99,9 @@
     <ClInclude Include="SSelect.h">
       <Filter>Core\SSelect</Filter>
     </ClInclude>
+    <ClInclude Include="SParser.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -163,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="SSelect.cpp">
       <Filter>Core\SSelect</Filter>
+    </ClCompile>
+    <ClCompile Include="SParser.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

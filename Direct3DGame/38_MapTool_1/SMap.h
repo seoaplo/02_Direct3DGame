@@ -1,5 +1,6 @@
 #pragma once
 #include "SDXShape.h"
+#include "SParser.h"
 
 #define RANDOM(n)			(rand() % (n))
 #define RANDOMSCOPE(s,e)	(rand() %(e-s)) + s;
@@ -40,6 +41,8 @@ public:
 	int*					m_pNormalLookupTable;
 	D3DXVECTOR3*			m_pFaceNormals;
 	bool					m_bStaticLight;
+
+	SParser					m_Paser;
 public:
 	bool			Frame();
 	bool			Render(ID3D11DeviceContext*	pContext);
@@ -64,6 +67,8 @@ public:
 	virtual	bool	CreateMap(SMapDesc& MapDesc);
 	virtual	bool	Init(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	virtual bool	Load(SMapDesc& MapDesc);
+	virtual bool	LoadFile(T_STR FileString);
+	virtual bool	SaveFile(T_STR FileString);
 	//===========================================================================================
 	// 정점 노말 연산을 위한 초기화 함수 및 페이스 노말 계산
 	//===========================================================================================

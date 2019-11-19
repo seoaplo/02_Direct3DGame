@@ -125,16 +125,6 @@ bool	SCore::CoreRelease()
 	if (!I_InputManager.Release())
 		return false;
 
-#if defined(DEBUG) || defined(_DEBUG)
-	Microsoft::WRL::ComPtr<ID3D11Debug> dxgiDebug;
-
-	if (SUCCEEDED(GetDevice()->QueryInterface(IID_PPV_ARGS(&dxgiDebug))))
-	{
-		dxgiDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-		dxgiDebug = nullptr;
-	}
-#endif
-
 	if(!CleanupDevice())
 		return false;
 
