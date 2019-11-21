@@ -81,7 +81,12 @@ HRESULT SModel::LoadTextures(ID3D11Device* pDevice, const TCHAR* pLoadTextureStr
 	HRESULT hr = S_OK;
 	if (pLoadTextureString == nullptr) return hr;
 	int iTextureID = I_TextureManager.Load(pDevice, pLoadTextureString);
-	m_dxobj.g_pTextureSRV = I_TextureManager.GetPtr(iTextureID)->m_pSRV;
+
+	if (iTextureID < 0) return S_FALSE;
+	m_pTexture = I_TextureManager.GetPtr(iTextureID);
+	
+	if (m_pTexture == nullptr) return S_FALSE;
+	m_dxobj.g_pTextureSRV = m_pTexture->m_pSRV;
 
 	return hr;
 }

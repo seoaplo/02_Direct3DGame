@@ -93,6 +93,92 @@ void SDXShape::CreateAABBBox(D3DXVECTOR3 max, D3DXVECTOR3 min)
 }
 #pragma endregion
 
+#pragma region SPoint
+HRESULT SPoint::SetInputLayout()
+{
+	HRESULT hr = S_OK;
+
+	// 
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	UINT numElements = sizeof(layout) / sizeof(layout[0]);
+	m_dxobj.g_pInputlayout.Attach(DXGame::CreateInputlayout(m_pDevice, m_dxobj.g_pVSBlob.Get()->GetBufferSize(),
+		m_dxobj.g_pVSBlob.Get()->GetBufferPointer(), layout, numElements));
+	return hr;
+}
+bool SPoint::CreateVertexData()
+{
+	m_vPosition.p = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_vPosition.c = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	m_dxobj.m_iVertexSize = sizeof(PC_VERTEX);
+	m_dxobj.m_iNumVertex = 1;
+	return true;
+}
+bool SPoint::CreateIndexData()
+{
+	m_IndexList.resize(1);
+	m_IndexList[0] = 0;
+
+	m_dxobj.m_iNumIndex = m_IndexList.size();
+	m_dxobj.m_iIndexSize = sizeof(DWORD);
+	return true;
+}
+HRESULT SPoint::CreateVertexBuffer()
+{
+	if (m_dxobj.m_iNumVertex <= 0) return S_OK;
+	m_dxobj.g_pVertexBuffer.Attach(DXGame::CreateVertexBuffer(m_pDevice,
+		&m_vPosition,
+		m_dxobj.m_iNumVertex,
+		m_dxobj.m_iVertexSize));
+	if (m_dxobj.g_pVertexBuffer == nullptr) return S_FALSE;
+	return S_OK;
+}
+HRESULT SPoint::LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pLoadShaderFile)
+{
+	T_STR ShaderFile;
+	if (pLoadShaderFile == nullptr) ShaderFile = L"../../shader/Shape/Line.hlsl";
+	else							ShaderFile = pLoadShaderFile;
+
+	m_dxobj.g_pVertexShader.Attach(DXGame::LoadVertexShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pVSBlob.GetAddressOf()));
+	m_dxobj.g_pPixelShader.Attach(DXGame::LoadPixelShaderFile(pDevice, ShaderFile.c_str()));
+	m_dxobj.g_pGeometryShader.Attach(DXGame::LoadGeometryShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pGSBlob.GetAddressOf()));
+	m_dxobj.g_pHullShader.Attach(DXGame::LoadHullShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pHSBlob.GetAddressOf()));
+	m_dxobj.g_pDomainShader.Attach(DXGame::LoadDomainShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pDSBlob.GetAddressOf()));
+	m_dxobj.g_pComputeShader.Attach(DXGame::LoadComputeShaderFile(pDevice, ShaderFile.c_str(), m_dxobj.g_pCSBlob.GetAddressOf()));
+	return S_OK;
+}
+
+bool SPoint::Draw(ID3D11DeviceContext* pContext, D3DXVECTOR3 vPosition, D3DXVECTOR4 vColor)
+{
+	PC_VERTEX vertices;
+	vertices.p = vPosition;
+	vertices.c = vColor;
+	// 동적 리소스 갱신 방법 1 : D3D11_USAGE_DEFAULT 사용
+	pContext->UpdateSubresource(GetVB(), 0, NULL, &vertices, 0, 0);
+	return Render(pContext);
+}
+//--------------------------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------------------------
+HRESULT SPoint::CreateResource()
+{
+	m_dxobj.m_iPrimitiveType = D3D10_PRIMITIVE_TOPOLOGY_POINTLIST;
+	return S_OK;
+}
+SPoint::SPoint()
+{
+
+}
+SPoint::~SPoint()
+{
+
+}
+#pragma endregion
+
 #pragma region SLine
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                            TLineShape

@@ -25,6 +25,24 @@ public:
 	virtual ~SDXShape() {};
 };
 
+class SPoint : public SDXShape
+{
+private:
+	PC_VERTEX m_vPosition;
+public:
+	HRESULT		SetInputLayout()		override;
+	bool		CreateVertexData()		override;
+	bool		CreateIndexData()		override;
+	HRESULT		CreateVertexBuffer()	override;
+	HRESULT		CreateResource()		override;
+	HRESULT		LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pLoadShaderFile = nullptr) override;
+	bool		Draw(ID3D11DeviceContext* pContext, D3DXVECTOR3 vPosition, D3DXVECTOR4 vColor);
+
+public:
+	SPoint();
+	virtual ~SPoint();
+};
+
 class SLine : public SDXShape
 {
 private:
@@ -39,7 +57,7 @@ public:
 	bool		Draw(ID3D11DeviceContext* pContext, D3DXVECTOR3 vStart, D3DXVECTOR3 vEnd, D3DXVECTOR4 dwColor) override;
 public:
 	SLine();
-	~SLine();
+	virtual ~SLine();
 };
 
 class SDirection : public SDXShape
@@ -55,7 +73,7 @@ public:
 	HRESULT		LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pLoadShaderFile = nullptr) override;
 public:
 	SDirection();
-	~SDirection();
+	virtual ~SDirection();
 };
 
 class SPlane : public SDXShape
@@ -73,7 +91,7 @@ public:
 	HRESULT		LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pLoadShaderFile = nullptr) override;
 public:
 	SPlane();
-	~SPlane();
+	virtual ~SPlane();
 };
 
 class SBox : public SDXShape
@@ -86,6 +104,6 @@ public:
 	HRESULT			LoadShaderFile(ID3D11Device* pDevice, const TCHAR* pLoadShaderFile = nullptr) override;
 public:
 	SBox();
-	~SBox();
+	virtual ~SBox();
 };
 

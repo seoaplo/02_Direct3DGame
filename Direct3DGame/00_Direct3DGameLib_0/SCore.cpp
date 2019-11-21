@@ -33,7 +33,8 @@ bool	SCore::CoreInit()
 		return false;
 	if (!I_InputManager.Init())
 		return false;
-
+	if (!I_TextureManager.Init())
+		return false;
 	SDxState::SetState(m_pDevice);
 
 	CreateDxResource();
@@ -63,7 +64,8 @@ bool	SCore::CoreFrame()
 		return false;
 	if (!I_InputManager.Frame())
 		return false;
-
+	if (!I_TextureManager.Frame())
+		return false;
 	ProcDebug();
 	m_Direction.Frame();
 
@@ -100,6 +102,8 @@ bool	SCore::CoreRender()
 		return false;
 	if (!I_InputManager.Render(m_rcClientRect.left, m_rcClientRect.top, m_rcClientRect.right, m_rcClientRect.bottom))
 		return false;
+	if (!I_TextureManager.Render())
+		return false;
 	if (!PostRender())	return false;
 
 	DrawDebug();
@@ -124,7 +128,8 @@ bool	SCore::CoreRelease()
 		return false;
 	if (!I_InputManager.Release())
 		return false;
-
+	if (!I_TextureManager.Release())
+		return false;
 	if(!CleanupDevice())
 		return false;
 
