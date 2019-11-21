@@ -227,7 +227,6 @@ bool  SQuadTreeMap::Render(ID3D11DeviceContext*	pContext)
 }
 void SQuadTreeMap::UpVectexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, float fDistance, float fHeight)
 {
-	std::vector<PNCT_VERTEX*> RetVertexList;
 
 	const float& fSellDistance = m_pMap->m_fSellDistance;
 
@@ -241,13 +240,12 @@ void SQuadTreeMap::UpVectexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, floa
 	float fBottom = -(vIntersection.z + fDistance) / fSellDistance;
 
 
-	fLeft = fLeft + iHalfCol > 0  ? fLeft + iHalfCol : 0;
-	fBottom = fBottom + iHalfRow > 0 ? fBottom + iHalfRow : 0;
 
-	fRight = fRight + iHalfCol < m_pMap->m_iNumSellCols
-			? fRight + iHalfCol : m_pMap->m_iNumSellCols;
-	fTop = fTop + iHalfRow < m_pMap->m_iNumSellRows
-			? fTop + iHalfRow : m_pMap->m_iNumSellRows;
+	fLeft = max(fLeft + iHalfCol, 0);
+	fBottom = max(fBottom + iHalfRow, 0);
+	fRight = min(fRight + iHalfCol, m_pMap->m_iNumSellCols);
+	fTop = min(fTop + iHalfRow, m_pMap->m_iNumSellRows);
+
 
 
 
@@ -283,10 +281,7 @@ void SQuadTreeMap::UpVectexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, floa
 void SQuadTreeMap::UpdateNode(SNode* pNode)
 {
 	assert(pNode);
-	if (pNode->m_IsLeaf)
-	{
-		ComputeBoundingBox(pNode);
-	}
+	ComputeBoundingBox(pNode);
 	for (auto& pChilde : pNode->m_ChildList)
 	{
 		UpdateNode(pChilde);

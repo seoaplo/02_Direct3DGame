@@ -45,6 +45,7 @@ public:
 	int						m_iDrawDepth;
 	SLine					m_Line;
 	SBox					m_Box;
+	BOX_VERTEX_LIST			m_BoxVertex;
 	SQuadTreeMap			m_QuadTree;
 	SMiniMap				m_MiniMap;
 	SMap					m_Map;
@@ -55,6 +56,10 @@ public:
 	PC_VERTEX				m_AlphaVertex;
 	SAlphaTexturing			m_AlphaTexture;
 
+	std::vector<SNode*>		m_PickingNodeList;
+	SNode*					m_PickNode;
+	D3DXVECTOR3				m_vPickVector;
+	D3DXVECTOR3				m_vPickNodeVector;
 	int iRow;
 	int iColl;
 	int iNumSize;
@@ -82,7 +87,9 @@ public:
 	void	DrawMiniMapNode(SNode* pNode);
 	void	DrawPickingTile(SNode* pNode);
 	void	SetHeightVertex(SNode* pNode, float fDistance, float fHeight);
-	SNode*	FindePickingNode(SNode* pNode);
+	bool	FindePickingNode(SNode* pNode);
+	bool	FindePickingFace(SNode* pNode);
+	SNode*	CheckPicking();
 	HRESULT ScreenViewPort(UINT iWidht, UINT iHeight);
 	//====================================================================
 	// 재정의 함수

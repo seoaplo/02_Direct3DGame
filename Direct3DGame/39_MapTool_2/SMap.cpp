@@ -271,7 +271,7 @@ void SMap::CalcVertexColor(D3DXVECTOR3 vLightDir)
 }
 bool SMap::ReLoadVBuffer()
 {
-	//CalcPerVertexNormalsFastLookup();
+	CalcPerVertexNormalsFastLookup();
 	m_pContext->UpdateSubresource(m_dxobj.g_pVertexBuffer.Get(), 0, nullptr, m_VertexList.data(), 0, 0);
 	return true;
 }

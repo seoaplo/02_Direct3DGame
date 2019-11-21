@@ -1,4 +1,12 @@
 #include "Sample.h"
+struct LengthSort
+{
+	bool operator()(D3DXVECTOR3& vStart, D3DXVECTOR3& vEnd)
+	{
+		
+		return D3DXVec3Length(&vStart) < D3DXVec3Length(&vEnd);
+	}
+};
 
 
 int Sample::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -122,7 +130,8 @@ bool Sample::Init()
 
 	iColl = 4;
 	iNumSize = 4;
-	fDistance = 10.0f;
+	m_fHeightDistance = 10.0f;
+
 	bCreateMap = true;
 	return true;
 }
@@ -206,14 +215,13 @@ bool Sample::Frame()
 		//--------------------------------------------------------------------------------------
 		m_QuadTree.Frame();
 		m_Map.Frame();
-		m_AlphaVertex.p = m_Select.m_vIntersection;
+		m_PickNode = CheckPicking();
+		m_AlphaVertex.p = m_vPickVector;
 		m_AlphaVertex.c = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
-		//m_AlphaVertex.p.x += m_Map.m_iNumSellCols * m_Map.m_fSellDistance;
-		//m_AlphaVertex.p.z += m_Map.m_iNumSellRows * m_Map.m_fSellDistance;
 		if (I_InputManager.MouseButtonState(0) == KEY_HOLD
 			&& m_bHeightSet)
 		{
-			SetHeightVertex(m_QuadTree.m_pRootNode, m_fHeightDistance, m_fHeightValue);
+			SetHeightVertex(m_PickNode, m_fHeightDistance, m_fHeightValue);
 		}
 	}
 	return true;
@@ -232,8 +240,12 @@ bool Sample::Render()
 	//=================================================================================
 	// ÄõµåÆ®¸® ±íÀÌ ´ÜÀ§ÀÇ ¶óÀÎ ·»´õ¸µ
 	//=================================================================================
-	DrawQuadLine(m_QuadTree.m_pRootNode);
+	m_Box.SetMatrix(&m_matInitWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 
+	/*DXGame::SDxState::SetRasterizerState(GetContext(), DebugRSWireFrame);
+	DrawQuadLine(m_QuadTree.m_pRootNode);
+	DXGame::SDxState::SetRasterizerState(GetContext(), m_RSDebugNum);
+*/
 	DXGame::SDxState::SetDepthStencilState(GetContext(), DebugDSSDepthEnable, 0x00);
 
 	//=================================================================================
@@ -254,7 +266,7 @@ bool Sample::Render()
 	{
 		m_AlphaTexture.Draw(GetContext(), m_AlphaVertex, m_fHeightDistance, 3.0f);
 
-		DrawPickingTile(m_QuadTree.m_pRootNode);
+		DrawPickingTile(m_PickNode);
 		m_Map.SetMatrix(&m_matWorld, &m_pMainCamera->_matView, &m_pMainCamera->_matProj);
 		m_QuadTree.Render(GetContext());
 		DrawMiniMap();
@@ -263,6 +275,9 @@ bool Sample::Render()
 	DXGame::SDxState::SetDepthStencilState(GetContext(), DebugDSSDepthDisable, 0x00);
 	GetContext()->OMSetRenderTargets(1, SDevice::GetRenderTargetViewAddress(), SDevice::GetDepthStencilView());
 	m_DefaultRT.End(GetContext());
+
+	m_PickingNodeList.clear();
+	m_PickNode = nullptr;
 	return true;
 }
 bool Sample::Release()
@@ -275,9 +290,8 @@ bool Sample::Release()
 
 bool Sample::DrawQuadLine(SNode* pNode)
 {
-	/*if (pNode == NULL) return false;
+	if (pNode == NULL) return false;
 	if (m_QuadTree.m_iRenderDepth < pNode->m_dwDepth) return false;
-
 	D3DXVECTOR4 vColor = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (pNode->m_dwDepth == 0) vColor = D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f);
 	if (pNode->m_dwDepth == 1) vColor = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -288,32 +302,53 @@ bool Sample::DrawQuadLine(SNode* pNode)
 	if (pNode->m_dwDepth == 6) vColor = D3DXVECTOR4(1.0f, 0.5f, 0.0f, 1.0f);
 	if (pNode->m_dwDepth == 7) vColor = D3DXVECTOR4(0.5f, 0.5f, 0.5f, 1.0f);
 	if (pNode->m_dwDepth == 8) vColor = D3DXVECTOR4(1.0f, 0.5f, 0.5f, 1.0f);
-	if (pNode->m_dwDepth == 9) vColor = D3DXVECTOR4(1.0f, 0.5f, 1.0f, 1.0f);
+	if (pNode->m_dwDepth > 9) vColor = D3DXVECTOR4(1.0f, 0.5f, 1.0f, 1.0f);
 
 	S_BOX& TargetBox = pNode->m_sBox;
-	D3DXVECTOR3 vPoint[4];
-	vPoint[0] = D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z);
-	vPoint[0].y -= 1.0f * pNode->m_dwDepth;
 
-	vPoint[1] = D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z);
-	vPoint[1].y -= 1.0f * pNode->m_dwDepth;
+	m_BoxVertex[0] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[1] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[2] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[3] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
+	// µÞ¸é
+	m_BoxVertex[4] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[5] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[6] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[7] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
-	vPoint[2] = D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z);
-	vPoint[2].y -= 1.0f * pNode->m_dwDepth;
+	// ¿À¸¥ÂÊ
+	m_BoxVertex[8] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[9] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[10] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[11] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
-	vPoint[3] = D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z);
-	vPoint[3].y -= 1.0f * pNode->m_dwDepth;
+	// ¿ÞÂÊ
+	m_BoxVertex[12] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[13] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[14] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[15] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
-	m_Line.Draw(GetContext(), vPoint[0], vPoint[1], vColor);
-	m_Line.Draw(GetContext(), vPoint[1], vPoint[3], vColor);
-	m_Line.Draw(GetContext(), vPoint[2], vPoint[3], vColor);
-	m_Line.Draw(GetContext(), vPoint[0], vPoint[2], vColor);
+	// À­¸é
+	m_BoxVertex[16] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[17] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[18] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[19] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
+
+	// ¾Æ·§¸é
+	m_BoxVertex[20] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[21] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[22] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[23] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
+
+	m_Box.UpdateVertexData(m_BoxVertex);
+
+	m_Box.Render(GetContext());
 
 	if (pNode->m_ChildList.size() != 4) return true;
 	for (int iNode = 0; iNode < 4; iNode++)
 	{
 		DrawQuadLine(pNode->m_ChildList[iNode]);
-	}*/
+	}
 	return true;
 }
 void Sample::DrawObject()
@@ -358,12 +393,18 @@ void Sample::DrawMiniMap()
 	matProj = m_pMainCamera->_matProj;
 	if (m_MiniMap.BeginRender(GetContext()))
 	{
-		DrawMiniMapObject(m_QuadTree.m_pRootNode);
+		//DrawMiniMapObject(m_QuadTree.m_pRootNode);
+
 		m_pMainCamera->SetMatrix(&m_matInitWorld, &m_MiniMap._matView, &m_MiniMap._matProj);
-		m_Line.SetMatrix(&m_matWorld, &m_MiniMap._matView, &m_MiniMap._matProj);
-		DrawQuadLine(m_QuadTree.m_pRootNode);
 		m_QuadTree.m_pMap->SetMatrix(&m_matInitWorld, &m_MiniMap._matView, &m_MiniMap._matProj);
+		m_Line.SetMatrix(&m_matWorld, &m_MiniMap._matView, &m_MiniMap._matProj);
+		m_Box.SetMatrix(&m_matInitWorld, &m_MiniMap._matView, &m_MiniMap._matProj);
+
+		/*DXGame::SDxState::SetRasterizerState(GetContext(), DebugRSWireFrame);
+		DrawQuadLine(m_QuadTree.m_pRootNode);
+		DXGame::SDxState::SetRasterizerState(GetContext(), m_RSDebugNum);*/
 		m_QuadTree.Render(GetContext());
+
 		m_pMainCamera->Render(GetContext());
 		m_MiniMap.EndRender(GetContext());
 	}
@@ -434,51 +475,226 @@ void Sample::DrawMiniMapObject(SNode* pNode)
 }
 void Sample::SetHeightVertex(SNode* pNode, float fDistance, float fHeight)
 {
-	SNode* pFindeNode = FindePickingNode(pNode);
-	if (pFindeNode == nullptr) return;
+	if (pNode == nullptr) return;
 
-	m_QuadTree.UpVectexHeight(*pFindeNode, m_Select.m_vIntersection, fDistance, fHeight);
+	m_QuadTree.UpVectexHeight(*pNode, m_vPickVector, fDistance, fHeight);
 	
 }
 void Sample::DrawPickingTile(SNode* pNode)
 {
-	SNode* pFindeNode = FindePickingNode(pNode);
+	if (pNode == nullptr) return;
+	DXGame::SDxState::SetRasterizerState(GetContext(), DebugRSWireFrame);
+	S_BOX& TargetBox = pNode->m_sBox;
 
-	if (pFindeNode == nullptr) return;
-	
-	S_BOX& TargetBox = pFindeNode->m_sBox;
-	D3DXVECTOR3 vPoint[4];
-	vPoint[0] = D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z);
-	vPoint[0].y -= 1.0f * pNode->m_dwDepth;
+	D3DXVECTOR4 vColor = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	vPoint[1] = D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z);
-	vPoint[1].y -= 1.0f * pNode->m_dwDepth;
+	m_BoxVertex[0] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[1] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[2] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[3] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 0.0f, -1.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
+	// µÞ¸é
+	m_BoxVertex[4] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[5] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[6] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[7] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 0.0f, 1.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
-	vPoint[2] = D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z);
-	vPoint[2].y -= 1.0f * pNode->m_dwDepth;
+	// ¿À¸¥ÂÊ
+	m_BoxVertex[8] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[9] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[10] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[11] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
-	vPoint[3] = D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z);
-	vPoint[3].y -= 1.0f * pNode->m_dwDepth;
+	// ¿ÞÂÊ
+	m_BoxVertex[12] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[13] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[14] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[15] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(-1.0f, 0.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
-	D3DXVECTOR4 vColor(1, 1, 1, 1);
+	// À­¸é
+	m_BoxVertex[16] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[17] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[18] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[19] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMax.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, 1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
-	m_Line.Draw(GetContext(), vPoint[0], vPoint[1], vColor);
-	m_Line.Draw(GetContext(), vPoint[1], vPoint[3], vColor);
-	m_Line.Draw(GetContext(), vPoint[2], vPoint[3], vColor);
-	m_Line.Draw(GetContext(), vPoint[0], vPoint[2], vColor);
+	// ¾Æ·§¸é
+	m_BoxVertex[20] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 0.0f));
+	m_BoxVertex[21] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMin.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 0.0f));
+	m_BoxVertex[22] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMax.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(1.0f, 1.0f));
+	m_BoxVertex[23] = PNCT_VERTEX(D3DXVECTOR3(TargetBox.vMin.x, TargetBox.vMin.y, TargetBox.vMax.z), D3DXVECTOR3(0.0f, -1.0f, 0.0f), vColor, D3DXVECTOR2(0.0f, 1.0f));
 
+	m_Box.UpdateVertexData(m_BoxVertex);
+
+	m_Box.Render(GetContext());
+	DXGame::SDxState::SetRasterizerState(GetContext(), m_RSDebugNum);
 }
 
-SNode*	Sample::FindePickingNode(SNode* pNode)
+bool Sample::FindePickingNode(SNode* pNode)
 {
-	if (m_Select.ChkOBBToRay(&pNode->m_sBox, &m_Select.m_Ray) == false) return nullptr;
-	if (pNode->m_ChildList.size() != 4) return pNode;
-	for (int iNode = 0; iNode < 4; iNode++)
+	if (pNode == nullptr) return false;
+
+	for (int iNode = 0; iNode < pNode->m_ChildList.size(); iNode++)
 	{
-		SNode* pCheckNode = FindePickingNode(pNode->m_ChildList[iNode]);
-		if (pCheckNode != nullptr) return pCheckNode;
+		if (m_Select.ChkOBBToRay(&pNode->m_ChildList[iNode]->m_sBox, &m_Select.m_Ray))
+		{
+			if (pNode->m_ChildList[iNode]->m_IsLeaf)
+			{
+				m_PickingNodeList.push_back(pNode->m_ChildList[iNode]);
+			}
+			else
+			{
+				FindePickingNode(pNode->m_ChildList[iNode]);
+			}
+		}
 	}
-	return nullptr;
+
+	return true;
+}
+
+bool Sample::FindePickingFace(SNode* pNode)
+{
+	if (pNode == nullptr) return false;
+	
+	/*int iMaxFace = pNode->m_IndexData.size() / 3;
+
+	int v0 = 0;
+	int v1 = 1;
+	int v2 = 2;
+	for (int iFace = 0; iFace < iMaxFace; iFace++)
+	{
+		v0 = iFace * 3;
+		v1 = v0 + 1;
+		v2 = v0 + 2;
+
+		int iIndex0 = pNode->m_IndexData[v0];
+		int iIndex1 = pNode->m_IndexData[v0 + 1];
+		int iIndex2 = pNode->m_IndexData[v0 + 2];
+
+		D3DXVECTOR3 Vertex0 = m_Map.m_VertexList[iIndex0].p;
+		D3DXVECTOR3 Vertex1 = m_Map.m_VertexList[iIndex1].p;
+		D3DXVECTOR3 Vertex2 = m_Map.m_VertexList[iIndex2].p;
+
+		 
+		D3DXVECTOR3 vStart = m_Select.m_Ray.vOrigin;
+		D3DXVECTOR3 vEnd = m_Select.m_Ray.vDirection * 9999.9f;
+
+		D3DXVECTOR3 vNormal = m_Map.ComputeFaceNormal(iIndex0, iIndex1, iIndex2);
+
+		if (m_Select.GetIntersection(
+			vStart,	vEnd, vNormal,
+			Vertex0, Vertex1, Vertex2)
+			)
+		{
+			if (m_Select.PointInPolygon(
+				m_Select.m_vIntersection, vNormal,
+				Vertex0, Vertex1, Vertex2))
+			{
+				return true;
+			}
+		}
+	}*/
+
+	DWORD dwWidth = m_QuadTree.m_dwWidth;
+
+	int dwStartRow = (pNode->m_CornerIndex[0]) / dwWidth;
+	int dwEndRow = (pNode->m_CornerIndex[2]) / dwWidth;
+	int dwStartCol = (pNode->m_CornerIndex[0]) % dwWidth;
+	int dwEndCol = (pNode->m_CornerIndex[1]) % dwWidth;
+
+	dwStartRow = max(dwStartRow - 1, 0);
+	dwStartCol = max(dwStartCol - 1, 0);
+	dwEndRow = min(dwEndRow + 1, m_Map.m_iNumSellRows - 1);
+	dwEndCol = min(dwEndCol + 1, m_Map.m_iNumSellCols - 1);
+
+	int iIndex = 0;
+	for (DWORD iRow = dwStartRow;	iRow < dwEndRow;
+		iRow++)
+	{
+		for (DWORD iCol = dwStartCol; iCol < dwEndCol;
+			iCol++)
+		{
+			DWORD dwIndex = iRow * dwWidth + iCol;
+			int iNextRow = iRow + 1;
+			int iNextCol = iCol + 1;
+
+			int i0 = iRow * dwWidth + iCol;
+			int i1 = iRow * dwWidth + iNextCol;
+			int i2 = iNextRow * dwWidth + iCol;
+
+			int i3 = i2;
+			int i4 = i1;
+			int i5 = iNextRow * dwWidth + iNextCol;
+			iIndex += 6;
+
+			D3DXVECTOR3 Vertex0 = m_Map.m_VertexList[i0].p;
+			D3DXVECTOR3 Vertex1 = m_Map.m_VertexList[i1].p;
+			D3DXVECTOR3 Vertex2 = m_Map.m_VertexList[i2].p;
+
+
+			D3DXVECTOR3 vStart = m_Select.m_Ray.vOrigin;
+			D3DXVECTOR3 vEnd = m_Select.m_Ray.vDirection * 9999.9f;
+
+			D3DXVECTOR3 vNormal = m_Map.ComputeFaceNormal(i0, i1, i2);
+
+			if (m_Select.GetIntersection(
+				vStart, vEnd, vNormal,
+				Vertex0, Vertex1, Vertex2)
+				)
+			{
+				if (m_Select.PointInPolygon(
+					m_Select.m_vIntersection, vNormal,
+					Vertex0, Vertex1, Vertex2))
+				{
+					return true;
+				}
+			}
+
+			Vertex0 = m_Map.m_VertexList[i3].p;
+			Vertex1 = m_Map.m_VertexList[i4].p;
+			Vertex2 = m_Map.m_VertexList[i5].p;
+
+			vNormal = m_Map.ComputeFaceNormal(i3, i4, i5);
+
+			if (m_Select.GetIntersection(
+				vStart, vEnd, vNormal,
+				Vertex0, Vertex1, Vertex2)
+				)
+			{
+				if (m_Select.PointInPolygon(
+					m_Select.m_vIntersection, vNormal,
+					Vertex0, Vertex1, Vertex2))
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+SNode*	Sample::CheckPicking()
+{
+	FindePickingNode(m_QuadTree.m_pRootNode);
+
+	SNode* pNode = nullptr;
+	float fLength = 9999.9f;
+	D3DXVECTOR3 vIntersection;
+
+	for (auto& pPickNode : m_PickingNodeList)
+	{
+		if (FindePickingFace(pPickNode))
+		{
+			
+
+			if (fLength > m_Select.m_fPickDistance)
+			{
+				fLength = m_Select.m_fPickDistance;
+				pNode = pPickNode;
+				m_vPickVector = m_Select.m_vIntersection;
+			}
+		}
+	}
+
+	return pNode;
 }
 HRESULT Sample::ScreenViewPort(UINT iWidth, UINT iHeight)
 {

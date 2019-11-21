@@ -228,8 +228,8 @@ bool SSelect::ChkOBBToRay(S_BOX* pBox, S_RAY* pRay)
 		m_vDxR = vDxR;
 		return false;
 	}
-
-	m_vIntersection = pRay->vOrigin + pRay->vDirection* t_min;
+	m_fPickDistance = t_min;
+	m_vIntersection = pRay->vOrigin + pRay->vDirection* m_fPickDistance;
 	return true;
 }
 
@@ -303,7 +303,8 @@ bool    SSelect::GetIntersection(
 	{
 		return false;
 	}
-	m_vIntersection = vStart + vDirection * fT;
+	m_fPickDistance = fT;
+	m_vIntersection = vStart + vDirection * m_fPickDistance;
 	return true;
 }
 // 폴리곤안에 위치하는지 판단한다.

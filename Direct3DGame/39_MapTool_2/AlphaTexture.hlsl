@@ -25,7 +25,7 @@ VS_OUTPUT VS(VS_INPUT vIn)
 {
 	VS_OUTPUT vOut = (VS_OUTPUT)0;
 
-	vOut.p = float4(vIn.p.xzy, 1.0f);
+	vOut.p = float4(vIn.p.xz, 0.0f, 1.0f);
 	vOut.c = vIn.c;
 	return vOut;
 }
