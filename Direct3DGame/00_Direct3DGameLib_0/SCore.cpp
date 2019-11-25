@@ -172,6 +172,11 @@ HRESULT SCore::CreateDxResource()
 
 	IDXGISurface1*		pBackBuffer = NULL;
 	HRESULT hr = GetSwapChain()->GetBuffer(0, __uuidof(IDXGISurface), (LPVOID*)&pBackBuffer);
+
+	m_nClientWidth = m_SwapChainDesc.BufferDesc.Width;
+	m_nClientHeight - m_SwapChainDesc.BufferDesc.Height;
+
+
 	I_DirectWrite.Set(m_hWnd, m_nClientWidth, m_nClientHeight, pBackBuffer);
 	if (pBackBuffer)	pBackBuffer->Release();
 
