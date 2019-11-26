@@ -6,6 +6,7 @@
 class SNode
 {
 public:
+	DWORD	m_dwIndex;
 	DWORD	m_dwDepth;
 	BOOL	m_IsLeaf;
 	// 바운딩 박스

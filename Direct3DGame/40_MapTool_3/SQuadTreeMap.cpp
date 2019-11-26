@@ -101,6 +101,7 @@ bool SQuadTreeMap::SubDivide(SNode* pNode)
 }
 void SQuadTreeMap::ComputeBoundingBox(SNode* pNode)
 {
+	if(pNode == nullptr) return;
 	D3DXVECTOR2 vHeight =
 		GetHeightFromNode(
 			pNode->m_CornerIndex[0],

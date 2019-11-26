@@ -180,7 +180,7 @@ SNode* SQuadTree::FindNode(SNode* pNode, SBaseObj* pObj)
 		}
 		// 큐에 들어 있는 리스트가 없다면 pNode가 완전히 포함하는 노드가 된다.
 		if (m_QuadTreeQueue.empty()) break;
-		// 완전히 오브젝트가 포함된 부모노드를 꺼애온다
+		// 완전히 오브젝트가 포함된 부모노드를 꺼온다
 		pNode = m_QuadTreeQueue.front();
 		m_QuadTreeQueue.pop();
 	} 

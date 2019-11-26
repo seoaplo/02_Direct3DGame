@@ -33,21 +33,21 @@ public:
 	virtual bool	Release();
 	virtual bool	DeleteNode(SNode* pNode);
 public:
-	bool			Build(float fWidth, float fHeight);
-	bool			BuildTree(SNode* pNode);
+	virtual bool			Build(float fWidth, float fHeight);
+	virtual bool			BuildTree(SNode* pNode);
 	virtual bool	SubDivide(SNode* pNode);
 public:
 	virtual SNode*	CreateNode(SNode* pParentNode, float fLeft, float fRight, float fBottom, float fTop);
-	SNode*			FindNode(SNode* pNode, SBaseObj* pObj);
-	void			DrawFindNode(SNode* pNode);
-	void			VisibleNode(SNode* pNode);
-	void			VisibleObject(SNode* pNode);
+	virtual SNode*			FindNode(SNode* pNode, SBaseObj* pObj);
+	virtual void			DrawFindNode(SNode* pNode);
+	virtual void			VisibleNode(SNode* pNode);
+	virtual void			VisibleObject(SNode* pNode);
 public:
-	int				AddObject(SBaseObj* pObj);
-	int				CheckRect(SNode* pNode, SBaseObj* pObj);
+	virtual int				AddObject(SBaseObj* pObj);
+	virtual int				CheckRect(SNode* pNode, SBaseObj* pObj);
 
 public:
-	void			Update(ID3D11Device* pDevice, SCamera* pCamera);
+	virtual void			Update(ID3D11Device* pDevice, SCamera* pCamera);
 	void			SetRenderDepth(int iRenderDepth){ m_iRenderDepth = iRenderDepth; }
 
 	void			SetMaxDepthLimit(int iMaxDepth) { m_iMaxDepthLimit = iMaxDepth; }

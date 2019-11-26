@@ -28,6 +28,9 @@
     <Filter Include="Core\SAlphaTexturing">
       <UniqueIdentifier>{c36b6439-47af-4e2f-b3d2-aef64749da79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\QuadTree">
+      <UniqueIdentifier>{0363ca2f-7a24-4e63-ad38-0511121ef458}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -78,26 +81,14 @@
     <ClInclude Include="SHeightMap.h">
       <Filter>Core\Map</Filter>
     </ClInclude>
-    <ClInclude Include="SNode.h">
-      <Filter>Core\Map</Filter>
-    </ClInclude>
     <ClInclude Include="SMiniMap.h">
       <Filter>Core\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="SQuadTreeMap.h">
-      <Filter>Core\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="SQuadTree.h">
-      <Filter>Core\Map</Filter>
     </ClInclude>
     <ClInclude Include="SBaseObj.h">
       <Filter>Core\Map</Filter>
     </ClInclude>
     <ClInclude Include="resource1.h">
       <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="SQuadTreeMT.h">
-      <Filter>Core\Map</Filter>
     </ClInclude>
     <ClInclude Include="SSelect.h">
       <Filter>Core\SSelect</Filter>
@@ -107,6 +98,18 @@
     </ClInclude>
     <ClInclude Include="SAlphaTexturing.h">
       <Filter>Core\SAlphaTexturing</Filter>
+    </ClInclude>
+    <ClInclude Include="SNode.h">
+      <Filter>Core\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTree.h">
+      <Filter>Core\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTreeMap.h">
+      <Filter>Core\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTreeArray.h">
+      <Filter>Core\QuadTree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -158,18 +161,6 @@
     <ClCompile Include="SMap.cpp">
       <Filter>Core\Map</Filter>
     </ClCompile>
-    <ClCompile Include="SNode.cpp">
-      <Filter>Core\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="SQuadTree.cpp">
-      <Filter>Core\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="SQuadTreeMap.cpp">
-      <Filter>Core\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="SQuadTreeMT.cpp">
-      <Filter>Core\Map</Filter>
-    </ClCompile>
     <ClCompile Include="SSelect.cpp">
       <Filter>Core\SSelect</Filter>
     </ClCompile>
@@ -178,6 +169,18 @@
     </ClCompile>
     <ClCompile Include="SAlphaTexturing.cpp">
       <Filter>Core\SAlphaTexturing</Filter>
+    </ClCompile>
+    <ClCompile Include="SNode.cpp">
+      <Filter>Core\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTree.cpp">
+      <Filter>Core\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTreeMap.cpp">
+      <Filter>Core\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTreeArray.cpp">
+      <Filter>Core\QuadTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

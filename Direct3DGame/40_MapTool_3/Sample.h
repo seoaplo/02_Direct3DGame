@@ -6,7 +6,7 @@
 #include "SQuadTree.h"
 #include "SBaseObj.h"
 #include "SMiniMap.h"
-#include "SQuadTreeMap.h"
+#include "SQuadTreeArray.h"
 #include "SHeightMap.h"
 #include "SSelect.h"
 #include "SAlphaTexturing.h"
@@ -46,7 +46,7 @@ public:
 	SLine					m_Line;
 	SBox					m_Box;
 	BOX_VERTEX_LIST			m_BoxVertex;
-	SQuadTreeMap			m_QuadTree;
+	SQuadTreeArray			m_QuadTree;
 	SMiniMap				m_MiniMap;
 	SMap					m_Map;
 	SHeightMap				m_HeightMap;

@@ -10,18 +10,20 @@ struct LengthSort
 
 HRESULT	Sample::CreateResource() 
 {
-	
-	m_pMainCamera = make_shared<SCamera>();
+	if (m_pMainCamera == nullptr) return S_OK;
+	GetClientRect(m_hWnd, &m_rcClientRect);
+	m_nClientHeight = m_rcClientRect.bottom;
+	m_nClientWidth = m_rcClientRect.right;
+
+	m_Select.Init(m_hWnd, m_nClientWidth, m_nClientHeight);
+	m_DefaultRT.Set(GetDevice(), 0, 0, m_nClientWidth, m_nClientHeight);
 	m_pMainCamera->SetViewMatrix(D3DXVECTOR3(0.0f, 10.0f, -50.0f), D3DXVECTOR3(0.0f, 0.0f, 1.0f));
 	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_nClientWidth / (float)(m_nClientHeight), 1.0f, 3000.0f);
-	m_pMainCamera->Init();
-	m_pMainCamera->CreateRenderBox(GetDevice(), m_pImmediateContext);
 
 	return S_OK; 
 }
 HRESULT	Sample::DeleteResource()
 {
-	m_pMainCamera->Release();
 	return S_OK; 
 }
 
@@ -122,7 +124,8 @@ bool Sample::Init()
 
 	float fAspectRatio = m_nWindowWidth / (FLOAT)m_nWindowHeight;
 	m_pMainCamera->SetViewMatrix(D3DXVECTOR3(0.0f, 10.0f, -50.0f), D3DXVECTOR3(0.0f, 0.0f, 1.0f));
-	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_nClientWidth / (float)(m_nClientHeight), 1.0f, 3000.0f);
+	//m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_nClientWidth / (float)(m_nClientHeight), 1.0f, 3000.0f);
+	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_SwapChainDesc.BufferDesc.Width / (float)(m_SwapChainDesc.BufferDesc.Height), 1.0f, 3000.0f);
 
 
 	m_pMainCamera->Init();

@@ -126,7 +126,10 @@ bool SFrustum::CreateFrustum()
 bool SFrustum::CreateRenderBox(ID3D11Device*  pDevice, ID3D11DeviceContext* pContext)
 {
 	m_pDevice = pDevice;
-	if (m_pBoxShape != NULL) return true;
+	if (m_pBoxShape != nullptr)
+	{
+		SAFE_DEL(m_pBoxShape);
+	}
 	SAFE_NEW(m_pBoxShape, SBox);
 	HRESULT_FAILED_RETURN_BOOL(m_pBoxShape->Create(pDevice, pContext, nullptr, L"../../shader/Shape/Box.hlsl"))
 	// vertex color
