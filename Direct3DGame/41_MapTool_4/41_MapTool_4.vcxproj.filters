@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{a29f851f-31ba-4819-9c08-7723871c2b4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Camera">
+      <UniqueIdentifier>{9894370c-151a-4f90-ae87-ce8b6213f52e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Map">
+      <UniqueIdentifier>{7e92466f-a6c9-4b57-bfce-37f023960923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\SSelect">
+      <UniqueIdentifier>{c09f30c7-0790-46ae-9ac3-d78bde09a3bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\QuadTree">
+      <UniqueIdentifier>{0363ca2f-7a24-4e63-ad38-0511121ef458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Brush">
+      <UniqueIdentifier>{4d7694fe-7bf6-42c4-8600-8c4714fba76e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Brush\SAlphaTexturing">
+      <UniqueIdentifier>{c36b6439-47af-4e2f-b3d2-aef64749da79}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SToolForm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SToolPane.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CMapToolView.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CMapToolDoc.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CMapTool.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SCamera.h">
+      <Filter>Core\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SFrustum.h">
+      <Filter>Core\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SArcBall.h">
+      <Filter>Core\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelViewCamera.h">
+      <Filter>Core\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SMap.h">
+      <Filter>Core\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="SHeightMap.h">
+      <Filter>Core\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="SMiniMap.h">
+      <Filter>Core\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SBaseObj.h">
+      <Filter>Core\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SSelect.h">
+      <Filter>Core\SSelect</Filter>
+    </ClInclude>
+    <ClInclude Include="SParser.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="SAlphaTexturing.h">
+      <Filter>Core\Brush\SAlphaTexturing</Filter>
+    </ClInclude>
+    <ClInclude Include="SNode.h">
+      <Filter>Core\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTree.h">
+      <Filter>Core\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTreeMap.h">
+      <Filter>Core\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SQuadTreeArray.h">
+      <Filter>Core\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SBrush.h">
+      <Filter>Core\Brush</Filter>
+    </ClInclude>
+    <ClInclude Include="SLightObj.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SToolForm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SToolPane.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMapTool.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CMapToolDoc.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CMapToolView.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SArcBall.cpp">
+      <Filter>Core\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SCamera.cpp">
+      <Filter>Core\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SFrustum.cpp">
+      <Filter>Core\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SModelViewCamera.cpp">
+      <Filter>Core\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SMiniMap.cpp">
+      <Filter>Core\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SBaseObj.cpp">
+      <Filter>Core\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="SHeightMap.cpp">
+      <Filter>Core\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="SMap.cpp">
+      <Filter>Core\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="SSelect.cpp">
+      <Filter>Core\SSelect</Filter>
+    </ClCompile>
+    <ClCompile Include="SParser.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SAlphaTexturing.cpp">
+      <Filter>Core\Brush\SAlphaTexturing</Filter>
+    </ClCompile>
+    <ClCompile Include="SNode.cpp">
+      <Filter>Core\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTree.cpp">
+      <Filter>Core\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTreeMap.cpp">
+      <Filter>Core\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SQuadTreeArray.cpp">
+      <Filter>Core\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SBrush.cpp">
+      <Filter>Core\Brush</Filter>
+    </ClCompile>
+    <ClCompile Include="SLightObj.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\CMapTool.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="SpaceDivision.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\CMapTool.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\CMapToolDoc.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Toolbar256.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\userimages.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MapTool.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="AlphaTexture.hlsl">
+      <Filter>Core\Brush\SAlphaTexturing</Filter>
+    </FxCompile>
+    <FxCompile Include="Terrain.hlsl">
+      <Filter>Core\Map</Filter>
+    </FxCompile>
+    <FxCompile Include="Brush.hlsl">
+      <Filter>Core\Brush</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

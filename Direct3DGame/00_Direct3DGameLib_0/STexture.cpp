@@ -34,6 +34,7 @@ bool STexture::Render()
 }
 bool STexture::Release()
 {
+	m_pSRV->Release();
 	return true;
 }
 

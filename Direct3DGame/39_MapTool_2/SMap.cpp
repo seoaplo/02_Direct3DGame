@@ -589,10 +589,8 @@ bool SMap::LoadFile(T_STR FileString)
 bool SMap::SaveFile(T_STR FileString)
 {
 	FILE* pStream = nullptr;
-	_wfopen_s(&pStream, FileString.c_str(), _T("wb"));
 	if (pStream == nullptr) return false;
 
-	_ftprintf(pStream, _T("%s"), _T("MapExporter100"));
 	_ftprintf(pStream, _T("\n%s %d %d %d %d %d %f"),
 		L"#HEADERINFO",
 		m_iNumRows,
@@ -640,10 +638,7 @@ bool SMap::SaveFile(T_STR FileString)
 			m_IndexList[iIndex + 1],
 			m_IndexList[iIndex + 2]);
 	}
-	fclose(pStream);
 
-	MessageBox(GetActiveWindow(), FileString.c_str(),
-		_T("Save Succeed!"), MB_OK);
 	return true;
 }
 SMap::SMap()
