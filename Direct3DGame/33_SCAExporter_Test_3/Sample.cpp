@@ -18,7 +18,7 @@ int Sample::WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 		return m_pMainCamera->WndProc(hWnd, Message, wParam, lParam);
 }
 
-TCHAR* Sample::SaveFileDiallog(const TCHAR* szName, const TCHAR* szTitle)
+T_STR Sample::SaveFileDiallog(const TCHAR* szName, const TCHAR* szTitle)
 {
 	TCHAR ARRAY_TCHAR_file[MAX_PATH] = { 0, };
 	TCHAR ARRAY_TCHAR_filetitle[MAX_PATH] = { 0, };
@@ -70,10 +70,10 @@ bool Sample::LoadSKMFile()
 	while (1)
 	{
 		int iKey;
-		TCHAR* TargetFile = SaveFileDiallog(L"skm", L"SkinViewer");
+		T_STR TargetFile = SaveFileDiallog(L"skm", L"SkinViewer");
 		::SetCurrentDirectory(ProgramPath);
 
-		if (TargetFile != nullptr)
+		if (TargetFile.size() > 0)
 		{
 			iKey = I_SkinFileLoaderManeger.Load(TargetFile);
 		}
@@ -99,10 +99,10 @@ bool Sample::LoadSMCFile()
 	while (1)
 	{
 		int iKey;
-		TCHAR* TargetFile = SaveFileDiallog(L"smc", L"MatViewer");
+		T_STR TargetFile = SaveFileDiallog(L"smc", L"MatViewer");
 		::SetCurrentDirectory(ProgramPath);
 
-		if (TargetFile != nullptr)
+		if (TargetFile.size() > 0)
 		{
 			iKey = I_MatrixFileLoader.Load(TargetFile);
 		}

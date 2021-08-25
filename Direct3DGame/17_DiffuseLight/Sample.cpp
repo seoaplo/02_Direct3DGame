@@ -75,7 +75,7 @@ bool Sample::Init()
 	//--------------------------------------------------------------------------------------
 	// 박스 오브젝트를 구 오브젝트로 변환(기하 쉐이더 및 스트림 아웃 처리)
 	//--------------------------------------------------------------------------------------
-	if (FAILED(m_SphereObj.Create(GetDevice(), GetContext(), L"../../data/tilea.jpg", L"../../shader/17_DuffuseLight/BoxSO.hlsl")))
+	if (FAILED(m_SphereObj.Create(GetDevice(), GetContext(), L"../../data/map/tilea.jpg", L"../../shader/17_DuffuseLight/BoxSO.hlsl")))
 	{
 		MessageBox(0, _T("m_SphereObj 실패"), _T("Fatal error"), MB_OK);
 		return 0;
@@ -85,7 +85,7 @@ bool Sample::Init()
 	// 높이맵 생성
 	//--------------------------------------------------------------------------------------
 	m_HeightMap.Init(GetDevice(), m_pImmediateContext);
-	if (m_HeightMap.CreateHeightMap(L"../../data/heightMap513.bmp") == false)
+	if (m_HeightMap.CreateHeightMap(L"../../data/map/heightMap513.bmp") == false)
 	{
 		return false;
 	}

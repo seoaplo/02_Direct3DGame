@@ -49,7 +49,7 @@ public:
 	HRESULT					CreateConstantBuffer();
 	int WindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
-	TCHAR* SaveFileDiallog(const TCHAR* szName, const TCHAR* szTitle);
+	T_STR SaveFileDiallog(const TCHAR* szName, const TCHAR* szTitle);
 	bool LoadSKMFile();
 	bool LoadSMCFile();
 	void ClearSCAObject();
