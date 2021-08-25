@@ -4,3 +4,56 @@ data/
 output/
 
 Direct3DGame/\.vs/
+doc/제2권.pdf
+*.pdf
+doc/3ds Max SDK Export(Character Animation)/CharacterObject.docx
+doc/3ds Max SDK Export(Object Animation).pptx
+doc/3ds Max SDK Export(Object Animation)/00_ObjectAnimation_1.docx
+doc/3ds Max SDK Export(Object Animation)/00_Parent Matrix.JPG
+doc/3ds Max SDK Export(Object Animation)/01_Child Matrix.JPG
+doc/3ds Max SDK Export(Object Animation)/03_Object Coord System.JPG
+doc/3ds Max SDK Export(Object Animation)/04_Bone Coord System.JPG
+doc/3ds Max SDK Export(Object Animation)/ClassDiagram.bmp
+doc/3ds Max SDK Export(Object Animation)/Document_Format.txt
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석.docx
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석.pptx
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드1.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드2.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드3.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드4.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드5.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드6.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드7.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드8.PNG
+doc/3ds Max SDK Export(Object Animation)/Object_Animation_서승석/슬라이드9.PNG
+doc/3ds Max SDK Export(Object Animation)/SAExporter.bmp
+doc/3ds Max SDK Export(Object Animation)/~$ject_Animation_서승석.docx
+doc/Note/A-star Algorithm.txt
+doc/Note/Access Image.txt
+doc/Note/ConstantBuffer.txt
+doc/Note/DepthBuffer.txt
+doc/Note/DesignPattern.txt
+doc/Note/Dijkstra Algorithm.txt
+doc/Note/DirectInput Joystick Key.txt
+doc/Note/DirectXDebug.txt
+doc/Note/DrawShape.txt
+doc/Note/ETC1.txt
+doc/Note/GeometryShader.txt
+doc/Note/ID3DX11EFFECT_1.txt
+doc/Note/IndexBuffer.txt
+doc/Note/Matrix.txt
+doc/Note/Max Exporter.txt
+doc/Note/Pruneutuve Type.txt
+doc/Note/SamplerState_1.txt
+doc/Note/Stencil Buffer.txt
+doc/Note/Texture1.txt
+doc/Note/Texture2.txt
+doc/Note/Transform.txt
+doc/Note/Vector.txt
+doc/Note/Vertex_Transform.txt
+doc/Note/VertexBuffer.txt
+doc/Note/ViewAndProjection.txt
+doc/Note/ViewPort.txt
+doc/Space Division/Space Division.docx
+doc/Space Division/SpaceDivision.pptx
+doc/Space Division/~$ace Division.docx
