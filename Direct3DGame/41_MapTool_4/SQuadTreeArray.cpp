@@ -5,12 +5,25 @@ bool SQuadTreeArray::Init()
 {
 	m_vPickVector = D3DXVECTOR3(9999.9f, 9999.9f, 9999.9f);
 	m_PickingNodeList.clear();
+
+	m_DrawNodeList.clear();
+	m_DrawObjList.clear();
 	return true;
 }
 bool SQuadTreeArray::Frame()
 {
-	m_DrawObjList.clear();
-	m_DrawNodeList.clear();
+	for (int i = 0; i < m_iObjListSize; i++)
+	{
+		m_DrawObjList[i] = nullptr;
+	}
+	m_iObjListSize = 0;
+
+	for (int i = 0; i < m_iNodeListSize; i++)
+	{
+		m_DrawNodeList[i] = nullptr;
+	}
+	m_iNodeListSize = 0;
+
 	if (!m_pCamera) return false;
 	DrawFindNode();
 	return true;
@@ -26,10 +39,9 @@ bool  SQuadTreeArray::Render(ID3D11DeviceContext*	pContext)
 	m_pMap->RenderSetTexture(pContext);
 	pContext->IASetIndexBuffer(m_pIndexBuffer.Get(),
 		DXGI_FORMAT_R32_UINT, 0);
-
-	for (int iNode = 0; iNode < m_DrawNodeList.size(); iNode++)
+	for(int i = 0; i < m_iNodeListSize; i++)
 	{
-		SNode* pNode = m_DrawNodeList[iNode];
+		SNode* pNode = m_DrawNodeList[i];
 
 
 		int iNodeIndexSize = pow(4, m_iMaxDepthLimit - pNode->m_dwDepth) * m_dwTileIndexBufferSize;
@@ -86,12 +98,17 @@ bool SQuadTreeArray::Build(float fWidth, float fHeight)
 
 bool SQuadTreeArray::Build(SMap* pMap, int   iMaxDepth, float fMinSize)
 {
+	Init();
 
 	m_dwWidth = pMap->m_iNumSellCols;
 	m_dwHeight = pMap->m_iNumSellRows;
 	m_iSellNum = pMap->m_iSellNum;
 	m_pMap = pMap;
 	m_dwTileIndexBufferSize = m_iSellNum * m_iSellNum * 6;
+
+	for (auto NodePtr : m_DrawNodeList) NodePtr = nullptr;
+	m_iNodeListSize = 0;
+
 
 	m_iMaxDepthLimit = log2(pMap->m_iNumCols);
 	int NodeMaxNum = 0;
@@ -100,6 +117,9 @@ bool SQuadTreeArray::Build(SMap* pMap, int   iMaxDepth, float fMinSize)
 		NodeMaxNum += pow(4, iCount);
 	}
 	m_NodeList.resize(NodeMaxNum);
+	m_DrawNodeList.resize(NodeMaxNum);
+
+
 	m_IndexBufferData.reserve(pMap->_IndexList.size());
 
 	m_fMinDivideSize = (pMap->m_fSellDistance * pMap->m_iSellNum) / 2;
@@ -329,17 +349,10 @@ void SQuadTreeArray::VisibleNode(SNode* pNode)
 	assert(m_pCamera);
 	if (pNode->m_dwDepth > m_iRenderDepth) return;
 
-	m_DrawNodeList.push_back(pNode);
+	m_DrawNodeList[m_iNodeListSize] = pNode;
+	m_iNodeListSize++;
+
 	VisibleObject(pNode);
-
-	if (m_pCamera->CheckOBBInPlane(&pNode->m_sBox))
-	{
-
-		/*for (auto& ChildNode : pNode->m_ChildList)
-		{
-			VisibleNode(ChildNode);
-		}*/
-	}
 }
 void SQuadTreeArray::VisibleObject(SNode* pNode)
 {
@@ -348,7 +361,20 @@ void SQuadTreeArray::VisibleObject(SNode* pNode)
 		S_BOX& CheckBox = Object->m_Box;
 		if (m_pCamera->CheckOBBInPlane(&CheckBox))
 		{
-			m_DrawObjList.push_back(Object);
+			if (m_DrawObjList.size() <= m_iObjListSize)
+			{
+				m_DrawObjList.push_back(Object);
+
+				for (int i = m_iObjListSize; i < m_DrawObjList.size(); i++)
+				{
+					m_DrawObjList[i] = nullptr;
+				}
+			}
+			else
+			{
+				m_DrawObjList[m_iObjListSize] = Object;
+				m_iObjListSize++;
+			}
 		}
 	}
 }

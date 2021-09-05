@@ -24,8 +24,13 @@ public:
 
 	
 	std::queue<SNode*>			m_QuadTreeQueue;
+
+
+	int m_iObjListSize;
 	std::vector<SBaseObj*>		m_DrawObjList;
-	std::vector<SNode*>		m_DrawNodeList;
+
+	int m_iNodeListSize;
+	std::vector<SNode*>			m_DrawNodeList;
 public:
 	virtual bool	Init();
 	virtual bool	Frame();
@@ -56,4 +61,3 @@ public:
 	SQuadTree();
 	virtual ~SQuadTree();
 };
-

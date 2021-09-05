@@ -259,9 +259,11 @@ bool  SQuadTreeMap::Render(ID3D11DeviceContext*	pContext)
 	{
 		pContext->PSSetShaderResources(1, 1, &m_pAlphaTexture);
 	}
-	for (int iNode = 0; iNode < m_DrawNodeList.size(); iNode++)
+	while(m_DrawNodeList.size() > 0)
+	for (int iNode = 0; iNode < m_iNodeListSize; iNode++)
 	{
 		SNode* pNode = m_DrawNodeList[iNode];
+
 		pContext->IASetIndexBuffer(pNode->m_IndexBuffer.Get(),
 			DXGI_FORMAT_R32_UINT, 0);
 		pContext->DrawIndexed(pNode->m_IndexData.size(), 0, 0);

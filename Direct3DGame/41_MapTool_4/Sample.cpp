@@ -144,7 +144,7 @@ bool Sample::Init()
 	float fAspectRatio = m_nWindowWidth / (FLOAT)m_nWindowHeight;
 	m_pMainCamera->SetViewMatrix(D3DXVECTOR3(0.0f, 10.0f, -50.0f), D3DXVECTOR3(0.0f, 0.0f, 1.0f));
 	//m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_nClientWidth / (float)(m_nClientHeight), 1.0f, 3000.0f);
-	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_SwapChainDesc.BufferDesc.Width / (float)(m_SwapChainDesc.BufferDesc.Height), 1.0f, 3000.0f);
+	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_SwapChainDesc.BufferDesc.Width / (float)(m_SwapChainDesc.BufferDesc.Height), 1.0f, 30000.0f);
 
 
 	m_pMainCamera->Init();
@@ -278,6 +278,8 @@ bool Sample::Frame()
 
 		m_Map.m_pAlphaSRV = m_AlphaTexture.m_RenderTarget.m_pSRV.Get();
 		m_Map.m_pBrush = m_Brush.m_RenderTarget.m_pSRV.Get();
+
+		m_MiniMap.Set(GetDevice(), 0, m_SwapChainDesc.BufferDesc.Height - 300, 300, 300);
 
 		bMap = true;
 		bCreateMap = false;
@@ -474,7 +476,7 @@ void Sample::DrawObject()
 }
 void Sample::DrawSelectTreeLevel(D3DXMATRIX* pView, D3DXMATRIX* pProj)
 {
-	for (int iObj = 0; iObj < m_QuadTree.m_DrawObjList.size(); iObj++)
+	for (int iObj = 0; iObj < m_QuadTree.m_iObjListSize; iObj++)
 	{
 		S_BoxObject* pBox = dynamic_cast<S_BoxObject*>(m_QuadTree.m_DrawObjList[iObj]);
 		m_Box.SetAmbientColor(pBox->m_vColor.x,

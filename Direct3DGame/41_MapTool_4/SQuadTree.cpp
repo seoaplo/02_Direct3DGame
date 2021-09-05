@@ -3,12 +3,18 @@
 
 bool SQuadTree::Init()
 {
+	m_iObjListSize = 0;
+	m_iNodeListSize = 0;
 	return true;
 }
 bool SQuadTree::Frame()
 {
-	m_DrawObjList.clear();
-	m_DrawNodeList.clear();
+	for (auto ObjPtr : m_DrawObjList) ObjPtr = nullptr;
+	m_iObjListSize = 0;
+
+	for (auto NodePtr : m_DrawNodeList) NodePtr = nullptr;
+	m_iNodeListSize = 0;
+
 	if (!m_pCamera) return false;
 	DrawFindNode(m_pRootNode);
 	return true;
@@ -19,8 +25,8 @@ bool SQuadTree::Render(ID3D11DeviceContext*	pContext)
 }
 bool SQuadTree::Release()
 {
-	m_DrawNodeList.clear();
-	m_DrawObjList.clear();
+	if(m_DrawObjList.size() > 0) m_DrawObjList.clear();
+	if (m_DrawNodeList.size() > 0) m_DrawNodeList.clear();
 	DeleteNode(m_pRootNode);
 	m_pRootNode = nullptr;
 	return true;
@@ -223,8 +229,10 @@ void SQuadTree::VisibleNode(SNode* pNode)
 {
 	assert(m_pCamera);
 	if (pNode->m_dwDepth > m_iRenderDepth) return;
+	//m_DrawNodeList.push_back(pNode);
+	m_DrawNodeList[m_iNodeListSize] = pNode;
+	m_iNodeListSize++;
 
-	m_DrawNodeList.push_back(pNode);
 	VisibleObject(pNode);
 
 	if (m_pCamera->CheckOBBInPlane(&pNode->m_sBox))
@@ -243,7 +251,8 @@ void SQuadTree::VisibleObject(SNode* pNode)
 		S_BOX& CheckBox = Object->m_Box;
 		if (m_pCamera->CheckOBBInPlane(&CheckBox))
 		{
-			m_DrawObjList.push_back(Object);
+			m_DrawObjList[m_iObjListSize] = Object;
+			m_iObjListSize++;
 		}
 	}
 }
