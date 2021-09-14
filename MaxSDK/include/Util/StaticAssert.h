@@ -29,7 +29,7 @@ namespace MaxSDK
 					public:
 						foo()
 						{
-							StaticAssert< std::tr1::is_pod<T>::value >();
+							StaticAssert< std::is_pod<T>::value >();
 						}
 				};
 			\endcode
@@ -45,7 +45,7 @@ namespace MaxSDK
 				c
 			};
 			baz a;
-			StaticAssert< std::tr1::is_enum<baz>::value >();
+			StaticAssert< std::is_enum<baz>::value >();
 			\endcode
 
 		*/

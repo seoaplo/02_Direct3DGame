@@ -64,8 +64,24 @@ class IObjXRefManager : public FPStaticInterface
 	The file asset of the scene containing the object to add.\n\n
 	<b>MCHAR *obname</b>\n\n
 	The name of the object in the scene.\n\n
-	\return  A pointer to the newly added xref object, or NULL in case the file or
-	name were invalid. */
+	<b>int xFlags</b>\n\n
+	The merge behavior is controlled by the bits set in xFlags:
+	Bit: 0 - Add as proxy (XREF_AS_PROXY)
+	Bit: 1 - Drop (ignore) modifiers (XREF_DROP_MODIFIERS)
+	Bit: 2 - Merge modifiers (XREF_XREF_MODIFIERS)
+	Bit: 3 - Merge manipulators (XREF_MERGE_MANIPULATORS)
+	Duplicate material names action:
+	Bit: 8 - Prompt
+	Bit: 9 - Use Scene Material
+	Bit: 10 - Use Merged Material
+	Bit: 11 - Merge material and automatically rename them
+	Reparent Action:
+	Bit: 12 - Prompt
+	Bit: 13 - Always Reparent
+	Bit: 14 - Never Reparent
+	The default behavior (flags = 0) is XRef the modifiers, XRef the manipulators, when duplicate material names are 
+	encountered use option specified by objXRefMgr.dupMtlNameAction (defaults to Merge and Rename), Always Reparent
+	\return  A pointer to the newly added xref object, or NULL in case the file or name were invalid. */
 	virtual IXRefObject *AddXRefObject(const MaxSDK::AssetManagement::AssetUser& asset, const MCHAR *obname, int xFlags = 0)=0;
 
 	/*! \remarks  This method returns the number if IXRefObjects that reference

@@ -63,17 +63,20 @@ inline void SetThreadName(DWORD dwThreadID, LPCSTR pcszThreadName)
     THREADNAME_INFO info(pcszThreadName, dwThreadID);
 
     enum { MS_VC_EXCEPTION_ID = 0x406D1388 };
-
+#ifdef _MSC_VER
     __try
+#endif
     {
         RaiseException( MS_VC_EXCEPTION_ID, 0, 
             sizeof(info)/ sizeof(ULONG_PTR), 
             reinterpret_cast<const ULONG_PTR*>(&info) );
     }
+#ifdef _MSC_VER
     __except (EXCEPTION_CONTINUE_EXECUTION)
     {
         // empty
     }
+#endif
 }
 
 inline void SetThreadName(LPCSTR pcszThreadName)
@@ -116,10 +119,10 @@ inline void SetThreadNameDebug(LPCSTR pcszThreadName)
 // Send a string to the debugger's output window, but only in debug builds.
 // More convenient than having to #ifndef NDEBUG all over the place.
 // It also supports a variable number of arguments, as you can see.
-inline void Trace(LPCTSTR lpctszMsg, ...)
+inline void Trace(LPCMSTR lpctszMsg, ...)
 {
 #ifndef NDEBUG
-    TCHAR tszBuffer[4096];
+    MCHAR tszBuffer[4096];
 
     va_list args;
     va_start(args, lpctszMsg);
@@ -133,7 +136,7 @@ inline void Trace(LPCTSTR lpctszMsg, ...)
 #endif
 }
 
-inline void Trace0(LPCTSTR lpctszMsg)
+inline void Trace0(LPCMSTR lpctszMsg)
 {
 #ifndef NDEBUG
     DebugOutputString(lpctszMsg);

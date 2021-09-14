@@ -35,12 +35,6 @@ extern ScripterExport Array* keyboard_input_terminators;
 #define LISTENER_STYLE_PYTHON_PROMPT	4
 #define LISTENER_STYLE_PYTHON_SUB_PROMPT	5
 
-extern COLORREF input_text_color;
-extern COLORREF output_text_color;
-extern COLORREF message_text_color;
-extern COLORREF label_text_color;
-extern COLORREF python_prompt_color;
-
 // listener flag values
 #define LSNR_INPUT_MODE_MASK	0x000F
 #define LSNR_KEYINPUT_OFF		0x0000

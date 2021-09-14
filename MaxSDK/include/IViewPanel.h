@@ -23,20 +23,6 @@ class ViewExp;
 * the number of viewports of current view panel. This interface provides 
 * methods to get/modify settings of a tabbed view panel no matter it is currently
 * active or not.
-* Here is an example on how to get the number of active and non-extended 
-* viewports of all view panels.
-* \code
-* int viewportCount = 0;
-* for (int i = 0; i < GetViewPanelManager()->GetViewPanelCount(); ++i)
-* {
-*		IViewPanel* pViewPanel = GetViewPanelManager()->GetViewPanel(i);
-*		if (pViewPanel)
-*		{
-*			viewportCount += pViewPanel->GetNumberOfViewports();
-*		}
-* }
-* \endcode
-* \see IViewPanelManager
 */
 class IViewPanel : public BaseInterface
 {
@@ -81,7 +67,7 @@ public:
 	 * \return the index of the viewport with the given window handle.
 	 * If none of the viewport matches the given handle, -1 is returned.
 	 */
-	virtual int	GetViewportIndex(HWND hwnd) = 0;
+	virtual int	GetViewportIndex(HWND hwnd) const = 0;
 
 	/**
 	 * Set active viewport according to the input param.
@@ -95,14 +81,14 @@ public:
 	 * \return the index of the active viewport.
 	 * If there is no active viewport in this viewpanel, -1 is returned.
 	*/
-	virtual int	GetActiveViewportIndex(void) = 0;
+	virtual int	GetActiveViewportIndex(void) const = 0;
 
 	
 	/**
 	 * Get the window handle of the tabbed view panel
 	 * \return Return the window handle of the view panel.
 	*/
-	virtual HWND GetHWnd() = 0;
+	virtual HWND GetHWnd() const = 0;
 
 	/**
 	* Set the view panel name.
@@ -114,7 +100,7 @@ public:
 	* Get the view panel name.
 	* \return Return the view panel name.
 	*/
-	virtual const MSTR& GetViewPanelName() = 0;
+	virtual const MSTR& GetViewPanelName() const = 0;
 
 	/**
 	* Get the ViewExp interface given the viewport index.
@@ -122,5 +108,17 @@ public:
 	* \return if input is valid, the specified ViewExp interface will be returned.
 	* Otherwise, the ViewExp interface of the first viewport(index = 0) will be returned.
 	*/
-	virtual ViewExp& GetViewExpByIndex(int index) = 0;
+	virtual ViewExp& GetViewExpByIndex(int index) const = 0;
+
+    /**
+     * Gets if this view panel is a floating view panel.
+     * \return Return true if it is a floating view panel.
+     */
+    virtual bool IsViewPanelFloating() const = 0;
+
+    /**
+     * Gets if this view panel is currently visible .
+     * \return Return true if this view panel is currently visible.
+     */
+    virtual bool IsViewPanelVisible() const = 0;
 };

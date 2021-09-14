@@ -254,6 +254,20 @@ namespace Util
 	*/
 	UtilExport MSTR CaptureCallStack(int skipFirstNStackLevels = 3, int maxStackLevels = -1);
 
+	/*! \brief Returns the file version as a string of form "#.#.#.#" where the numbers are the major version,
+	* the update version, the Hot Fix number, and the build number. 
+	* \param [in] fileName - the file name of the file to get the version number for. The function uses the search sequence 
+	* specified by the LoadLibrary function.
+	* \return String containing the file version, empty if the file is not found or does not have version information
+	*/
+	UtilExport MSTR GetVersionOfFile(const MCHAR * fileName);
+
+	/*! \brief Returns the 3ds Max build number as a string of form "#.#.#.#" where the numbers are the major version,
+	* the update version, the Hot Fix number, and the build number. This is the same string seen as the Product
+	* Version of 3dsmax.exe in File Properties and at the top of the About 3ds Max dialog.
+	*/
+	UtilExport MSTR GetMaxBuildNumber();
+
 } // end namespace Util
 } // end namespace MaxSDK
 

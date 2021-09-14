@@ -781,10 +781,10 @@ PB2Export IParamMap2 *CreateRParamMap2(
     Qt dialogs are the preferred way of managing automatic parameter mapping between parameter blocks and their UIs.
     To map a Qt dialog to a parameter block, use the P_AUTO_UI_QT flag in the parameter block descriptor. Individual parameters should <b>not</b>
     specify UI properties (through the p_ui flag) when using Qt dialogs; instead, the UI is entirely defined as part of the Qt widget - this
-    includes behaviour, naming, localization, and mapping the parameter values.
+    includes behavior, naming, localization, and mapping the parameter values.
 
     When specifying the P_AUTO_UI_QT flag on a parameter block descriptor, the usual (Win32) UI specification (dialog resource ID, etc.) are not 
-    provided; no UI-definition parameters are to be provided in the paramter block descriptor. When using the P_MULTIMAP flag, the number of parameter
+    provided; no UI-definition parameters are to be provided in the parameter block descriptor. When using the P_MULTIMAP flag, the number of parameter
     maps and their individual IDs are provided as usual, but the IDs are not followed by the usual (Win32) UI specifications. Instead, Qt parameter
     maps go through ClassDesc2::CreateQtWidget() to retrieve a new Qt widget and associated properties which, in the Win32 world, would have been
     provided in the parameter block descriptor.
@@ -808,14 +808,25 @@ PB2Export IParamMap2 *CreateRParamMap2(
                 - Any QObject that defines a property "value" is supported.
                 - Any QObject that does not define a property "value", but has property "text". The value will be reported as read-only
                   through the "text" property.
-        - <b>TYPE_BOOL</b>:
+        - <b>TYPE_BOOL</b>
             - Any widget which has a property called "checked". 
             - If the widget has a property called "checkable", then this property's value must be 'true'.
-        - <b>TYPE_INODE</b>:
+        - <b>TYPE_INODE</b>
             - <b>QPushButton</b>
                 - Will behave as a node picker. The p_classID and p_sclassID options may be used for filtering nodes. The text on the button
-                  is automatically set, by the system, to the node's name, if and only if the P_NO_AUTO_LABELS flag is absent from the paremeter
+                  is automatically set, by the system, to the node's name, if and only if the P_NO_AUTO_LABELS flag is absent from the parameter
                   definition.
+        - <b>TYPE_TEXMAP</b>, <b>TYPE_MTL</b>
+            - <b>QPushButton</b>
+                - Will behave as a texture map or material picker. The text on the button
+                  is automatically set by the system to the texture map or material name, if and only if the P_NO_AUTO_LABELS flag is absent from the parameter definition.
+        - <b>TYPE_TAB_*</b>
+                - Any of the compatible types mentioned above (float, int, bool, INode, TexMap, Material) can be used in table-type parameters.  
+				  In this case, the widget name should have the pattern [param_name]_tab_[index], using a 1-based index.
+				  For example, to connect to the last element of a 7 member TAB param called "tex", name the widget
+				  "tex_tab_7".
+		- <b>TYPE_POINT2/3/4</b>, <b>TYPE_MATRIX3</b>
+			- These parameters have corresponding custom widgets QmaxPoint2Spinner, QmaxPoint3Spinner, QmaxPoint4Spinner and QmaxMatrix3spinner, that are rendered with the correct number of sub-spinners.
         - <b>All other types</b> are currently unsupported.
 */
 
@@ -887,7 +898,7 @@ The category parameter provides flexibility with regard to where a particular
 rollup should be displayed in the UI. RollupPanels with lower category fields
 will be displayed before RollupPanels with higher category fields. For
 RollupPanels with equal category value the one that was added first will be
-displayed first. Allthough it is possible to pass any int value as category
+displayed first. Although it is possible to pass any int value as category
 there exist currently 5 different category defines: <b>ROLLUP_CAT_SYSTEM</b>,
 <b>ROLLUP_CAT_STANDARD</b>, and <b>ROLLUP_CAT_CUSTATTRIB</b>.\n\n
 When using <b>ROLLUP_SAVECAT</b>, the rollup page will make the provided
@@ -1188,7 +1199,7 @@ The category parameter provides flexibility with regard to where a particular
 rollup should be displayed in the UI. RollupPanels with lower category fields
 will be displayed before RollupPanels with higher category fields. For
 RollupPanels with equal category value the one that was added first will be
-displayed first. Allthough it is possible to pass any int value as category
+displayed first. Although it is possible to pass any int value as category
 there exist currently 5 different category defines: <b>ROLLUP_CAT_SYSTEM</b>,
 <b>ROLLUP_CAT_STANDARD</b>, and <b>ROLLUP_CAT_CUSTATTRIB</b>.\n\n
 When using <b>ROLLUP_SAVECAT</b>, the rollup page will make the provided

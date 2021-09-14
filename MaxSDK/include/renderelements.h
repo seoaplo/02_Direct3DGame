@@ -442,7 +442,7 @@ public:
 	Renderer.\n\n
 	Several render elements derive from MaxRenderElement class
 	    but are not actually compatible (or useful) in the Default Scanline Renderer.
-		In the past, 3ds max only checked if the class exposed the MaxRenderElement 
+		In the past, 3ds Max only checked if the class exposed the MaxRenderElement 
 		interface to decide if it should show up in the render element dialog for the
 		Scanline renderer, which cluttered this dialog up with many elements that
 		actually are not applicable. 
@@ -452,7 +452,7 @@ public:
 		the render element selection dialog for the Scanline renderer. It *only* affects
 		visibility in this dialog, and does not affect the functionality.
 	*/
-	virtual BOOL IsVisibleToScanlineRenderer() { return TRUE; };
+	virtual BOOL IsVisibleToScanlineRenderer() { return FALSE; };
 
 	// ---------------------
 	// from class Animatable

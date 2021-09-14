@@ -678,6 +678,7 @@ public:
 protected:
 	#pragma warning(push)
 	#pragma warning(disable:4100)
+	#pragma warning(disable:4840) // non-trivially copyable WStr class type. See MAXX-45576
 	BEGIN_FUNCTION_MAP
 		RO_PROP_FN(kGetId, GetId, TYPE_DWORD);
 		RO_PROP_FN(kGetName, GetName, TYPE_STRING);
@@ -831,7 +832,7 @@ class IActionManager : public FPStaticInterface
 public:
 	/** Register an action table with the manager. 
 	Note that plug-ins that expose their action tables via their ClassDesc::NumActionTables() method. 
-	do not need to register their action tables explicitely, as 3ds Max will do it for them. 
+	do not need to register their action tables explicitly, as 3ds Max will do it for them. 
 	Also note that plug-ins do not need to unregister or destroy their action tables and action items, 
 	as 3ds Max will take care of this when it shuts down.
 	Also note that an action table needs to be activated once registered. 
@@ -890,7 +891,7 @@ public:
 	/** Retrieves a string that describes the specified operation from the action table whose ID is passed.
 	\param tableId The ID of the action table.
 	\param commandId The ID of the command.
-	\param buf Points to storage for the description string.
+	\param buf Points to storage for the description string.   Note that \p buf's length must be 256, including space for the terminating null character.
 	\return TRUE if the string was returned; FALSE if not. */
 	virtual BOOL GetActionDescription(ActionTableId tableId, int commandId, MCHAR* buf) = 0;
 
@@ -926,21 +927,7 @@ public:
 	/// \name Internal Methods 
 	///@{
 	/// \internal
-	virtual const MCHAR* GetShortcutFile() = 0;
-	/// \internal
-	virtual const MCHAR* GetShortcutDir() = 0;
-	/// \internal
 	virtual int IdToIndex(ActionTableId id) = 0;
-	/// \internal
-	virtual void SaveAllContextsToINI() = 0;
-	/// \internal
-	virtual int MakeActionSetCurrent(const MCHAR* pDir, const MCHAR* pFile) = 0;
-	/// \internal
-	virtual int LoadAccelConfig(LPACCEL *accel, int *cts, ActionTableId tableId = -1, BOOL forceDefault = FALSE) = 0;
-	/// \internal
-	virtual int SaveAccelConfig(LPACCEL *accel, int *cts) = 0;
-	/// \internal
-	virtual int GetCurrentActionSet(MCHAR *buf) = 0;
 	/// \internal
 	virtual BOOL SaveKeyboardFile(const MCHAR* pFileName) = 0;
 	/// \internal

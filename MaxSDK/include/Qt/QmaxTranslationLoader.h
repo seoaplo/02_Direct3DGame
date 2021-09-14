@@ -12,8 +12,9 @@
 #include <utilexp.h>
 
 #pragma warning( push )
-#pragma warning( disable: 4127 4512 )
-#include <QtCore/QtCore>
+#pragma warning( disable: 4127 4251 4800 )
+#include <QtCore/QObject>
+#include <QtCore/QString>
 #pragma warning( pop )
 
 namespace MaxSDK

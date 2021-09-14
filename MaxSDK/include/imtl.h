@@ -187,11 +187,11 @@ class LightDesc : public RenderData {
 	 };
 
 // Pre-defined categories of texture maps
-CoreExport MCHAR TEXMAP_CAT_2D[];  // 2D maps
-CoreExport MCHAR TEXMAP_CAT_3D[];  // 3D maps
-CoreExport MCHAR TEXMAP_CAT_COMP[]; // Composite
-CoreExport MCHAR TEXMAP_CAT_COLMOD[]; // Color modifier
-CoreExport MCHAR TEXMAP_CAT_ENV[];  // Environment
+extern CoreExport MCHAR TEXMAP_CAT_2D[];  // 2D maps
+extern CoreExport MCHAR TEXMAP_CAT_3D[];  // 3D maps
+extern CoreExport MCHAR TEXMAP_CAT_COMP[]; // Composite
+extern CoreExport MCHAR TEXMAP_CAT_COLMOD[]; // Color modifier
+extern CoreExport MCHAR TEXMAP_CAT_ENV[];  // Environment
 
 // this interface is a dummy interface returned by texmap::getinterface
 // if the map is a ray tracing type map.

@@ -563,8 +563,10 @@
 // Procedural Content id's
 #define idh_proc_content_graph_editor		10100
 
-// Shared Views IDs
+// Desktop connected services IDs
 #define idh_sharedviews						10150
+#define idh_dc_unwrap						10155
+#define idh_dc_rvtproject_analysis			10160
 
 // Gus' IDs
 
@@ -834,6 +836,13 @@
 #define topic_mesh_inspector				15031  //about mesh validator
 #define topic_startup_defaults				15032
 #define topic_particle_view					15033
+
+#define idh_security_tools					15100 // help for security tools - general
+#define idh_security_tools_crp				15101 // help for security tools - CRP malicious script
+#define idh_security_tools_adsl				15102 // help for security tools - ADSL malicious script
+#define idh_security_tools_alc				15103 // help for security tools - ALC malicious script
+
+#define idh_fluids_simulation				16000 // help for fluids simulation
 
 //
 // Any change to this file will require an update of core/HelpsysContextIDtoString.cpp

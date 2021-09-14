@@ -75,7 +75,7 @@ __inline
 int
 GetClassName(
 			 HWND hWnd,
-			 LPTSTR lpClassName,
+			 LPMSTR lpClassName,
 			 int nMaxCount
 			 )
 {
@@ -1251,6 +1251,7 @@ class Animatable : public InterfaceServer, public MaxSDK::Util::Noncopyable
 		<b>ADDKEY_SELECT</b>\n Select the new key and deselect any other selected keys.\n\n
 		<b>ADDKEY_INTERP</b>\n If TRUE then initialize the new key to the interpolated value at that
 		time. If FALSE, initialize the key to the value of the previous key.
+		<b>ADDKEY_FLAGGED</b>\n Flag the newly created key as if FlagKey() was called for it.
 		\par Default Implementation:
 		<b>{}</b> */
 		virtual void AddNewKey(TimeValue t, DWORD flags) {}

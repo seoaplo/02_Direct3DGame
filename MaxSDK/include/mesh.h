@@ -1181,7 +1181,7 @@ class Mesh : public BaseInterfaceServer {
 		BOOL		CanDrawStrips(DWORD rndMode, Material *mtl, int numMtls);
 		BOOL		NormalsMatchVerts();
 		void		checkRVertsAlloc(void);
-		void		buildFaceNormals();		// calcs just the face normals
+		DllExport void		buildFaceNormals();		// calcs just the face normals
 		void		setCacheGW(GraphicsWindow *gw)	{ cacheGW = gw; }
 		GraphicsWindow *getCacheGW(void)			{ return cacheGW; }
 

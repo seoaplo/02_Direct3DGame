@@ -44,7 +44,7 @@ public:
 	static void	setup();
 	const MCHAR*		name() { return set_name; }
 	void		collect();
-	void		sprin1(CharStream* s) { s->printf(_M("$%s"), set_name); }
+	void		sprin1(CharStream* s) { s->printf(_M("$%s"), set_name.data()); }
 	void		export_to_scripter();
 #	define		is_objectset(v) ((DbgVerify(!is_sourcepositionwrapper(v)), (v))->tag == class_tag(ObjectSet))
 

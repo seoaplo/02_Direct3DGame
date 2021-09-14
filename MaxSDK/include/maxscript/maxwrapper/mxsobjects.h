@@ -777,7 +777,7 @@ enum GetINodeTabResult
 // or a single node. If pResult is != NULL and val is '$', then *pResult = NULL to signify the current selection set (some sdk
 // methods interpret an INodeTab* of NULL to mean the current selection set). Otherwise the node set is added to nodeTab and 
 // if pResult is != NULL, *pResult = &nodeTab.
-ScripterExport extern GetINodeTabResult GetINodeTabFromValue(Value* val, INodeTab& nodeTab, INodeTab** pResult);
+extern ScripterExport GetINodeTabResult GetINodeTabFromValue(Value* val, INodeTab& nodeTab, INodeTab** pResult);
 
 
 visible_class (MAXNode)
@@ -1766,6 +1766,9 @@ public:
 #include "../macros/define_implementations.h"
 #	include "../protocols/arrays.inl"
 
+	Value*			get_property(Value** arg_list, int count) override;
+	Value*			set_property(Value** arg_list, int count) override;
+
 	// built-in property accessors 
 	def_property ( count );
 
@@ -1863,6 +1866,12 @@ public:
 	def_generic( ne,		"!=");
 	def_generic(coerce, "coerce");
 	
+	def_generic_debug_ok	( getUserPropBuffer,	"getUserPropBuffer");
+	def_generic				( setUserPropBuffer,	"setUserPropBuffer");
+
+	def_generic_debug_ok    (getUserProp, "getUserProp");
+	def_generic             (setUserProp, "setUserProp");
+
 	/* declare built-in property accessors */
 	def_property	( name );
 	def_property	( children );

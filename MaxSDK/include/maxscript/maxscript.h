@@ -165,6 +165,7 @@ ScripterExport Value* _get_key_arg_or_default(Value** arg_list, int count, Value
 #define node_key_arg(key, var, def)			((var = _get_key_arg(arg_list, count, n_##key)) == &unsupplied ? def : var->to_node())
 #define string_key_arg(key, var, def)		((var = _get_key_arg(arg_list, count, n_##key)) == &unsupplied ? def : var->to_string())
 #define filename_key_arg(key, var, def)		((var = _get_key_arg(arg_list, count, n_##key)) == &unsupplied ? def : var->to_filename())
+#define point4_key_arg(key, var, def)		((var = _get_key_arg(arg_list, count, n_##key)) == &unsupplied ? def : var->to_point4())
 
 #define check_arg_count(fn, w, g)			if ((w) != (g)) throw ArgCountError (_M(#fn), w, g)
 #define check_gen_arg_count(fn, w, g)		if ((w) != (g + 1)) throw ArgCountError (_M(#fn), w, g + 1)
@@ -274,6 +275,8 @@ extern ScripterExport Interface11* MAXScript_interface11;
 extern ScripterExport Interface13* MAXScript_interface13;
 extern ScripterExport Interface14* MAXScript_interface14;
 extern ScripterExport Interface17* MAXScript_interface17;
+extern ScripterExport Interface18* MAXScript_interface18;
+extern ScripterExport Interface19* MAXScript_interface19;
 
 extern ScripterExport BOOL		escape_enabled; // RK: 05/20/02, 5.0 or later only
 extern ScripterExport BOOL		MAXScript_detaching;
@@ -366,6 +369,9 @@ ScripterExport DWORD		ProcessDefaultActionVal (Value* inpActionVal, DWORD defaul
 //! The MXS debugger interface. A Singleton.
 extern ScripterExport IMXSDebugger* theMXSDebugger;
 
+// type_check is a general Value type checking macro
+// prefer integer_type_check macro to check for integer types validity for all Integer types (Integer, Inter64 and IntegerPtr)
+// prefer float_type_check macro to check for floating types validity for all Float types (Float and Double)
 #define type_check(val, cl, where) if (val->tag != class_tag(cl)) throw TypeError (where, val, &cl##_class);
 
 // macros for setting numeric printing to English locale and back again - all numeric output in MAXScript is English

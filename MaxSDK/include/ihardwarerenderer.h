@@ -138,13 +138,13 @@ public:
 	//	Returns a pointer to a GFX D3DXMesh class that wraps the D3DXMesh
 	//	object
 
-	virtual DWORD_PTR	LoadMesh(LPCTSTR filename) = 0;
+	virtual DWORD_PTR	LoadMesh(LPCMSTR filename) = 0;
 
 	// Save a D3DXMesh to a .X file
 	//
 	//	pMesh = pointer to a GFX D3DMesh class
 
-	virtual void	SaveMesh(LPCTSTR filename, DWORD_PTR pMesh) = 0;
+	virtual void	SaveMesh(LPCMSTR filename, DWORD_PTR pMesh) = 0;
 
 	// Free a D3DXMesh
 	//
@@ -198,10 +198,10 @@ public:
 	/*! \remarks This simple loads a texture from the supplied filename using the
 	default options for D3DXCreateTextureFromFile. Please refer to the DirectX
 	documentation for further information. */
-	virtual DWORD_PTR	LoadTexture(LPCTSTR filename) = 0;
+	virtual DWORD_PTR	LoadTexture(LPCMSTR filename) = 0;
 
 	// Save a D3DTexture to a file, includes CubeMaps
-	virtual void	SaveTexture(LPCTSTR filename, DWORD_PTR pTex) = 0;
+	virtual void	SaveTexture(LPCMSTR filename, DWORD_PTR pTex) = 0;
 
 	// Free a D3DTexture, includes CubeMaps
 	virtual void	FreeTexture(DWORD_PTR pTex) = 0;
@@ -260,10 +260,10 @@ public:
 	//
 	//	Returns a pointer to a GFX D3DVertexShader class
 
-	virtual DWORD_PTR	LoadVertexShader(LPCTSTR filename) = 0;
+	virtual DWORD_PTR	LoadVertexShader(LPCMSTR filename) = 0;
 
 	// Save a D3DVertexShader to a file
-	virtual void	SaveVertexShader(LPCTSTR filename, DWORD_PTR pVertexShader) = 0;
+	virtual void	SaveVertexShader(LPCMSTR filename, DWORD_PTR pVertexShader) = 0;
 
 	// Set a D3DVertexShader
 	virtual void	SetVertexShader(DWORD_PTR pVertexShader) = 0;
@@ -292,10 +292,10 @@ public:
 	//
 	//	Returns a pointer to a GFX D3DPixelShader class
 
-	virtual DWORD_PTR	LoadPixelShader(LPCTSTR filename) = 0;
+	virtual DWORD_PTR	LoadPixelShader(LPCMSTR filename) = 0;
 
 	// Save a D3DPixelShader to a file
-	virtual void	SavePixelShader(LPCTSTR filename, DWORD_PTR pPixelShader) = 0;
+	virtual void	SavePixelShader(LPCMSTR filename, DWORD_PTR pPixelShader) = 0;
 
 	// Set a D3DPixelShader
 	virtual void	SetPixelShader(DWORD_PTR pPixelShader) = 0;
@@ -319,24 +319,24 @@ public:
 	virtual	DWORD_PTR	BuildEffect(LPCSTR code) = 0;
 
 	// Load a D3DXEffect from a file
-	virtual DWORD_PTR	LoadEffect(LPCTSTR filename) = 0;
+	virtual DWORD_PTR	LoadEffect(LPCMSTR filename) = 0;
 
 	// Save a D3DXEffect to a file
-	virtual void	SaveEffect(LPCTSTR filename, DWORD_PTR pEffect) = 0;
+	virtual void	SaveEffect(LPCMSTR filename, DWORD_PTR pEffect) = 0;
 
 	// Set D3DXEffect Parameters
 	//
 	//	name is the name of the parameter, type is the D3DXPARAMETERTYPE of the
 	//	parameter, pData is the actual data
 	//
-	virtual void	SetEffectParameter(DWORD_PTR pEffect, LPCTSTR name,
+	virtual void	SetEffectParameter(DWORD_PTR pEffect, LPCMSTR name,
 		DWORD type, void *pData) = 0;
 
 	// Set D3DXEffect Technique
 	//
 	//	name is the name of the technique
 	//
-	virtual void	SetEffectTechnique(DWORD_PTR pEffect, LPCTSTR name) = 0;
+	virtual void	SetEffectTechnique(DWORD_PTR pEffect, LPCMSTR name) = 0;
 
 	// Begin a D3DXEffect
 	virtual void	BeginEffect(DWORD_PTR pEffect) = 0;

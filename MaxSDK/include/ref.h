@@ -698,6 +698,10 @@ system ignores validity of a material. It updates material only when receiving t
 //! \brief Notification sent when any position in modifier stack has changed.
 #define REFMSG_HISTORY_POS_CHANGED							0x00000283
 
+//! \brief Notification sent when a node's user defined properties changed.
+/*! This message is sent when either GBufId or User-defined attributes of a node changed.*/
+#define REFMSG_NODE_USER_PROPERTY_CHANGED		 			0x00000284
+
 //@}
 
 //! \brief Message numbers above this value can be defined for use by sub-classes, below are reserved.
@@ -780,7 +784,6 @@ enum NotifyDependentsOption {
 //! \param  propagated_notifyDependentsOption - Returns the level of optimization dependents should request.
 //! \return true if the message can be optimized; false if it cannot.
 CoreExport bool CanOptimizeDependentNotifications(NotifyDependentsOption notifyDependentsOption, RefMessage message, NotifyDependentsOption& propagated_notifyDependentsOption);
-
 
 class ReferenceTarget;
 /*! \brief Creates a typename for ReferenceTarget pointers */
@@ -2255,24 +2258,11 @@ class ReferenceTarget : public ReferenceMaker {
 			int whichRef = -1);
 
 	private:
-		//! \brief Reference list link-node
-		/*! A linked list of these objects constitute the list of ReferenceMakers that a
-		ReferenceTarget keeps internally. These RefListItems are not accessed directly
-		by the reference target, but are used in the RefList class. */
-		class RefListItem : public MaxSDK::Util::Noncopyable 
-		{
-		public:
-			ReferenceMaker* mMaker;
-			RefListItem* mNext;
-			//! Constructor
-			RefListItem( ReferenceMaker* maker, RefListItem *list );
-			~RefListItem();
-		};
+		class RefListImpl;
 
 		//! \brief Stores the list of dependents for a ReferenceTargets, i.e. the list of references to a ReferenceTarget
-		/*! Each Reference target uses one object of this class to store it's dependents
-		(reference makers). Each item in the list is pointed to by a RefListItem which
-		are associated in a linked list. */
+		/*! Each ReferenceTarget uses one object of this class to store and maintain
+		  pointers to its dependents (ReferenceMakers) */
 		class RefList: public MaxSDK::Util::Noncopyable 
 		{
 			//! \brief Helper class used internally
@@ -2285,9 +2275,6 @@ class ReferenceTarget : public ReferenceMaker {
 			//! \brief Destructor
 			~RefList();
 
-			//! \brief Gets the first item in the reference list
-			RefListItem* FirstItem() const;
-
 			//! \brief Deletes the specified item from the list.
 			/*! \param  maker - The item to delete.
 			\param  eval - If nonzero then when inside of NotifyDependents(),
@@ -2296,7 +2283,7 @@ class ReferenceTarget : public ReferenceMaker {
 			otherwise REF_INVALID is returned. */
 			RefResult DeleteItem(ReferenceMaker* maker, int eval);
 
-			//! \brief Adds an item to the list by creating a RefListItem pointer.
+			//! \brief Adds an item to the list.
 			/*! The new	pointer is placed at the start of the list.
 			\param  maker - Handle to the ReferenceMaker
 			\return Always returns REF_SUCCEED. */
@@ -2317,8 +2304,8 @@ class ReferenceTarget : public ReferenceMaker {
 			bool CleanupReferences();
 
 		private: // data members
-			//! \brief Head of the reference list (RefList)
-			RefListItem* mFirst;	
+			//! \brief Implementation of the reference list (RefListImpl)
+			RefListImpl *mMakers;
 			//! \brief The owner of the RefList
 			AnimHandle mOwnerRefTarget;
 			//! \brief When true, the RefList contains at least one item with a NULL ReferenceMaker
@@ -2374,7 +2361,7 @@ public:
 	CoreExport ReferenceMaker* Next();
 	//! \brief Resets the iterator object so it starts at the beginning again 
 	//! with the original ReferenceTarget passed.
-	CoreExport void Reset(); 
+	CoreExport void Reset();
 	
 private:
 	// No default construction allowed
@@ -2383,7 +2370,9 @@ private:
 private:
 	
 	ReferenceTarget* mTarget;
-	ReferenceTarget::RefListItem* mNext;
+	// Iterator's current index into the list of ReferenceMaker pointers.
+	// Defined as 64 bits to keep the SDK binary compatibile with Max 2019
+	__int64 mIndex;
 };
 
 class DeletedRestore : public RestoreObj
@@ -2912,10 +2901,10 @@ public:
 	\param  autoBackup - If TRUE, auto-backup is suspended, 
 	otherwise it's not changed. See Interface::EnableAutoBackup() for more information.
 	\param  saveRequired - If TRUE, backs up the "save required" flag, otherwise it doesn't.
-	See IsSaveRequired() for more information.
+	\see IsSaveRequired for more information.
 	\param  refMsgs - If TRUE, passing of reference messages is suspended, 
 	otherwise it's not changed. See DisableRefMsgs() for more information.
-	\param  sceneExplorerUdates - If TRUE, the update of all scene explorers is suspended.
+	\param  sceneExplorerUpdates - If TRUE, the update of all scene explorers is suspended.
 	*/
 	SuspendAll(
 		BOOL holdState = FALSE, 

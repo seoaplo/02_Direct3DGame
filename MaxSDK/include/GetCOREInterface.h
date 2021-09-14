@@ -21,6 +21,8 @@ class Interface14;
 class Interface15;
 class Interface16;
 class Interface17;
+class Interface18;
+class Interface19;
 class FPInterface;
 
 /// \defgroup SystemCoreInterfaceAccess Access to services exposed by 3ds Max's "core"
@@ -38,6 +40,8 @@ CoreExport Interface14* GetCOREInterface14();
 CoreExport Interface15* GetCOREInterface15();
 CoreExport Interface16* GetCOREInterface16();
 CoreExport Interface17* GetCOREInterface17();
+CoreExport Interface18* GetCOREInterface18();
+CoreExport Interface19* GetCOREInterface19();
 //@}
 
 /// \defgroup CoreInterfaceManagement Core Interface Management

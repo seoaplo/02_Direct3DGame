@@ -28,7 +28,7 @@ enum EMxsMaxFileVersion
 	//! \brief The current 3ds Max version, corresponds to MAX_RELEASE
 	kMxsMaxFileVersion_Current = 1,
 
-	//! \brief 3ds Max 2016 file version, corresponds to MAX_RELEASE_R18
+	//! \brief 3ds Max 2016 file version, corresponds to MAX_RELEASE_R18, obsolete as of 3ds Max 2020
 	kMxsMaxFileVersion_2016 = 2016,
 	//! \brief 3ds Max 2017 file version, corresponds to MAX_RELEASE_R19
 	kMxsMaxFileVersion_2017 = 2017,
@@ -36,6 +36,8 @@ enum EMxsMaxFileVersion
 	kMxsMaxFileVersion_2018 = 2018,
 	//! \brief 3ds Max 2019 file version, corresponds to MAX_RELEASE_R21
 	kMxsMaxFileVersion_2019 = 2019,
+	//! \brief 3ds Max 2020 file version, corresponds to MAX_RELEASE_R22
+	kMxsMaxFileVersion_2020 = 2020,
 };
 
 /** 

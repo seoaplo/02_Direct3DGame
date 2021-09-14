@@ -35,29 +35,32 @@
 class ILuminaire : public FPMixinInterface 
 {
 	public:
-    // Dimming a luminaire means changing the intensity of all of its light 
-    // sources at once with the same percentage.
-    // A dimmer value of zero means effectively turning off all light sources 
-    // in the luminiare; a dimmer value of 100 means that the light sources 
-    // shine at their ("factory") default intensity, while a dimmer value 
-    // greater than 100 means that their intensity is amplified\multiplied above
-    // the ("factory") default value.
-    // In the case of standard Max light sources, "factory" default intensity 
-    // means a certain arbitrary multiplier value that is chosen by the user.
-    // In case of physically based light sources, "factory" default intensity 
-    // means the intensity given in the light's photometric file.
+		// Dimming a luminaire means changing the intensity of all of its light 
+		// sources at once with the same percentage.
+		// A dimmer value of zero means effectively turning off all light sources 
+		// in the luminiare; a dimmer value of 100 means that the light sources 
+		// shine at their ("factory") default intensity, while a dimmer value 
+		// greater than 100 means that their intensity is amplified\multiplied above
+		// the ("factory") default value.
+		// In the case of standard Max light sources, "factory" default intensity 
+		// means a certain arbitrary multiplier value that is chosen by the user.
+		// In case of physically based light sources, "factory" default intensity 
+		// means the intensity given in the light's photometric file.
 		virtual void		SetDimmer(float value, TimeValue time) = 0;
-		virtual float		GetDimmer(TimeValue time, Interval& valid = FOREVER) const = 0 ;
+		virtual float		GetDimmer(TimeValue time, Interval& valid) const = 0 ;
+		float				GetDimmer(TimeValue time) const { Interval valid = FOREVER; return GetDimmer(time, valid); }
 
 		// These methods allow for specifing and retrieving at once (simultaneously) 
-    // the filter color of all light sources of a luminaire
+		// the filter color of all light sources of a luminaire
 		virtual void		SetRGBFilterColor(Point3& value, TimeValue& time) = 0;
-		virtual Point3	GetRGBFilterColor(TimeValue& time, Interval& valid = FOREVER) const = 0;
+		virtual Point3		GetRGBFilterColor(TimeValue& time, Interval& valid) const = 0;
+		Point3				GetRGBFilterColor(TimeValue& time) const { Interval valid = FOREVER; return GetRGBFilterColor(time, valid); }
 
 		// These methods allow for specifing and retrieving at once (simultaneously) 
-    // the on\off state of all light sources of a luminaire
+		// the on\off state of all light sources of a luminaire
 		virtual void		SetUseState(bool onOff, TimeValue& time) = 0;
-		virtual bool		GetUseState(TimeValue& time, Interval& valid = FOREVER) const = 0;
+		virtual bool		GetUseState(TimeValue& time, Interval& valid) const = 0;
+		bool				GetUseState(TimeValue& time) const { Interval valid = FOREVER; return GetUseState(time, valid); }
 
 		// Function Publishing Methods IDs
 		enum 

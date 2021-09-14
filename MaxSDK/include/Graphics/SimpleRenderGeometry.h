@@ -7,6 +7,7 @@
 //
 //
 
+#pragma once
 #include <Graphics/IRenderGeometry.h>
 #include <Graphics/DrawContext.h>
 #include <Graphics/MaterialRequiredStreams.h>

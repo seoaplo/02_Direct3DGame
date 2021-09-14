@@ -35,7 +35,7 @@ namespace MaxSDK { namespace Graphics {
 
 	The following code snippet illustrates how a material plug-in may implement IHLSLMaterialTranslator:
 	\code
-	#include <./graphics/IHLSLMaterialTranslator.h>
+	_include <./graphics/IHLSLMaterialTranslator.h>
 	// A material plug-in that has HLSLMaterialHandle and needs to update HLSLMaterial parameters.
 	class MyMtlPlugin : public MtlBase, public MaxSDK::Graphics::IHLSLMaterialTranslator {
 		// HLSLMaetrialHandle omitted for brevity

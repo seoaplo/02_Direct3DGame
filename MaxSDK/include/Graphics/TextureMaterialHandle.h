@@ -14,6 +14,7 @@
 
 namespace MaxSDK { namespace Graphics {
 
+	
 /** This is material class to support material with texture.
 How to use:
 \code
@@ -26,6 +27,9 @@ pItem->SetCustomMaterial(hMaterial); // pItem is an instance of RenderItemHandle
 class TextureMaterialHandle : public BaseMaterialHandle
 {
 public:
+
+	enum FilterMode{ FilterNone, FilterLinear };
+
 	GraphicsDriverAPI TextureMaterialHandle();
 	GraphicsDriverAPI TextureMaterialHandle(const TextureMaterialHandle& from);
 	GraphicsDriverAPI TextureMaterialHandle& operator = (const TextureMaterialHandle& from);
@@ -62,6 +66,12 @@ public:
 	\return the material required streams.
 	*/
 	GraphicsDriverAPI virtual const MaterialRequiredStreams* GetRequiredStreams() const;
+
+	/** Specifies material filters.
+	Sets material filter.
+	\param[in] filters description.
+	*/
+	GraphicsDriverAPI void SetFilters(const FilterMode filters);
 };
 
 

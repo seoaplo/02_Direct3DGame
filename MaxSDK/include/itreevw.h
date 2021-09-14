@@ -46,7 +46,7 @@ class Animatable;
 #define TV_CAN_DOCK_TOP	3	// floating but able to dock on top
 
 // Major modes
-#define MODE_EDITKEYS		0
+#define MODE_EDITKEYS		0 //dope sheet mode
 #define MODE_EDITTIME		1
 #define MODE_EDITRANGES		2
 #define MODE_POSRANGES		3
@@ -148,6 +148,7 @@ public:
 		};
 	#pragma warning (push)
 	#pragma warning(disable:4238)
+	#pragma warning(disable:4840)
 	BEGIN_FUNCTION_MAP
 		RO_PROP_FN(tv_getHWnd, GetHWnd, TYPE_HWND);
 		RO_PROP_FN(tv_layoutName, GetLayoutName, TYPE_TSTR_BV);

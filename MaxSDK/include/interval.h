@@ -88,6 +88,14 @@ class Interval: public MaxHeapOperators {
             of everything. Empty sets are subsets or everything. */
         bool IsSubset(const Interval& subset) const { return (IsInfinite() || subset.Empty() || InInterval(subset)); }
 
+		/*! Returns whether an interval intersects with another interval. */
+		bool Intersects(const Interval& other) const
+		{ 
+			if (Empty() || other.Empty())
+				return false;
+			return InInterval(other.Start()) || InInterval(other.End()) || other.InInterval(Start()) || other.InInterval(End());
+		}
+
 		/*! \remarks Returns 1 if the interval is <b>EMPTY</b>, i.e. has a
 		start and end time equal to <b>TIME_NegInfinity</b>. Returns 0
 		otherwise. */

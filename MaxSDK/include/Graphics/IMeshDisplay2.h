@@ -15,6 +15,7 @@
 
 #include "../BaseInterface.h"
 
+
 /** Interface id of IMeshDisplay2.
 */
 #define IMesh_DISPLAY2_INTERFACE_ID Interface_ID(0x177b2945, 0x776a1f62)
@@ -22,6 +23,8 @@
 namespace MaxSDK { namespace Graphics {
 
 class IMeshDisplay2Impl;
+
+
 
 /** Use this interface to query the per node related render items from a mesh or mnesh.
 	One can directly query this interface from a mesh or mnmesh object.
@@ -61,8 +64,11 @@ public:
 
 	GraphicsDriverAPI virtual BaseInterface* GetInterface(Interface_ID id);
 
+
 private:
 	IMeshDisplay2Impl* mpImpl;
+
+
 };
 
 } } // end namespace

@@ -88,6 +88,7 @@ const ChannelMask EDGEVISIBLITY_CHANNEL =			(ChannelMask)(1<<11);
 //! \brief For internal use
 /*! A channel used to determine whether we should use tri strips or not */
 const ChannelMask DONT_RECREATE_TRISTRIP_CHANNEL =	(ChannelMask)(1<<12);
+
 //! \brief This is no longer used. 
 /*! Material applied to object as whole. Materials are rolled into the Face data 
 structure and are part of the topology channel. */

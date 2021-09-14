@@ -15,7 +15,7 @@ void SSkinManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, i
 	int ChildNum = pNode->NumChildren();
 	int iObjectNumber = -1;
 
-	SCAObject& Object = m_ObjectList[iObjectNum];
+	SCAObject Object;
 	iObjectNumber = iObjectNum;
 	CheckID = pNode->GetObjectRef();
 	Control* pControl = pNode->GetTMController();
@@ -78,7 +78,10 @@ void SSkinManager::AddObject(INode* pNode, SAScene& Scene, Interval& interval, i
 	SAGlobal::DumpMatrix3(Object.matInvWorld, &Invwtm);
 
 	Object.m_Mesh.iMaterialID = iMaterialID;
+	if (iMaterialID < 0) return;
 	GetMesh(pNode, Object.m_Mesh, interval, MatrixNodeList);
+
+	m_ObjectList.push_back(Object);
 }
 void SSkinManager::GetMesh(INode* pNode, SCAMesh& sMesh, Interval& interval, NodeList& MatrixNodeList)
 {

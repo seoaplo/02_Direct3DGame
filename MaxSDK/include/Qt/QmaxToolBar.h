@@ -96,6 +96,11 @@ private:
 	Q_DECLARE_PRIVATE( QmaxToolBar )
 	Q_DISABLE_COPY( QmaxToolBar )
 	QmaxToolBarPrivate* d_ptr;
+
+protected:
+	bool event( QEvent* evt ) override;
+	bool nativeEvent( const QByteArray& eventType, void* message, long* result ) override;
+
 };
 
 };

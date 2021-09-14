@@ -116,7 +116,7 @@ namespace MaxSDK { namespace Graphics {
 		// The following function are used for initializing the connection point.
 		friend class Fragment;
 
-		ConnectionPoint(Fragment* pOwnerFragment, const Class_ID& typeID);
+		FragmentGraphAPI ConnectionPoint(Fragment* pOwnerFragment, const Class_ID& typeID);
 
 	protected:
 		Fragment* mpOwnerFragment;

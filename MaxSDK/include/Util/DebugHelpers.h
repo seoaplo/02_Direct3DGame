@@ -62,10 +62,10 @@ namespace MaxSDK
 	            More convenient than having to \#ifndef NDEBUG all over the place.
 	            It also supports a variable number of arguments, as you can see.
                 \param lpctszMsg The string to send to the debugger's output window. */
-	        void Trace(LPCTSTR lpctszMsg, ...);
+	        void Trace(LPCMSTR lpctszMsg, ...);
 
 	        /*! Identical to Trace(), but without the variable argument list. */
-	        void Trace0(LPCTSTR lpctszMsg);
+	        void Trace0(LPCMSTR lpctszMsg);
 
         }       // namespace DebugHelpers
     }   //namespace Util

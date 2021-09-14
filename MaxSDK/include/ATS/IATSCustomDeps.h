@@ -54,7 +54,7 @@ public:
 	virtual const MCHAR*	GetFile( UINT iIndex ) = 0;
 
 	//! \brief Get list of files
-	/*! \param[out] files reference to a Tab of TSTRs.  This parameter
+	/*! \param[out] files reference to a Tab of MSTRs.  This parameter
 	will be filled with a copy of the Custom Dependency files.
 	\return number files added to Tab.
 	*/

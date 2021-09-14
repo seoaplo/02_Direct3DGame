@@ -89,6 +89,39 @@ class INode: public ReferenceTarget, public FPMixinInterface {
 		/*! \remarks Sets the name of the node.
 		\param s   The name of the node. */
 		virtual void SetName(const MCHAR *s)=0; 
+
+        /*! \remarks Builds a string representing the object's hierachy path.
+        \param doQuoted       Place quotes around each level name.
+        \param isRootIncluded Determines whether root node is to be included in path name. */
+        WStr BuildHierarchyName(bool doQuoted = true, bool isRootIncluded = false)
+        {
+            const WStr nullStr = L"";
+            const WStr sepStr = L"/";
+            WStr pathname;
+
+            WStr levelMarker = nullStr;
+            if (doQuoted)
+            {
+                levelMarker = L"'";
+            }
+
+            INode* nextNode = this;
+            const WStr* separator = &nullStr;
+            while (nextNode != NULL)
+            {
+                INode* nodeCurr = nextNode;
+                nextNode = nodeCurr->GetParentNode();
+                if (isRootIncluded || (nextNode != NULL))
+                {
+                    WStr levelName(nodeCurr->GetName());
+                    pathname = levelMarker + levelName + levelMarker + (*separator) + pathname;
+                }
+
+                separator = &sepStr;
+            }
+
+            return pathname;
+        }
 //! @}
 		
 //! \name Transformation Matrices

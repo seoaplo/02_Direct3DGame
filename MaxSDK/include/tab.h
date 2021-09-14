@@ -58,9 +58,9 @@ struct TabHdr : public MaxHeapOperators
 ////////////////////////////////////////////////////////////////////////////////
 // Functions for internal use only: Clients should never call these.
 //
-UtilExport int TBMakeSize(TabHdr** pth, int num, int elsize); 
-UtilExport int TBInsertAt(TabHdr** pth, int at, int num, const void *el, int elsize, int extra); 
-UtilExport int TBCopy(TabHdr** pth, int at, int num, const void *el, int elsize); 
+UtilExport int TBMakeSize(TabHdr** pth, int num, int elsize);
+UtilExport int TBInsertAt(TabHdr** pth, int at, int num, const void *el, int elsize, int extra);
+UtilExport int TBCopy(TabHdr** pth, int num, const void *el, int elsize);
 UtilExport int TBDelete(TabHdr** pth, int starting, int num, int elsize);
 UtilExport void TBSetCount(TabHdr** pth, int n, int elsize, BOOL resize);
 UtilExport void zfree(void**p);
@@ -161,7 +161,7 @@ will free each piece of memory. So, the problem with using a Tab<MSTR> is that w
 you assign a Tab to another Tab, the Tab copy constructor will copy all the items 
 in the table, but it will not call the copy operator on the individual items. 
 Thus, if you had a Tab<MSTR> and you assigned it to another Tab<MSTR>, you'd have 
-two TSTRs pointing to the same memory. Then when the second one gets deleted it 
+two MSTRs pointing to the same memory. Then when the second one gets deleted it 
 will be trying to double free that memory.
 
 So again, you should only put things in a Tab that don't allocate and deallocate 
@@ -194,15 +194,15 @@ template <class T> class NoExport Tab: public MaxHeapOperators
 		Tab(const Tab& tb) : th(NULL)
 		{
 			ADSK_MAXSDK_IS_PLAIN_OLD_DATA_TYPE(T);
-			TBCopy((TabHdr**)&th, 0, tb.Count(), (tb.th ? &tb.th->data : NULL), sizeof(T)); 
+			TBCopy((TabHdr**)&th, tb.Count(), (tb.th ? &tb.th->data : NULL), sizeof(T));
 		}
 
 		//! \brief Destructor
 		/*!	The memory occupied by the Tab's items is freed, but the objects pointed 
 		by the items are not.
 		*/
-		~Tab() {
-			zfree((void**)&th); 
+		virtual ~Tab() {
+			zfree((void**)&th);
 		}
 
 		//! \brief Initializes a Tab instance
@@ -344,7 +344,7 @@ template <class T> class NoExport Tab: public MaxHeapOperators
 		\return Reference to this Tab
 		*/
 		Tab& operator=(const Tab& tb) {
-			TBCopy((TabHdr**)&th, 0, tb.Count(), (tb.th ? &tb.th->data : NULL), sizeof(T)); 
+			TBCopy((TabHdr**)&th, tb.Count(), (tb.th ? &tb.th->data : NULL), sizeof(T));
 			return *this;
 		}
 

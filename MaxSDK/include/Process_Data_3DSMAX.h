@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <fstream>
+#include "strbasic.h"
 
 // Note: this header has no dependencies on 3ds Max so that it may be included in
 // external projects without establishing a dependency on 3ds Max
@@ -53,12 +54,12 @@ namespace MaxSDK
 		/** \brief The root name of the named file mapping object that contains the ProcessData3dsMax data.
 		The process id value is appended to this string to form the full name.
 		*/
-		static const TCHAR* sProcessData3dsMaxFileMappingObjectNameRoot = _T("Local\\3dsmax_process_data_");
+		static const MCHAR* sProcessData3dsMaxFileMappingObjectNameRoot = _T("Local\\3dsmax_process_data_");
 
 		/** \brief The root name of the mutex for accessing the named file mapping object that contains the ProcessData3dsMax data.
 		The process id value is appended to this string to form the full name.
 		*/
-		static const TCHAR* sProcessData3dsMaxFileMappingObjectNameMutexRoot = _T("Local\\3dsmax_process_data_mutex");
+		static const MCHAR* sProcessData3dsMaxFileMappingObjectNameMutexRoot = _T("Local\\3dsmax_process_data_mutex");
 
 		/** \brief Utility function to get the main 3ds Max window handle for the given process handle. 
 		\param processId [in] The 3ds Max Process id to get data for.

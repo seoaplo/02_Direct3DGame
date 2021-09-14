@@ -22,7 +22,7 @@
 
 // MAX File version:
 #ifndef MAX_VERSION_MAJOR
-#define MAX_VERSION_MAJOR 21
+#define MAX_VERSION_MAJOR 22
 #endif
 
 #ifndef MAX_VERSION_MINOR
@@ -35,7 +35,7 @@
 
 // MAX Product version
 #ifndef MAX_PRODUCT_VERSION_MAJOR
-#define MAX_PRODUCT_VERSION_MAJOR 21
+#define MAX_PRODUCT_VERSION_MAJOR 22
 #endif
 
 #ifndef MAX_PRODUCT_VERSION_MINOR
@@ -51,7 +51,7 @@
 #endif
 
 #ifndef MAX_PRODUCT_YEAR_NUMBER
-#define MAX_PRODUCT_YEAR_NUMBER 2019
+#define MAX_PRODUCT_YEAR_NUMBER 2020
 #endif
 
 // MAX_RELEASE_EXTERNAL is an alternative for MAX_RELEASE (plugapi.h)

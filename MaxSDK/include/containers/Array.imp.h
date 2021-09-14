@@ -15,7 +15,7 @@
     Array container.
 
 ==============================================================================*/
-
+#pragma once
 namespace MaxSDK {
 
 template <class T> Array<T>::Array()

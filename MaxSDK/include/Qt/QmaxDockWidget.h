@@ -108,8 +108,9 @@ Q_SIGNALS:
 
 protected:
 
-	virtual bool event( QEvent* evt ) override;
-	virtual void paintEvent( QPaintEvent* evt ) override;
+	bool event( QEvent* evt ) override;
+	void paintEvent( QPaintEvent* evt ) override;
+	bool nativeEvent( const QByteArray& eventType, void* message, long* result ) override;
 
 private:
 

@@ -26,22 +26,23 @@ namespace MaxSDK
 {;
 
 /** 
-* Struct NotificationAPIUtils.
 * This namespace exposes 4 private internal calls to the 3dsmax application.
-* Useful for activeshade renderers to keep track of the active view.
+* Useful for Active Shade renderers to keep track of the active view.
 */	
 namespace NotificationAPIUtils
 {;
 	/** 
 	* Gets Active ViewExp considering extended and non extended views.
-	* \param IsAnExtendedView will be true if the view is an extended view.
+    * \param outIsAnExtendedView will be true if the view is an extended view.
+    * \return the ViewExp* for the active viewport
 	*/
-	NotificationAPIUtilsExport ViewExp* GetActiveViewExpIncludingExtendedViews(bool& IsAnExtendedView);
+	NotificationAPIUtilsExport ViewExp* GetActiveViewExpIncludingExtendedViews(bool& outIsAnExtendedView);
 	
 	/**
 	* Gets the ViewExp from its view undoID considering extended views and all tab panels not only the active tab panel.
 	* \param viewUndoID the view undo ID
 	* \param outIsAnExtendedView will be true if the view is an extended view.
+    * \return the ViewExp* for the viewport whose undoId is viewUndoID
 	*/	
 	NotificationAPIUtilsExport ViewExp* GetViewExpFromUndoIDIncludingExtendedViews(int viewUndoID, bool& outIsAnExtendedView);
 	
@@ -50,11 +51,12 @@ namespace NotificationAPIUtils
 	* \param viewUndoID the view undo ID
 	* \param outViewportLabel the viewport label.
 	*/
-	NotificationAPIUtilsExport void GetViewportLabelFromUndoIDIncludingExtendedViews(int viewUndoID, TSTR& outViewportLabel);
+	NotificationAPIUtilsExport void GetViewportLabelFromUndoIDIncludingExtendedViews(int viewUndoID, MSTR& outViewportLabel);
 	
 	/**
 	* To know if the renderer is locked
 	* \param renderSettingID the render setting ID
+    * \return true if it is locked to a given viewport
 	*/
 	NotificationAPIUtilsExport bool IsUsingActiveView(RenderSettingID renderSettingID);
 };

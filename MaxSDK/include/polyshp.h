@@ -246,12 +246,12 @@ public:
 	/** Appends the specified point to the polyline. This adds
 	* the point to the end of the points list.
 	* \param p The point to appended. */
-	CoreExport void Append(PolyPt& p);
+	CoreExport void Append(const PolyPt& p);
 
 	/** Inserts the specified point at the location passed.
 	* \param where	The "pts" array index indicating where to insert the point.
 	* \param p	The point to insert. */
-	CoreExport void Insert(int where, PolyPt& p);
+	CoreExport void Insert(int where, const PolyPt& p);
 
 	/** Deletes the specified point.
 	* \param where The "pts" array index indicating which point to delete. */

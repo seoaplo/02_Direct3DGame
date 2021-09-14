@@ -1308,6 +1308,20 @@
 	def_name ( scrollBar )
 	def_name ( asNeeded )
 
+	def_name ( reparentAction )
+	def_name ( quoteStrings )
+	def_name ( encodeCRLF )
+	def_name ( decodeCRLF )
+
+	def_name( stdScriptsLoading )
+	def_name( stdScriptsLoaded )
+	def_name( startupScriptsLoading )
+	def_name( startupScriptsLoaded )
+
+	def_name ( asArray )
+
+	def_name ( includeFullGroup )
+
 	/* distinguished marker values, un-interned names */
 	def_marker(keyarg_marker, "#keys")
 

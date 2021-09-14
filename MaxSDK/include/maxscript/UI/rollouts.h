@@ -244,7 +244,7 @@ public:
 visible_class (RolloutControl);
 //! \endcond
 
-class RolloutControl : public Value, public ReferenceMaker
+class RolloutControl : public Value
 {
 public:
 	Value*		name;
@@ -255,28 +255,23 @@ public:
 	int			keyparm_count;
 	Rollout*	parent_rollout;
 	WORD	    control_ID;
-	Control*	controller;		// optional linked animation controller
-	ParamDimension*  dim;		// controllers dimension
 	PB2Param*	pid;			// if non-NULL, indicates this control is associated with an MSPlugin parameter &
 								//   points at ParamUIRep-like data for it
 	short		flags;
 
-	ScripterExport  RolloutControl();
 	ScripterExport  RolloutControl(Value* name, Value* caption, Value** keyparms, int keyparm_count);
 	ScripterExport ~RolloutControl();
 
+	// Value
 				classof_methods (RolloutControl, Value);
-	BOOL		_is_rolloutcontrol() { return 1; }
+	BOOL		_is_rolloutcontrol() override { return 1; }
 #	define		is_rolloutcontrol(v) ((v)->_is_rolloutcontrol())
-	void		collect();
-	ScripterExport void gc_trace();
+	void		collect() override;
+	virtual	ScripterExport void gc_trace() override;
+	virtual	ScripterExport Value* get_property(Value** arg_list, int count) override;
+	virtual	ScripterExport Value* set_property(Value** arg_list, int count) override;
 
-#pragma push_macro("new")
-#undef new
-	// Needed to solve ambiguity between Collectable's operators and MaxHeapOperators
-	using Collectable::operator new;
-	using Collectable::operator delete;
-#pragma pop_macro("new")
+	// RolloutControl
 	virtual ScripterExport void	add_control(Rollout *ro, HWND parent, HINSTANCE hInst, int& current_y);
 	// Adjust the layout of existing hwnds owned by the control that were created via add_control. The
 	// implementation of this method would parallel add_control, except that it sets the position and 
@@ -292,32 +287,30 @@ public:
 	virtual ScripterExport void	process_layout_params(Rollout *ro, layout_data* pos, int& current_y);
 	virtual ScripterExport void	setup_layout(Rollout *ro, layout_data* pos, int& current_y);
 	virtual ScripterExport void	process_common_params();
+
 	virtual ScripterExport void	call_event_handler(Rollout *ro, Value* event, Value** arg_list, int count);
 	virtual ScripterExport void	run_event_handler(Rollout *ro, Value* event, Value** arg_list, int count);
 	virtual BOOL	handle_message(Rollout *ro, UINT message, WPARAM wParam, LPARAM lParam) { return FALSE; }
+
 	ScripterExport WORD	next_id();
 
-	virtual	ScripterExport Value* get_property(Value** arg_list, int count);
-	virtual	ScripterExport Value* set_property(Value** arg_list, int count);
 	virtual	ScripterExport void	set_text(const MCHAR* text, HWND ctl = NULL, Value* align = NULL);
 	virtual	ScripterExport void	set_enable();
 	virtual ScripterExport BOOL set_focus();
-	virtual ScripterExport int num_controls() { return 1; }
-	        ScripterExport Value* get_event_handler(Value* event);
-	// Animatable
-	virtual Class_ID ClassID() { return Class_ID(0x3d063ac9, 0x7136487c); }
-	virtual void GetClassName(MSTR& s) { s = _M("RolloutControl"); } // from Animatable
+	virtual int num_controls() { return 1; }
+	ScripterExport Value* get_event_handler(Value* event);
+	ScripterExport Value* get_wrapped_event_handler(Value* event);
 
+	virtual void ui_time_changed() { } // called when the ui time has changed, implement if control needs to be updated
+	virtual Control* get_controller() { return nullptr; } // get the controller for this rollout control. Overrriden by AnimatableRolloutControl
+	virtual BOOL controller_ok(Control* c) { return FALSE; } // return TRUE if controller 'c' can be assigned to the ui control
 
-	// ReferenceMaker
-	int			NumRefs() { return 1; }
-	RefTargetHandle GetReference(int i) { return controller; }
-protected:
-	virtual void		SetReference(int i, RefTargetHandle rtarg) { controller = (Control*)rtarg; }
-public:
-	ScripterExport RefResult NotifyRefChanged(const Interval& changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message, BOOL propagate);
-	virtual void controller_changed() { }
-	virtual BOOL controller_ok(Control* c) { return FALSE; }
+	// get primary hwnd associated with the rollout control
+	ScripterExport HWND GetHWND();
+
+	// returns true if the rollout control is disabled externally (usually because it's locked),
+	// and should thus show itself in an disabled state.
+	ScripterExport bool IsDisabledExternally();
 
 	// PB2 UI update
 	ScripterExport IParamBlock2* get_pblock();
@@ -329,16 +322,87 @@ public:
 	virtual int FindSubTexFromHWND(HWND hw) { return -1; }
 	virtual void SetMtlDADMgr(DADMgr* dad) { }
 	virtual int FindSubMtlFromHWND(HWND hw) { return -1; } 
+};
 
-	// added for r8. wraps handler function in a PluginMethod pointing at scripted plugin associated with rollout 
-	ScripterExport Value* get_wrapped_event_handler(Value* event);
+/* ui controls that have animation controllers, such as sliders and spinners, derive from AnimatableRolloutControl. This class handles the controller. 
+We don't want the RolloutControl to derive from Animatable, nor create an Animatable in its ctor since RolloutControls are created in the Listener thread.
+We only want to create Animatables in the main thread. A AnimatableRolloutControl::ControllerHolder instance is created when needed and is used to
+hold the controller.
+*/
+class AnimatableRolloutControl : public RolloutControl
+{
+public:
+	/* the AnimatableRolloutControl class uses instances of this class to hold their controller. 
+	*/
+	class ControllerHolder : public ReferenceMaker
+	{
+	public:
+		explicit ControllerHolder(AnimatableRolloutControl* owner) : mOwner(owner) {}
 
-	// added for r11
-	HWND GetHWND();
+		// Animatable
+		virtual Class_ID ClassID() override { return Class_ID(0x3d063ac9, 0x7136487c); }
+		virtual void GetClassName(MSTR& s) override { s = _M("AnimatableRolloutControlControllerHolder"); }
 
-	//returns true if the rollout control is disabled externally (usually because it's locked),
-	//and should thus show itself in an disabled state.
-	bool IsDisabledExternally();
+		// ReferenceMaker
+		virtual int NumRefs() override { return 1; }
+		virtual RefTargetHandle GetReference(int i) override { return mController; }
+
+	protected:
+		virtual void SetReference(int i, RefTargetHandle rtarg) override;
+
+	public:
+		// REFMSG_CHANGE messages from the controller causes controller_changed() to be called on the owner
+		RefResult NotifyRefChanged(const Interval& changeInt, RefTargetHandle hTarget, PartID& partID,
+				RefMessage message, BOOL propagate) override;
+
+		// ControllerHolder
+		virtual Control* get_controller() { return mController; }
+		virtual void set_controller(Control* c) { ReplaceReference(0, c); }
+		virtual void gc_trace();
+
+	private:
+		Control* mController = nullptr; // the animation controller
+		// AnimatableRolloutControl::process_common_params potentially replaces the reference to the controller. That is called while the 
+		// hold system is suspended. That can result in undo/redo instability if there were restore objects using the previous controller.
+		// We hold a MAXControl* here to prevent this instability, relying on the fact the the MAXControl will not be deleted
+		// until a full gc occurs, at which time the undo system is already empty or is flushed.
+		Value* mMAXControl = nullptr;
+		AnimatableRolloutControl* mOwner = nullptr; // the owning AnimatableRolloutControl
+	};
+public:
+	AnimatableRolloutControl(Value* name, Value* caption, Value** keyparms, int keyparm_count);
+	~AnimatableRolloutControl();
+
+#pragma push_macro("new")
+#undef new
+	// Needed to solve ambiguity between Collectable's operators and MaxHeapOperators
+	using Collectable::operator new;
+	using Collectable::operator delete;
+#pragma pop_macro("new")
+
+	// Value
+	virtual ScripterExport void gc_trace() override;
+
+	// RolloutControl
+	virtual ScripterExport void process_common_params() override;
+	virtual ScripterExport Value* get_property(Value** arg_list, int count) override;
+	virtual ScripterExport Value* set_property(Value** arg_list, int count) override;
+
+	virtual ScripterExport void ui_time_changed() override; // default implementation calls controller_changed
+	virtual Control* get_controller() override;
+	virtual BOOL controller_ok(Control* c) override { return FALSE; }
+
+	// AnimatableRolloutControl
+	void ScripterExport set_controller(Control* c);
+	// following is called when controller or its value has changed, ui needs to update to new value.
+	// derived classes must implement this method
+	virtual void controller_changed() = 0;
+
+protected:
+	ParamDimension* dim = nullptr; // controller's dimension
+
+private:
+	ControllerHolder* mControllerHolder = nullptr; // the holder of the animation controller
 };
 
 // flag bits for RolloutControl::flags
@@ -607,7 +671,7 @@ public:
 visible_class_s (SpinnerControl, RolloutControl);
 //! \endcond
 
-class SpinnerControl : public RolloutControl
+class SpinnerControl : public AnimatableRolloutControl
 {
 public:
 	float		fvalue = 0.f;
@@ -651,7 +715,7 @@ public:
 visible_class_s (SliderControl, RolloutControl);
 //! \endcond
 
-class SliderControl : public RolloutControl
+class SliderControl : public AnimatableRolloutControl
 {
 public:
 	float		value = 0.f;

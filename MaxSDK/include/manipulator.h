@@ -572,8 +572,8 @@ public:
 	 <b>Point3\& selColor</b>\n\n
 	 The color of the gizmo when selected. */
     ManipExport ManipulatorGizmo(PolyShape* pShape, DWORD flags,
-                     Point3& unselColor,
-                     Point3& selColor =  GetSubSelColor());
+                     const Point3& unselColor,
+                     const Point3& selColor =  GetSubSelColor());
 	 /*! \remarks Constructor. This constructor method is used to initialize a mesh
 	 manipulator.
 	 \par Parameters:
@@ -586,8 +586,8 @@ public:
 	 <b>Point3\& selColor</b>\n\n
 	 The color of the gizmo when selected. */
     ManipExport ManipulatorGizmo(Mesh* pMesh, DWORD flags,
-                     Point3& unselColor,
-                     Point3& selColor = GetSubSelColor());
+                     const Point3& unselColor,
+                     const Point3& selColor = GetSubSelColor());
 	 /*! \remarks Constructor. This constructor method is used to initialize a
 	 marker manipulator.
 	 \par Parameters:
@@ -603,8 +603,8 @@ public:
 	 The color of the gizmo when selected. */
     ManipExport ManipulatorGizmo(MarkerType markerType, Point3& position,
                      DWORD flags,
-                     Point3& unselColor,
-                     Point3& selColor = GetSubSelColor());
+                     const Point3& unselColor,
+                     const Point3& selColor = GetSubSelColor());
 	 /*! \remarks Constructor. This constructor method is used to initialize a text
 	 manipulator.
 	 \par Parameters:
@@ -620,8 +620,8 @@ public:
 	 The color of the gizmo when selected. */
     ManipExport ManipulatorGizmo(const MCHAR* pText, Point3& position,
                      DWORD flags,
-                     Point3& unselColor,
-                     Point3& selColor = GetSubSelColor());
+                     const Point3& unselColor,
+                     const Point3& selColor = GetSubSelColor());
     /*! \remarks Destructor. */
     ManipExport ~ManipulatorGizmo();
                      
@@ -1010,8 +1010,8 @@ public:
     <b>Point3\& selColor = GetSubSelColor()</b>\n\n
     The color of the gizmo when selected. */
     virtual void	AppendPolyShape(PolyShape* pPolyShape, DWORD flags,
-                                    Point3& unselColor,
-                                    Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
+                                    const Point3& unselColor,
+                                    const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
     
     /*! \remarks Implemented by the system.\n\n
     This method adds a new GizmoShape to the manipulator. The shape is defined
@@ -1040,8 +1040,8 @@ public:
     <b>Point3\& selColor = GetSubSelColor()</b>\n\n
     The color of the gizmo when selected. */
     virtual void	AppendGizmo(GizmoShape* pGizmoShape, DWORD flags,
-                                Point3& unselColor,
-                                Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
+                                const Point3& unselColor,
+                                const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
     
     /*! \remarks Implemented by the system.\n\n
     This method adds a new mesh to the manipulator. The mesh is defined in the
@@ -1067,8 +1067,8 @@ public:
     <b>Point3\& selColor = GetSubSelColor()</b>\n\n
     The color of the gizmo when selected. */
     virtual void	AppendMesh(Mesh* pMesh, DWORD flags,
-                               Point3& unselColor,
-                               Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
+                               const Point3& unselColor,
+                               const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
     
     /*! \remarks Implemented by the system.\n\n
     This method adds a new marker to the manipulator.
@@ -1099,8 +1099,8 @@ public:
     The color of the gizmo when selected. */
     virtual void	AppendMarker(MarkerType markerType, Point3& position,
                                  DWORD flags,
-                                 Point3& unselColor,
-                                 Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
+                                 const Point3& unselColor,
+                                 const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
     
     /*! \remarks Implemented by the system.\n\n
     This method adds a new text entry to the manipulator.
@@ -1131,8 +1131,8 @@ public:
     The color of the gizmo when selected. */
     virtual void	AppendText(const MCHAR* pText, Point3& position,
                                DWORD flags,
-                               Point3& unselColor,
-                               Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
+                               const Point3& unselColor,
+                               const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected))=0;
     
     /*! \remarks This method returns the current status of the mouse.
     \return  One of the following values:\n\n
@@ -1318,8 +1318,8 @@ public:
     <b>Point3\& selColor = GetSubSelColor()</b>\n\n
     The color of the gizmo when selected. */
     ManipExport void AppendPolyShape(PolyShape* pPolyShape, DWORD flags,
-                                     Point3& unselColor,
-                                     Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
+                                     const Point3& unselColor,
+                                     const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
     /*! \remarks Implemented by the system.\n\n
     This method adds a new GIzmoShape to the manipulator. The shape is defined
     in the local coordinates of the node that owns the manipulator.
@@ -1343,8 +1343,8 @@ public:
     <b>Point3\& selColor = GetSubSelColor()</b>\n\n
     The color of the gizmo when selected. */
     ManipExport void AppendGizmo(GizmoShape* pGizmoShape, DWORD flags,
-                                 Point3& unselColor,
-                                 Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
+                                 const Point3& unselColor,
+                                 const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
     /*! \remarks Implemented by the system.\n\n
     This method adds a new Mesh to the manipulator. The shape is defined in the
     local coordinates of the node that owns the manipulator.
@@ -1368,8 +1368,8 @@ public:
     <b>Point3\& selColor = GetSubSelColor()</b>\n\n
     The color of the gizmo when selected. */
     ManipExport void AppendMesh(Mesh* pMesh, DWORD flags,
-                                Point3& unselColor,
-                                Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
+                                const Point3& unselColor,
+                                const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
     /*! \remarks Implemented by the system.\n\n
     This method adds a new Marker to the manipulator. The shape is defined in
     the local coordinates of the node that owns the manipulator.
@@ -1397,8 +1397,8 @@ public:
     The color of the gizmo when selected. */
     ManipExport void AppendMarker(MarkerType markerType, Point3& position,
                                   DWORD flags,
-                                  Point3& unselColor,
-                                  Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
+                                  const Point3& unselColor,
+                                  const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
     /*! \remarks Implemented by the system.\n\n
     This method adds a new Text to the manipulator. The shape is defined in the
     local coordinates of the node that owns the manipulator.
@@ -1425,8 +1425,8 @@ public:
     The color of the gizmo when selected. */
     ManipExport void AppendText(const MCHAR* pText, Point3& position,
                                 DWORD flags,
-                                Point3& unselColor,
-                                Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
+                                const Point3& unselColor,
+                                const Point3& selColor =  ColorMan()->GetColorAsPoint3(kManipulatorsSelected));
 
     /*! \remarks Implemented by the system.\n\n
     This method returns the manipulator name. */

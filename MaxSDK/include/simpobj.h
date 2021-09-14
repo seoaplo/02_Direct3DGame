@@ -74,8 +74,7 @@ class SimpleObjectBase : public GeomObject
 		CoreExport void Snap(TimeValue t, INode* inode, SnapInfo *snap, IPoint2 *p, ViewExp *vpt);
 		CoreExport int Display(TimeValue t, INode* inode, ViewExp *vpt, int flags);		
 		CoreExport unsigned long GetObjectDisplayRequirement() const;
-		CoreExport bool PrepareDisplay(
-			const MaxSDK::Graphics::UpdateDisplayContext& prepareDisplayContext);
+		CoreExport bool PrepareDisplay(const MaxSDK::Graphics::UpdateDisplayContext& prepareDisplayContext);
 
 		CoreExport bool UpdatePerNodeItems(
 			const MaxSDK::Graphics::UpdateDisplayContext& updateDisplayContext,
@@ -428,22 +427,62 @@ protected:
 	}
 };
 
-class SimpleMod;
+class SimpleModBase;
 class IParamMap;
 
-// Make a WSM out of an OSM
+/*! \sa  Class SimpleWSMObject, Class SimpleModBase, Class Deformer, Class IParamMap.\n\n
+\par Description:
+This class is used to allow any Object Space Modifier derived from
+<b>SimpleModBase</b> to easily be turned into a World Space Modifier (Space
+Warp).\n\n
+This is very simple to do because a modifier version already contains just
+about everything that needs to be done. This is because the modifier works the
+same -- it is just in world space instead of object space.\n\n
+All a developer needs to do to turn their <b>SimpleModBase</b> modifier into the
+WSM version is implement a class derived from this one and call the
+<b>SimpleOSMTOWSMObject</b> constructor from their constructor. See the sample
+code below (for the full sample code using this class see
+<b>/MAXSDK/SAMPLES/MODIFIERS/BEND.CPP</b>).\n\n
+\code
+class BendWSM : public SimpleOSMToWSMObject
+{
+	BendWSM() {}
+	BendWSM(BendMod *m) : SimpleOSMToWSMObject(m) {}
+	void DeleteThis() { delete this; }
+	SClass_ID SuperClassID() {return WSM_OBJECT_CLASS_ID;}
+	Class_ID ClassID() {return BENDWSM_CLASSID;}
+	const MCHAR *GetObjectName() {return GetString(IDS_RB_BEND2);}
+};
+\endcode
+These new modifier-based space warps are accessed in the drop-down category
+list of the Space Warps branch of the Create command panel. Choose
+Modifier-Based from the list to display buttons for each of the new space
+warps.
+\par Data Members :
+<b>SimpleModBase *mod; < / b>\n\n
+Points to the SimpleModBase instance this is based on.\n\n
+<b>static IParamMap *pmapParam; < / b>\n\n
+Points to the parameter map used to handle the user interface for this WSM.
+These are the parameter block indices for the pmap : \n\n
+\code
+#define PB_OSMTOWSM_LENGTH 0
+#define PB_OSMTOWSM_WIDTH 1
+#define PB_OSMTOWSM_HEIGHT 2
+#define PB_OSMTOWSM_DECAY 3 
+\endcode 
+*/
 class SimpleOSMToWSMObject : public SimpleWSMObject {
 	public:
-		SimpleMod *mod;
+		SimpleModBase *mod;
 		static IParamMap *pmapParam;
 
 		/*! \remarks Constructor. */
 		CoreExport SimpleOSMToWSMObject();
 		/*! \remarks Constructor.
 		\par Parameters:
-		<b>SimpleMod *m</b>\n\n
-		This is a pointer to the <b>SimpleMod</b> instance this WSM is based on. */
-		CoreExport SimpleOSMToWSMObject(SimpleMod *m);
+		<b>SimpleModBase *m</b>\n\n
+		This is a pointer to the <b>SimpleModBase</b> instance this WSM is based on. */
+		CoreExport SimpleOSMToWSMObject(SimpleModBase *m);
 
 		int NumRefs() {return 2;}
 		CoreExport RefTargetHandle GetReference(int i);

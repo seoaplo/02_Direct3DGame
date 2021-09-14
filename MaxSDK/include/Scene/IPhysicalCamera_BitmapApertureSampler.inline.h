@@ -103,9 +103,9 @@ inline IPhysicalCamera_BitmapApertureSampler::IPhysicalCamera_BitmapApertureSamp
             for(unsigned int x = 0; x < m_x_resolution; ++x, ++pixel_index)
             {
                 // Evaluate the pixel value
-                const RGBValue original_pixel_value = aperture_bitmap_access.get_pixel_value(x, unsigned int(y));
+                const RGBValue original_pixel_value = aperture_bitmap_access.get_pixel_value(x, static_cast<unsigned int>(y));
                 // Apply the center bias
-                const RGBValue pixel_value_with_bias = apply_center_bias(original_pixel_value, center_bias, x, unsigned int(y), m_x_resolution, m_y_resolution);
+                const RGBValue pixel_value_with_bias = apply_center_bias(original_pixel_value, center_bias, x, static_cast<unsigned int>(y), m_x_resolution, m_y_resolution);
 
                 // Accumulate CDF using pixel value that has the center bias applied (sampling takes this bias into account)
                 const float pixel_sampling_weight = get_sampling_weight(pixel_value_with_bias);
@@ -225,8 +225,8 @@ inline IPhysicalCamera_BitmapApertureSampler::RGBValue IPhysicalCamera_BitmapApe
     // Retrieve the pixel value, without any filtering or interpolation. I experimented with interpolation, but it results in artifacts as it introduces
     // a mismatch between the sampling weight and evaluation result. To properly do interpolation, we'd have to take the average value of the interpolated
     // pixel when calculating its sampling weight. I don't think it's worth it, though: aliasing shouldn't be visible on the aperture bitmap.
-    const unsigned int clamped_x = std::min(unsigned int(x), m_x_resolution - 1);
-    const unsigned int clamped_y = std::min(unsigned int(y), m_y_resolution - 1);
+    const unsigned int clamped_x = std::min(static_cast<unsigned int>(x), m_x_resolution - 1);
+    const unsigned int clamped_y = std::min(static_cast<unsigned int>(y), m_y_resolution - 1);
     const size_t pixel_index = size_t(clamped_x) + (size_t(clamped_y) * m_x_resolution);
     return m_pixel_weight[pixel_index];
 }

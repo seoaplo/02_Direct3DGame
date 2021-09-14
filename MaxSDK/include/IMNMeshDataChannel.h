@@ -284,13 +284,13 @@ namespace MaxSDK
 			/*! Returns the name to be used in the UI for the Data Channel modifier 
 			\param name the name to be used in the Data Channel Modifier
 			*/
-			virtual void GetUIName(TSTR& name) = 0;
+			virtual void GetUIName(MSTR& name) = 0;
 			/*! Returns the Operand Info to be used by the ui (uses Tooltip string by default)
 			*/
-			virtual void GetOperandInfo(TSTR& info) { GetTooltip(info); }
+			virtual void GetOperandInfo(MSTR& info) { GetTooltip(info); }
 			/*! Returns the tooltip to be used by the ui
 			*/
-			virtual void GetTooltip(TSTR& name) = 0;
+			virtual void GetTooltip(MSTR& name) = 0;
 			/*! Returns what this engine needs for data */
 			virtual MaxSDK::Array<InputDataType> InputRequirements() = 0;
 			/*! Returns what this engine outputs for data. Per instance data can be stored here also though if you change the requirements existing data may be deleted */
@@ -309,7 +309,7 @@ namespace MaxSDK
 				if the input type changed to a data that was not supported it can send an error message to the user
 				that this is not a valid case 
 				\param errorString is a string describing why the engine failed */
-			virtual bool ValidConditions(TSTR& errorString) { UNUSED_PARAM(errorString);return true;  };
+			virtual bool ValidConditions(MSTR& errorString) { UNUSED_PARAM(errorString);return true;  };
 
 			/*! This does all the work.  It takes the input data and then fills out the output data 
 				\param t the time that the data is to be processed
@@ -325,9 +325,9 @@ namespace MaxSDK
 			/*! This allows engines that creates floats to define the domain of there values.  This gives the display some hints on how to gradiate the color			*/
 			virtual bool HasDomain() { return false; }
 			/*! Returns the min value for the domain			*/
-			virtual float DomainMin() { return -1.0E38; }
+			virtual float DomainMin() { return -1.0E38f; }
 			/*! Returns the max value for the domain			*/
-			virtual float DomainMax() { return 1.0E38; }
+			virtual float DomainMax() { return 1.0E38f; }
 
 			/*! This allows the engine to override the modifier display.
 				Return true and implement display if you want a custom display
@@ -394,7 +394,7 @@ namespace MaxSDK
 			/*! A list of all the temporary per instance data used to handle UI.  Since the UI is tied to the single instance but there
 			can be multiple local data which needs to be processed this can let you mark which local data has been processed.  The life time of 
 			the data the pointer's points to is managed by the Data Channel Modifier's local data */
-			MaxSDK::Array<int>* mPerTempInstanceData;
+			MaxSDK::Array<int>* mPerTempInstanceData = nullptr;
 
 
 		};

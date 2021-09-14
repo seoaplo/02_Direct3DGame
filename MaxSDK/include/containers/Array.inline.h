@@ -15,7 +15,7 @@
     Array container.
 
 ==============================================================================*/
-
+#pragma once
 namespace MaxSDK {
 
 template<class T> inline T* Array<T>::ArrayAllocate(size_t len)
@@ -33,12 +33,9 @@ template<class T> inline T* Array<T>::ArrayAllocate(size_t len)
 
 template <class T> inline void Array<T>::ArrayConstruct(T* arrayBegin, size_t len, const T& defaultVal)
 {
-	if(!__has_trivial_constructor(T))
+	for(size_t i = 0; i < len; ++i)
 	{
-		for(size_t i = 0; i < len; ++i)
-		{
-			new(&(arrayBegin[i])) T(defaultVal);
-		}
+		new(&(arrayBegin[i])) T(defaultVal);
 	}
 }
 #pragma pop_macro("new")

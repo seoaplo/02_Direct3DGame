@@ -252,7 +252,7 @@ public:
 	Value* isKindOf_vf(Value** arg_list, int count) { return fn->isKindOf_vf(arg_list, count); }
 	BOOL   is_kind_of(ValueMetaClass* c) { return fn->is_kind_of(c); }
 	Value* get_property(Value** arg_list, int count) { return fn->get_property(arg_list, count); }
-	Value* eval() { return fn->eval(); }
+	Value* eval() { return Value::eval(); }  // 2019.Update1 change, ensure no sdk break
 	Value* apply(Value** arglist, int count, CallContext* cc=NULL);
 	Value* apply_no_alloc_frame(Value** arglist, int count, CallContext* cc=NULL); // LAM - 11/16/02
 };
@@ -294,7 +294,7 @@ public:
 	Value* isKindOf_vf(Value** arg_list, int count) { return fn->isKindOf_vf(arg_list, count); }
 	BOOL   is_kind_of(ValueMetaClass* c) { return (is_pluginMethod(c)) ? 1 : Value::is_kind_of(c); }
 	Value* get_property(Value** arg_list, int count) { return fn->get_property(arg_list, count); }
-	Value* eval() { return fn->eval(); }
+	Value* eval() { return Value::eval(); }  // 2019.Update1 change, ensure no sdk break
 	Value* apply(Value** arg_list, int count, CallContext* cc=NULL);
 	Value* apply_no_alloc_frame(Value** arg_list, int count, CallContext* cc=NULL);
 
@@ -563,7 +563,7 @@ private:
 	static bool			s_updateEditorOnResolve;
 };
 
-extern ScripterExport void print_FP_interface(CharStream* out, FPInterface* fpi, bool getPropNames = true, 
+ScripterExport void print_FP_interface(CharStream* out, FPInterface* fpi, bool getPropNames = true, 
 			   bool getMethodNames = true, bool getInterfaceNames = true, bool getActionTables = true);
 
 // FPMixinInterfaceValue provides wrappers for mixin interfaces on individual target objects
@@ -705,3 +705,51 @@ public:
 	Value*		apply(Value** arglist, int count, CallContext* cc=NULL);
 };
 
+/*! \remarks This function will wrap a Value in a StructMethod and/or a PluginMethod if the value is a 
+MAXScriptFunction, the code is currently in a structure or plugin context, and the MAXScriptFunction's
+owner is the StructDef associated with the structure or the MSPluginClass associated with the plugin.
+\par Parameters:
+<b>Value* val</b>\n\n
+The Value to potentially wrap.\n\n
+<b>MAXScript_TLS* _tls</b>\n\n
+The current MAXScript thread local storage pointer if known.
+\return If val is a MAXScriptFunction, either a wrapper for the MAXScriptFunction, the MAXScriptFunction, or
+if not a MAXScriptFunction, the val.
+\par Description:
+This function is used when storing a MAXScriptFunction for later use in a callback. The MAXScriptFunction
+needs to be wrapped in a StructMethod and/or a PluginMethod if the MAXScriptFunction is defined by a StructDef 
+and/or MSPluginClass so that the proper context is set when later calling the MAXScriptFunction. This context
+allows plugin and structure locals to be properly resolved to the instance of the plugin and/or structure
+the MAXScriptFunction was acquired from.  
+*/
+ScripterExport Value* CreateWrappedMAXScriptFunction(Value* val, MAXScript_TLS* _tls = nullptr);
+
+/*! \remarks Determines the number of parameters defined by a MAXScriptFunction.
+\par Parameters:
+<b>Value* val</b>\n\n
+A potentially wrapped MAXScriptFunction.\n\n
+<b>int& parameterCount</b>\n\n
+The number of parameters defined by a MAXScriptFunction.
+\return True if val is a MAXScriptFunction or a wrapped MAXScriptFunction, and the parameterCount arg was set. Otherwise, false.
+*/
+ScripterExport bool GetMAXScriptFunctionParameterCount(Value* val, int& parameterCount);
+
+/*! \remarks Determines if 2 values point to the same MAXScriptFunction in the same context.
+\par Parameters:
+<b>Value* fn1</b>\n\n
+The first potentially wrapped MAXScriptFunction.\n\n
+<b>Value* fn2</b>\n\n
+The second potentially wrapped MAXScriptFunction.\n\n
+\return True if both vals point to the same MAXScriptFunction, and if they are wrapped MAXScriptFunctions, 
+whether there contexts are the same. Otherwise, false.
+*/
+ScripterExport bool IsSameMAXScriptFunction(Value* fn1, Value* fn2, MAXScript_TLS* _tls = nullptr);
+
+
+/*! \remarks Return the wrapped MAXScriptFunction. MAXScriptFunction may be wrapped in a StructMethod and/or a PluginMethod
+\par Parameters:
+<b>Value* val</b>\n\n
+A potentially wrapped MAXScriptFunction.\n\n
+\return The wrapped MAXScriptFunction. If val is not a MAXScriptFunction, StructMethod, or PluginMethod, val is returned
+*/
+ScripterExport Value* GetWrappedMAXScriptFunction(Value* val);

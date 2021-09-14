@@ -37,6 +37,18 @@
 
 #pragma once
 
+#pragma message("zlibdll.h is deprecated, use zlib.h instead")
+/*
+zlibdll.h exposes a customized old version of zlib and is deprecated as of 3ds Max 2019 Update 1.
+Recommend usage of zlib.h instead. zlib.h is included in the zlib distribution package.
+See the "Third Party SDKs" section of the SDK Requirements topic in the 3ds Max Developer's Guide for more information.
+See http://help.autodesk.com/view/3DSMAX/2019/ENU/?guid=__developer_about_the_3ds_max_sdk_sdk_requirements_html
+*/
+
+
+#ifndef ZLIB_H
+#define ZLIB_H
+
 #define ZLIB_VERSION "1.0.4"
 
 #include "maxheap.h"
@@ -682,3 +694,4 @@ extern int  inflateInit2_(z_streamp strm, int  windowBits,
         inflateInit2_((strm), (windowBits), ZLIB_VERSION, sizeof(z_stream))
 
 
+#endif

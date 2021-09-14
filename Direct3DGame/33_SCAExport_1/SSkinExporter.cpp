@@ -5,12 +5,11 @@ void SSkinExporter::Convert()
 	m_SkinManager.Release();
 	SAExporter::CreateMaterialList();
 	m_SkinManager.SetSize(m_iSelectNodeMax);
-	for (auto& pNode : m_SelectNodeList)
+	for (auto& pNode : SAExporter::g_NodeList)
 	{
 		int iMaterialNum = SAExporter::FindMaterial(pNode.first);
 		m_SkinManager.AddObject(pNode.first, g_Scene, g_Interval, pNode.second, iMaterialNum, g_NodeList);
 	}
-
 }
 bool SSkinExporter::Export()
 {
@@ -32,7 +31,7 @@ void SSkinExporter::ExportHeader(FILE* pStream)
 {
 	if (m_pStream == nullptr) return;
 	g_Scene.iNumMaterials = g_MaterialManager.m_MaterialList.size();
-	g_Scene.iNumObjects = m_SelectNodeList.size();
+	g_Scene.iNumObjects = m_SkinManager.m_ObjectList.size();
 	_ftprintf(m_pStream, _T("%s"), _T("SkinExporter100"));
 	_ftprintf(m_pStream, _T("\n%s %d %d %d %d %d %d"),
 		L"#HEADERINFO",

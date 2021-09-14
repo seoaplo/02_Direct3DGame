@@ -179,8 +179,10 @@ public Q_SLOTS:
 	void setDockingLocked( bool state );
 
 protected:
-	virtual bool eventFilter( QObject* obj, QEvent* evt ) override;
-	virtual void childEvent( QChildEvent* evt ) override;
+	bool eventFilter( QObject* obj, QEvent* evt ) override;
+	void childEvent( QChildEvent* evt ) override;
+	bool event( QEvent* evt ) override;
+	bool nativeEvent( const QByteArray& eventType, void* message, long* result ) override;
 
 	/** \brief Adds the default docking options for a given toolbar or dock widget 
 	* to the specified menu. */

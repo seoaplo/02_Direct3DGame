@@ -79,10 +79,10 @@ namespace MaxSDK
          *                      Unicode characters to the file. Otherwise, the function writes ANSI characters.
         */
         UtilExport BOOL WritePrivateProfileString(
-            LPCTSTR pSection,
-            LPCTSTR pKeyName,
-            LPCTSTR pString,
-            LPCTSTR pFileName
+            LPCMSTR pSection,
+            LPCMSTR pKeyName,
+            LPCMSTR pString,
+            LPCMSTR pFileName
         );
 
         /** 
@@ -107,11 +107,11 @@ namespace MaxSDK
          *                      To get extended error information, call GetLastError.
          */
         UtilExport BOOL WritePrivateProfileStruct(
-            LPCTSTR pSection,
-            LPCTSTR pKeyName,
+            LPCMSTR pSection,
+            LPCMSTR pKeyName,
             LPVOID pStruct,
             UINT uSizeStruct,
-            LPCTSTR pFileName
+            LPCMSTR pFileName
         );
 
         /** 
@@ -133,9 +133,9 @@ namespace MaxSDK
          *                     To get extended error information, call GetLastError.
          */
         UtilExport BOOL WritePrivateProfileSection(
-            LPCTSTR pSection,
-            LPCTSTR pString,
-            LPCTSTR pFileName
+            LPCMSTR pSection,
+            LPCMSTR pString,
+            LPCMSTR pFileName
         );
 
         /**
@@ -162,12 +162,12 @@ namespace MaxSDK
          *                          case, the return value is equal to nSize minus two.
         */
         UtilExport DWORD GetPrivateProfileString(
-            LPCTSTR pSection,
-            LPCTSTR pKeyName,
-            LPCTSTR pDefault,
-            LPTSTR pReturnedString,
+            LPCMSTR pSection,
+            LPCMSTR pKeyName,
+            LPCMSTR pDefault,
+            LPMSTR pReturnedString,
             DWORD nSize,
-            LPCTSTR pFileName
+            LPCMSTR pFileName
         );
 
         /**
@@ -181,18 +181,18 @@ namespace MaxSDK
 		 * @param pDefault	        A default string. If the pKeyName key cannot be found in the initialization file,
 		 *                          GetPrivateProfileString copies the default string to the pReturnedString buffer.
 		 *                          If this parameter is NULL, the default is an empty string, "".
-         * @param returnedString    A reference to the MaxSDK::Array<TCHAR> buffer that receives the retrieved string. This service
+         * @param returnedString    A reference to the MaxSDK::Array<MCHAR> buffer that receives the retrieved string. This service
 		 *                          will adjust the size as necessary to hold the string.
          * @param pFileName         The name of the initialization file.
          * @return                  The return value is the number of characters copied to the buffer, not including the 
          *                          terminating null character. 
         */
         UtilExport DWORD GetPrivateProfileString(
-            LPCTSTR pSection,
-            LPCTSTR pKeyName,
-            LPCTSTR pDefault,
-            MaxSDK::Array<TCHAR> &returnedString,
-            LPCTSTR pFileName
+            LPCMSTR pSection,
+            LPCMSTR pKeyName,
+            LPCMSTR pDefault,
+            MaxSDK::Array<MCHAR> &returnedString,
+            LPCMSTR pFileName
         );
 
         /**
@@ -208,11 +208,11 @@ namespace MaxSDK
 		 * @return               If the function succeeds, the return value is nonzero. If the function fails, the return value is zero.
         */
 		UtilExport BOOL GetPrivateProfileStruct(
-			LPCTSTR pSection,
-			LPCTSTR pKeyName,
+			LPCMSTR pSection,
+			LPCMSTR pKeyName,
 			LPVOID  pStruct,
 			UINT    uSizeStruct,
-			LPCTSTR pFileName
+			LPCMSTR pFileName
 		);
 
         /**
@@ -229,15 +229,15 @@ namespace MaxSDK
          *                          size specified by nSize minus two.
         */
         UtilExport DWORD GetPrivateProfileSectionNames(
-            LPTSTR pReturnedString,
+            LPMSTR pReturnedString,
             DWORD nSize, 
-            LPCTSTR pFileName
+            LPCMSTR pFileName
         );
 
         /**
          * Retrieves the names of all sections in an initialization file.
          * This service uses a FileMutexObject instance to ensure only one 3ds Max session is accessing the .ini at a time.
-         * @param returnedString    A reference to the MaxSDK::Array<TCHAR> buffer that receives the section names associated with the named file.
+         * @param returnedString    A reference to the MaxSDK::Array<MCHAR> buffer that receives the section names associated with the named file.
          *                          The buffer is filled with one or more null-terminated strings; the last string is followed
          *                          by a second null character. This service will adjust the size as necessary to hold the string.
          * @param pFileName         The name of the initialization file.
@@ -245,8 +245,8 @@ namespace MaxSDK
          *                          terminating null character. 
         */
         UtilExport DWORD GetPrivateProfileSectionNames(
-            MaxSDK::Array<TCHAR> &returnedString,
-            LPCTSTR pFileName
+            MaxSDK::Array<MCHAR> &returnedString,
+            LPCMSTR pFileName
         );
 
         /**
@@ -264,17 +264,17 @@ namespace MaxSDK
          *                          size specified by nSize minus two.
         */
 		UtilExport DWORD GetPrivateProfileSection(
-			LPCTSTR pSection,
-			LPTSTR  pReturnedString,
+			LPCMSTR pSection,
+			LPMSTR  pReturnedString,
 			DWORD   nSize,
-			LPCTSTR pFileName
+			LPCMSTR pFileName
 		);
 
         /**
          * Retrieves all the keys and values for the specified section of an initialization file.
          * This service uses a FileMutexObject instance to ensure only one 3ds Max session is accessing the .ini at a time.
 		 * @param pSection          The name of the section in the initialization file.
-		 * @param returnedString    A reference to the MaxSDK::Array<TCHAR> buffer that receives the key name and value pairs associated with the named file.
+		 * @param returnedString    A reference to the MaxSDK::Array<MCHAR> buffer that receives the key name and value pairs associated with the named file.
 		 *                          The buffer is filled with one or more null-terminated strings; the last string is followed
 		 *                          by a second null character. This service will adjust the size as necessary to hold the string.
          * @param pFileName         The name of the initialization file.
@@ -282,9 +282,9 @@ namespace MaxSDK
          *                          terminating null character. 
         */
 		UtilExport DWORD GetPrivateProfileSection(
-			LPCTSTR pSection,
-			MaxSDK::Array<TCHAR> &returnedString,
-			LPCTSTR pFileName
+			LPCMSTR pSection,
+			MaxSDK::Array<MCHAR> &returnedString,
+			LPCMSTR pFileName
 		);
 
         /**
@@ -298,10 +298,10 @@ namespace MaxSDK
          *                          specified initialization file. If the key is not found, the return value is the specified default value. 
         */
 		UtilExport DWORD GetPrivateProfileInt(
-			LPCTSTR pSection,
-			LPCTSTR pKeyName,
+			LPCMSTR pSection,
+			LPCMSTR pKeyName,
 			INT nDefault,
-			LPCTSTR pFileName
+			LPCMSTR pFileName
 		);
 	}
 }

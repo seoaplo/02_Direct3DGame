@@ -133,6 +133,11 @@ const int kMNNurmsHourglassLimit = 2500; // between 4 and 5 iterations on a box.
 #define QCHAM_OPTION_ELWOOD_DEFAULTS (0)			//!< Elwood (Max 2015) defaults
 #define QCHAM_OPTION_LIMIT_EFFECT (1<<0)			//!< Provides legacy-style limiting of chamfering
 #define QCHAM_OPTION_QUAD_INTERSECTIONS (1<<1)		//!< Provides quad intersections
+#define QCHAM_OPTION_FIXED_EDGE_WEIGHTS (1<<2)		//!< Provides parallel edges on chamfers
+#define QCHAM_OPTION_VARIABLE_EDGE_WEIGHTS (1<<3)	//!< Provides variable-weight chamfered edges based on Edge Crease value
+#define QCHAM_OPTION_USE_INSET (1<<4)				//!< Provides insets from chamfered edges
+#define QCHAM_OPTION_FORCE_POSITIVE_OFFSET (1<<5)   //!< Forces a positive offset value to be applied at mitered edges
+#define QCHAM_OPTION_USE_CONSTANT_OFFSET (1<<6)     //!< Uses a constant offset value at each chamfer cluster, regardless of cluster type
 //@}
 
 /// \name Quad Chamfer version values:
@@ -140,7 +145,8 @@ const int kMNNurmsHourglassLimit = 2500; // between 4 and 5 iterations on a box.
 #define QCHAM_VERSION_ELWOOD (0)			//!< Elwood (Max 2015)
 #define QCHAM_VERSION_PHOENIX (100)			//!< Phoenix (Max 2016) - Includes edge selection fix
 #define QCHAM_VERSION_IMOOGI (200)			//!< Imoogi (Max 2018) - Includes Quad Intersections upgrade
-#define QCHAM_VERSION_LATEST (QCHAM_VERSION_IMOOGI)		//!< The latest version, used as the default
+#define QCHAM_VERSION_ATHENA_ALPHA1 (290)	//!< Athena (Max 2020) - New options starting with QCHAM_OPTION_FIXED_EDGE_WEIGHTS
+#define QCHAM_VERSION_LATEST (QCHAM_VERSION_ATHENA_ALPHA1)		//!< The latest version, used as the default
 //@}
 
 /// \name MNFace flags:
@@ -205,7 +211,10 @@ const int kMNNurmsHourglassLimit = 2500; // between 4 and 5 iterations on a box.
 		MNMesh::FindOpenRegions() method. */
 #define MN_MESH_HAS_VOLUME (1<<7)			
 /** \internal Forces faces to be hit only if all triangles are hit. */
-#define MN_MESH_HITTEST_REQUIRE_ALL (1<<8)	
+#define MN_MESH_HITTEST_REQUIRE_ALL (1<<8)
+/** When set, disables the "null" edge check and remediation in EliminateNullEdges. Presently used for old versions
+    of PolyOperations to avoid corrupting models generated before the null edge check was implemented. */
+#define MN_MESH_DIASBLE_NULL_EDGE_CHECK (1<<9)
 /** Indicates that the MNMesh has only set some of the vertices as invalid and not to reprocess 
 		the entire mesh just the vertices that changed. */
 #define MN_MESH_PARTIALCACHEINVALID (1<<16) 
@@ -222,6 +231,7 @@ const int kMNNurmsHourglassLimit = 2500; // between 4 and 5 iterations on a box.
 #define MN_MESH_USE_MAX2012_WELD_MATH (1<<19)//!< \internal Mesh flag to determine whether to use a different math for MNMesh::WeldBorderVerts (float thresh, DWORD flag) since between 2012 and 2013 the FPU math changed slightly and this corrects for that	
 #define MN_CLEARMAPCHANNEL (1<<20)    //!< Mesh Flag if set  new tv face data will be cleared otherwise it will use a default planar
 #define MN_MESH_VERTEXCOLOR_INVALID (1<<21)//!< \internal Mesh flag that means any of the vertex color channel data is changed.
+#define MN_MESH_FACEFLAGS_INVALID (1<<22)//!< \internal Mesh flag that means mesh's face flags have changed.
 //@}
 
 /** MNMesh selection levels.
@@ -515,8 +525,9 @@ public:
 		int dnum\n\n
 		The size of the diag array - essentially double the number of diagonals.\n\n
 		int *diag\n\n
-		The diagonals. */
-DllExport void DiagSort (int dnum, int *diag);
+		The diagonals.
+		\deprecated This function is deprecated in Max 2020.  Please use MaxSDK::SortPolygonDiagonals().*/
+MAX_DEPRECATED DllExport void DiagSort (int dnum, int *diag);
 
 /** The face structure used with the MNMesh mesh.
 		MNFace are not necessarily triangles. They also may contain hidden vertices
@@ -720,6 +731,21 @@ public:
 	was a problem. If FALSE is returned, the triangulation will need to be revised
 	with a call to RetriangulateFace. */
 	DllExport bool Delete (int pos, int num=1, int edir=1, bool fixtri=TRUE);
+
+	/** Searches the edge list for this face for "null" edges, defined as edges
+    with identical start and end vertices. These edges are excised from the face
+    edge list, and the associated duplicate vertices are removed from the vertex
+    list. The face is retriangulated if any null edges are encountered. If removing
+    null edges would result in a degenerate face of degree less than three, the face
+    simply flags itself as MN_DEAD and returns the identified edges in nullEdges.
+	\param [out] nullEdges: list of indices in the owning MNMesh container of null
+    edges identified in this face; if the same null edge was present N times in this
+    face's edge list, it will appear N times in nullEdges
+	\param [out] excisedVertices: list of local indices, in face vtx container
+    at entry to function, of duplicate vertices removed due to excision of a null
+    edge
+	\param [in] mesh: mesh container in which this face resides*/
+    DllExport void RemoveNullEdges(Tab<int>& nullEdges, Tab<int>& excisedVertices, const MNMesh* mesh);
 	
 	/** Re-indexes the vertices and edges so that the vertex in position
 	newstart becomes the new first vertex. Triangulation is also
@@ -1146,7 +1172,7 @@ private:
 	int nf_alloc;
 	int nm_alloc;
 
-		
+
 	/// \name Cache geometric data for quick rendering
 	//@{
 	Box3 bdgBox;
@@ -1558,7 +1584,7 @@ public:
 	int MNum () const { return numm; }
 	
 	/** Number of triangles */
-	DllExport int TriNum () const;
+	DllExport int TriNum ();
 #pragma endregion
 
 #pragma region Mapping Methods
@@ -1869,10 +1895,8 @@ public:
 	int vv\n\n
 	The vertex from whose edge list the edge should be deleted.\n\n
 	int ee\n\n
-	The edge to delete from the vertex's edge list.
-	\return  Returns -1 if edge ee is not in the edge table.\n\n
-		*/
-	void VDeleteEdge (int vv, int ee) { if (vedg) vedg[vv].Delete (VEdgeIndex(vv, ee), 1); }
+	The edge to delete from the vertex's edge list. */
+	DllExport void VDeleteEdge (int vv, int ee);
 	/** This method is available in release 3.0 and later only. It
 	replaces the old MNVert::DeleteFace method.\n\n
 	Finds face ff in the vfac[vv] table and removes it. NOTE that
@@ -2151,8 +2175,8 @@ public:
 	to maintain mesh integrity. */
 	DllExport void CollapseDeadVerts ();
 	/** Removes all MNEdges with the MN_DEAD flag from the list of
-	edges. Also, re-indexes all the faces' and vertices' edge references to
-	maintain mesh integrity. */
+	edges. Also, re-indexes all the faces' and vertices' edge references
+    to maintain mesh integrity. */
 	DllExport void CollapseDeadEdges ();
 	/** Removes all MNFaces with the MN_DEAD flag from the list of
 	faces. Also, re-indexes all the edges' and vertices' face references to
@@ -2533,10 +2557,27 @@ public:
 	This parameter is available in release 4.0 and later only.\n\n
 	If nonzero, it indicates that only flagged vertices should be split up if
 	"bad".
+    bool doNullEdgeCheck:\n\n
+	When true, this function calls EliminateNullEdges before processing vertices,
+    as such edges can confuse the algorithm.
 	\return  False if nothing changed, true if at least one bad vertex was
 	found and split.\n\n
 		*/
-	DllExport bool EliminateBadVerts (DWORD flag=0);	// o(n*8) or so
+	DllExport bool EliminateBadVerts (DWORD flag = 0, bool doNullEdgeCheck = true);	// o(n*8) or so
+    /** Eliminates from the mesh any "null" edges, defined as edges with identical
+    start and end vertices. In particular, RemoveNullEdges is called for each face
+    of the mesh, and if any edges are identified, they are removed from their
+    vertex edge list and flagged as MN_DEAD. The corresponding duplicate vertices
+    are also removed from the related MNMapFace entities. As EliminateBadVerts may
+    have previously introduced improper split vertices as a result of null edges, if
+    any null edges are identified, then all vedg and vfac lists are checks against
+    face edge lists and edge face lists for consistency. If inconsistencies are
+    found, then they are remdiated by re-unifying split vertices, and flagging the
+    superfluous copies as MN_DEAD. Note that EliminateNullEdges has no effect if
+    null edge checks have been disabled via the MN_MESH_DIASBLE_NULL_EDGE_CHECK
+    flag.
+	\return Returns a flag indicating whether any null edges were identified.*/
+    DllExport bool EliminateNullEdges();
 	/** This routine organizes the face and edge lists of each vertex
 	such that going counterclockwise around the vertex (with the surface normal
 	pointing up), you'll encounter edg[0], fac[0], edg[1], fac[1], etc, ending
@@ -5049,6 +5090,10 @@ BOOL CalcNewBooleanOp(Mesh & mesh, Mesh & mesh1, Mesh & mesh2, int op, MeshOpPro
 private:
 	// Pointer to space accelerating data maintained by Max system
 	MN_SpaceAccelData* mpSpaceAccelData;
+	//number of tris that make up the mnmesh use.  Setting this value to -1 means that the num tris need to be recomputed the next time it is asked for by int TriNum()
+	//it is set to -1 when InvalidateTopologyCache() is called.
+	int mNumTris = -1;
+
 public:
 	/** Invoke these methods to check the Sub-Objects associated with the face indexed by face_i is in the hit region.
 	The detailed parameters are in SelectionCheckParams structure. Currently these methods are not exposed in SDK.
@@ -6725,6 +6770,8 @@ public:
 /** Extends the MNMeshUtilities class for 2018 Update 4, adding new functionality applied on a MNMesh. The added functions are a new 
 GetExtrudeDirection that allows for distance to be computed from surface instead of along normal.
 
+NOTE should only be used now for support of loading older file less than 2019.1
+
 Usage:
 
 \code
@@ -6744,3 +6791,60 @@ public:
 	virtual void GetExtrudeDirection(MNChamferData *mcd, DWORD faceFlag, float bias) = 0;
 };
 
+
+#define IMNMESHUTILITIES15_INTERFACE_ID Interface_ID(0x484a5448, 0x22ae6ace)
+
+/** Extends the MNMeshUtilities class for 2019.1.  Fixes various issues with extruding.
+
+Usage:
+
+\code
+IMNMeshUtilities15* l_mesh15 = static_cast<IMNMeshUtilities15*>(mesh.GetInterface(IMNMESHUTILITIES15_INTERFACE_ID));
+\endcode */
+
+class IMNMeshUtilities15 : public BaseInterface {
+public:
+	Interface_ID	GetID() { return IMNMESHUTILITIES15_INTERFACE_ID; }
+
+	//! This improves the GetExtrudeDirection instead of just using the length applied to the normal it computes 
+	//! the distance perpendicular from the surface and uses that to compute the distance along the normal.
+	//! \param[in,out] mcd The data structure in which the extrusion directions are stored. (Note that
+	//!  there is no map support for this operation, as there is no well - defined way
+	//!  to modify mapping values during an extrusion drag.)\n\n
+	//! \param[in] faceFlag which flag to uses that defines the extrusion. 
+	//! \param[in] bias is the blend along the normal and distance from tha surface 
+	virtual void GetExtrudeDirection(MNChamferData *mcd, DWORD faceFlag, float bias) = 0;
+};
+
+#define IMNMESHUTILITIES16_INTERFACE_ID Interface_ID(0x2555776b, 0x61143448)
+
+/** Extends the MNMeshUtilities class for 2020.
+
+Usage:
+
+\code
+IMNMeshUtilities16* l_mesh16 = static_cast<IMNMeshUtilities16*>(mesh.GetInterface(IMNMESHUTILITIES16_INTERFACE_ID));
+\endcode */
+
+/** Universal quad chamfer parameters */
+
+class MNQuadChamferParameters;
+
+class IMNMeshUtilities16 : public BaseInterface {
+public:
+	virtual Interface_ID	GetID() override { return IMNMESHUTILITIES16_INTERFACE_ID; }
+
+	//! Performs chamfers on a mesh, with varying versions
+	//! \param[in] params -- The Quad Chamfer parameter data (See \ref QuadChamferParameters)
+	//! \return true if mesh altered; false otherwise
+	virtual bool QuadChamfer(const MNQuadChamferParameters& params) = 0;
+
+	//! This improves the GetExtrudeDirection instead of just using the length applied to the normal it computes 
+	//! the distance perpendicular from the surface and uses that to compute the distance along the normal.
+	//! \param[in,out] mcd The data structure in which the extrusion directions are stored. (Note that
+	//!  there is no map support for this operation, as there is no well - defined way
+	//!  to modify mapping values during an extrusion drag.)\n\n
+	//! \param[in] faceFlag which flag to uses that defines the extrusion. 
+	//! \param[in] bias is the blend along the normal and distance from tha surface 
+	virtual void GetExtrudeDirection(MNChamferData *mcd, DWORD faceFlag, float bias) = 0;
+};

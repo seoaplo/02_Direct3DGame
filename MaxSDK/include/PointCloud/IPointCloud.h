@@ -48,7 +48,16 @@ namespace MaxSDK { namespace PointCloud{
 		pb_fence_globalinvert, //!< TYPE_BOOL: whether to invert the clip effect 
 		pb_geomshader, //!< used internally
 		pb_scan_files, //!< used internally
+		pb_pts_visible, //!< TYPE_INT_TAB : visible points per viewports,
 	};
+
+	enum PointCloudExposedFunctionIds
+	{
+		pb_block_until_loading_finished,
+		pb_pts_visible_active_viewport,
+		pb_pts_total,
+	};
+
 	//@}
 	
 	//! \brief The interface for interacting with point cloud objects.
@@ -88,6 +97,7 @@ namespace MaxSDK { namespace PointCloud{
 			int width, 
 			int height,
 			MaxSDK::Array<IPointCloudVisibleVoxelNode*>& visibleNodesList) = 0;
+		
 
 		//! \brief Return the total point count of the current point cloud file.
 		virtual unsigned long GetTotalPointCount() = 0;
@@ -110,6 +120,32 @@ namespace MaxSDK { namespace PointCloud{
 		//! \brief Returns a pointer to the interface metadata for this class.
 		//! \see FPMixinInterface::GetDesc
 		virtual FPInterfaceDesc* GetDesc() { return this->GetDescByID(IID_POINT_CLOUD); }
+	};
+
+	class IPointCloudEx : public IPointCloud
+	{
+		//Function Publishing System MACROS that describe the functions for Maxscript
+		//Function Map For Mixin Interface
+		//*************************************************
+		BEGIN_FUNCTION_MAP
+			VFN_0(pb_block_until_loading_finished, WaitForLoading);
+			FN_0(pb_pts_visible_active_viewport, TYPE_INT, ActiveViewportPointCount);
+			FN_0(pb_pts_total, TYPE_INT64, fpGetTotalPointCount);
+		END_FUNCTION_MAP
+
+		//! \brief Block until all points are loaded. 
+		//! Pointclouds are loaded asynchronously. This function blocks until all the data is loaded.
+		virtual void WaitForLoading() = 0;
+
+		//! \brief Return the visible point count in the active viewport
+		virtual int ActiveViewportPointCount() = 0;
+
+	private:
+
+		INT64 fpGetTotalPointCount()
+		{
+			return static_cast<INT64>(GetTotalPointCount());
+		}
 
 	};
 }}

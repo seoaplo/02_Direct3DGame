@@ -110,8 +110,8 @@ enum epolyParameters { ep_by_vertex, ep_ignore_backfacing, ep_show_normals,
 
 
 	//new 2019
-	ep_extrude_bias
-
+	ep_extrude_bias,	// float - indicates how much to blend between surface distance and local normal (epop_extrude)
+	ep_bevel_bias		// float - "bias" amount blends between surface distance and local normal values (epop_bevel)
 };
 
 // Editable Poly Operations:
@@ -276,7 +276,9 @@ enum ePolyMethods { epfn_hide, epfn_unhide_all, epfn_named_selection_copy,
 	epfn_make_hard_edges,
 	epfn_make_smooth_edges,
 	epfn_select_hard_edges,
-	epfn_select_smooth_edges
+	epfn_select_smooth_edges,
+
+    epfn_get_last_operation
 };
 
 /*! \sa  Class FPMixinInterface,  Class MNMesh, Class IParamBlock2, \ref per_edge_data "Edge data channel index values", 
@@ -471,6 +473,8 @@ public:
 		
 		VFN_0(epfn_matid_floater, MatIDFloater);
 		FN_0(epfn_matid_floatervisible,TYPE_BOOL, MatIDFloaterVisible);
+
+        FN_0(epfn_get_last_operation, TYPE_INT, EpfnGetLastOperation);
 
 	END_FUNCTION_MAP
 	#pragma warning(pop)
@@ -2303,6 +2307,8 @@ private:
 	virtual void 		EpfnClosePopupDialog () { }
 
 	virtual void 		EpfnRepeatLastOperation () { }
+
+    virtual int         EpfnGetLastOperation() { return -1; }
 
 	virtual void 		EpfnGrowSelection (int meshSelLevel) { }
 	virtual void 		EpfnShrinkSelection (int meshSelLevel) { }

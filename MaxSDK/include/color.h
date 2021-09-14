@@ -115,7 +115,7 @@ public:
 	\par Parameters:
 	<b>Color\& a</b>\n\n
 	Specifies the initial color. */
-	Color(const Color& a) { r = a.r; g = a.g; b = a.b; } 
+	Color(const Color&) = default;
 	/*! \remarks Constructor. Initializes the color to the Windows RGB value.
 	\par Parameters:
 	<b>DWORD rgb</b>\n\n
@@ -126,7 +126,8 @@ public:
 	\par Parameters:
 	<b>Point3 p</b>\n\n
 	Specifies the color. r=x, g=y, b=z. */
-	Color(Point3 p) { r = p.x; g = p.y; b = p.z; }
+	Color(const Point3& p) { r = p.x; g = p.y; b = p.z; }
+	Color(Point3&& p) { r = p.x; g = p.y; b = p.z; }
 	/*! \remarks Constructor. Initializes the color to the value passed.
 	\par Parameters:
 	<b>float af[3]</b>\n\n
@@ -211,10 +212,6 @@ public:
 	// Convert to Windows RGB
 //	operator DWORD() { return RGB(FLto255(r),FLto255(g), FLto255(b)); }
 	DWORD toRGB() { return RGB(FLto255(r),FLto255(g), FLto255(b)); };
-
-	// Convert to Point3
-	/*! \remarks Convert the Color to a Point3. x=r, y=g, z=b. */
-	operator Point3() { return Point3(r,g,b); }
 
 	// Convert to RealPixel
 	/*! \remarks Convert the Color to the RealPixel format. */

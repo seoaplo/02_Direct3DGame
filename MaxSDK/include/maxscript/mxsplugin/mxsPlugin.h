@@ -539,14 +539,14 @@ public:
 	ReferenceTarget* get_delegate() { return delegate; } 
 
 	// From Animatable
-	void			GetClassName(MSTR& s) { s = pc->name->to_string(); } // non-localized name
-	Class_ID		ClassID() { return pc->class_id; }
+	void			GetClassName(MSTR& s) { s = MS_SUPER::pc->name->to_string(); } // non-localized name
+	Class_ID		ClassID() { return MS_SUPER::pc->class_id; }
 	void			FreeCaches() { }; // { delegate->FreeCaches(); } 		
-	int				NumSubs() { return pblocks.Count() + 1; }  
-	Animatable*		SubAnim(int i) { if (i == 0) return delegate; else return pblocks[i-1]; }
-	MSTR			SubAnimName(int i) { if (i == 0) return delegate->GetObjectName(); else return pblocks[i-1]->GetLocalName(); }
-	int				NumParamBlocks() { return pblocks.Count(); }
-	IParamBlock2*	GetParamBlock(int i) { return pblocks[i]; }
+	int				NumSubs() { return MS_SUPER::pblocks.Count() + 1; }  
+	Animatable*		SubAnim(int i) { if (i == 0) return delegate; else return MS_SUPER::pblocks[i-1]; }
+	MSTR			SubAnimName(int i) { if (i == 0) return delegate->GetObjectName(); else return MS_SUPER::pblocks[i-1]->GetLocalName(); }
+	int				NumParamBlocks() { return MS_SUPER::pblocks.Count(); }
+	IParamBlock2*	GetParamBlock(int i) { return MS_SUPER::pblocks[i]; }
 	IParamBlock2*	GetParamBlockByID(BlockID id) { return MSPlugin::GetParamBlockByID(id); }
 	void*			GetInterface(ULONG id) { if (id == I_MAXSCRIPTPLUGIN) return (MSPlugin*)this; else return MS_SUPER::GetInterface(id); }
 	
@@ -575,7 +575,7 @@ public:
 	void			SetReference(int i, RefTargetHandle rtarg); 
 
 	// From BaseObject
-	const MCHAR *			GetObjectName() { return pc->name->to_string(); } // non-localized name
+	const MCHAR *			GetObjectName() { return MS_SUPER::pc->name->to_string(); } // non-localized name
 	void			BeginEditParams( IObjParam *objParam, ULONG vflags, Animatable *pPrev);
 	void			EndEditParams( IObjParam *objParam, ULONG vflags, Animatable *pNext);
 	int				HitTest(TimeValue t, INode* inode, int type, int crossing, int vflags, IPoint2 *p, ViewExp *vpt)
@@ -719,124 +719,124 @@ public:
 	RefTargetHandle Clone(RemapDir& remap);
 
 	// From LightObject
-	RefResult		EvalLightState(TimeValue time, Interval& valid, LightState *ls) { return REF_SUCCEED; }
-	ObjLightDesc *	CreateLightDesc(INode *n, BOOL forceShadowBuf) { return LightObject::CreateLightDesc(n, forceShadowBuf); }
-	void			SetUseLight(int onOff) { }
-	BOOL			GetUseLight(void) { return FALSE; }
-	void			SetHotspot(TimeValue time, float f) { } 
-	float			GetHotspot(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
-	void			SetFallsize(TimeValue time, float f) { }
-	float			GetFallsize(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
-	void			SetAtten(TimeValue time, int which, float f) { }
-	float			GetAtten(TimeValue t, int which, Interval& valid = Interval(0,0)) { return 0.0f; }
-	void			SetTDist(TimeValue time, float f) { }
-	float			GetTDist(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
-	void			SetConeDisplay(int s, int notify=TRUE) { }
-	BOOL			GetConeDisplay(void) { return FALSE; }
-	int 			GetShadowMethod() {return LIGHTSHADOW_NONE;}
-	void 			SetRGBColor(TimeValue t, Point3& rgb) { }
-	Point3 			GetRGBColor(TimeValue t, Interval &valid = Interval(0,0)) {return Point3(0,0,0);}        
-	void 			SetIntensity(TimeValue time, float f) { }
-	float 			GetIntensity(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
-	void 			SetAspect(TimeValue t, float f) { }
-	float			GetAspect(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}    
-	void 			SetUseAtten(int s) { }
-	BOOL 			GetUseAtten(void) {return FALSE;}
-	void 			SetAttenDisplay(int s) { }
-	BOOL 			GetAttenDisplay(void) {return FALSE;}      
-	void 			Enable(int enab) { }
-	void 			SetMapBias(TimeValue t, float f) { }
-	float 			GetMapBias(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
-	void 			SetMapRange(TimeValue t, float f) { }
-	float 			GetMapRange(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
-	void 			SetMapSize(TimeValue t, int f) { }
-	int 			GetMapSize(TimeValue t, Interval& valid = Interval(0,0)) {return 0;}
-	void 			SetRayBias(TimeValue t, float f) { }
-	float 			GetRayBias(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
-	int 			GetUseGlobal() {return 0;}
-	void 			SetUseGlobal(int a) { }
-	int 			GetShadow() {return 0;}
-	void 			SetShadow(int a) { }
-	int 			GetShadowType() {return 0;}
-	void 			SetShadowType(int a) { }
-	int 			GetAbsMapBias() {return 0;}
-	void 			SetAbsMapBias(int a) { }
-	int 			GetOvershoot() {return 0;}
-	void 			SetOvershoot(int a) { }
-	int 			GetProjector() {return 0;}
-	void 			SetProjector(int a) { }
-	ExclList* 		GetExclList() { return &exclusionList; }
-	BOOL 			Include() {return FALSE;}
-	Texmap* 		GetProjMap() {return NULL;}
-	void 			SetProjMap(Texmap* pmap) { }
-	void 			UpdateTargDistance(TimeValue t, INode* inode) { }
-	int				UsesWireColor() { return LightObject::UsesWireColor(); }   // TRUE if the object color is used for display
+	virtual RefResult		EvalLightState(TimeValue time, Interval& valid, LightState *ls) override { return REF_SUCCEED; }
+	virtual ObjLightDesc *	CreateLightDesc(INode *n, BOOL forceShadowBuf) override { return LightObject::CreateLightDesc(n, forceShadowBuf); }
+	virtual void			SetUseLight(int onOff) override { }
+	virtual BOOL			GetUseLight(void) override { return FALSE; }
+	virtual void			SetHotspot(TimeValue time, float f) override { } 
+	virtual float			GetHotspot(TimeValue t, Interval& valid) override { return 0.0f; }
+	virtual void			SetFallsize(TimeValue time, float f) override { }
+	virtual float			GetFallsize(TimeValue t, Interval& valid) override { return 0.0f; }
+	virtual void			SetAtten(TimeValue time, int which, float f) override { }
+	virtual float			GetAtten(TimeValue t, int which, Interval& valid) override { return 0.0f; }
+	virtual void			SetTDist(TimeValue time, float f) override { }
+	virtual float			GetTDist(TimeValue t, Interval& valid) override { return 0.0f; }
+	virtual void			SetConeDisplay(int s, int notify=TRUE) override { }
+	virtual BOOL			GetConeDisplay(void) override { return FALSE; }
+	virtual int 			GetShadowMethod() override {return LIGHTSHADOW_NONE;}
+	virtual void 			SetRGBColor(TimeValue t, Point3& rgb) override { }
+	virtual Point3 			GetRGBColor(TimeValue t, Interval& valid) override {return Point3(0,0,0);}        
+	virtual void 			SetIntensity(TimeValue time, float f) override { }
+	virtual float 			GetIntensity(TimeValue t, Interval& valid) override {return 0.0f;}
+	virtual void 			SetAspect(TimeValue t, float f) override { }
+	virtual float			GetAspect(TimeValue t, Interval& valid) override {return 0.0f;}    
+	virtual void 			SetUseAtten(int s) override { }
+	virtual BOOL 			GetUseAtten(void) override {return FALSE;}
+	virtual void 			SetAttenDisplay(int s) override { }
+	virtual BOOL 			GetAttenDisplay(void) override {return FALSE;}      
+	virtual void 			Enable(int enab) override { }
+	virtual void 			SetMapBias(TimeValue t, float f) override { }
+	virtual float 			GetMapBias(TimeValue t, Interval& valid) override {return 0.0f;}
+	virtual void 			SetMapRange(TimeValue t, float f) override { }
+	virtual float 			GetMapRange(TimeValue t, Interval& valid) override {return 0.0f;}
+	virtual void 			SetMapSize(TimeValue t, int f) override { }
+	virtual int 			GetMapSize(TimeValue t, Interval& valid) override {return 0;}
+	virtual void 			SetRayBias(TimeValue t, float f) override { }
+	virtual float 			GetRayBias(TimeValue t, Interval& valid) override {return 0.0f;}
+	virtual int 			GetUseGlobal() override {return 0;}
+	virtual void 			SetUseGlobal(int a) override { }
+	virtual int 			GetShadow() override {return 0;}
+	virtual void 			SetShadow(int a) override { }
+	virtual int 			GetShadowType() override {return 0;}
+	virtual void 			SetShadowType(int a) override { }
+	virtual int 			GetAbsMapBias() override {return 0;}
+	virtual void 			SetAbsMapBias(int a) override { }
+	virtual int 			GetOvershoot() override {return 0;}
+	virtual void 			SetOvershoot(int a) override { }
+	virtual int 			GetProjector() override {return 0;}
+	virtual void 			SetProjector(int a) override { }
+	virtual ExclList* 		GetExclList() override { return &exclusionList; }
+	virtual BOOL 			Include() override {return FALSE;}
+	virtual Texmap* 		GetProjMap() override {return NULL;}
+	virtual void 			SetProjMap(Texmap* pmap) override { }
+	virtual void 			UpdateTargDistance(TimeValue t, INode* inode) override { }
+	virtual int				UsesWireColor() override { return LightObject::UsesWireColor(); }   // TRUE if the object color is used for display
 
 	// From GenLight
 
-	GenLight *		NewLight(int type) { return NULL; }
-	int				Type() { return 0; }  // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT
-	void			SetType(int tp) { } // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT      
-	BOOL			IsSpot() { return FALSE; }
-	BOOL			IsDir() { return FALSE; }
-	void			SetSpotShape(int s) { }
-	int				GetSpotShape(void) { return 0; }
-	void 			SetHSVColor(TimeValue t, Point3& hsv) { }
-	Point3 			GetHSVColor(TimeValue t, Interval &valid = Interval(0,0)) { return Point3(0.0f, 0.0f, 0.0f); }
-	void 			SetContrast(TimeValue time, float f) { }
-	float 			GetContrast(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
-	void 			SetUseAttenNear(int s) { }
-	BOOL 			GetUseAttenNear(void) { return FALSE; }
-	void 			SetAttenNearDisplay(int s) { }
-	BOOL 			GetAttenNearDisplay(void) { return FALSE; }
+	virtual GenLight*		NewLight(int type) override { return NULL; }
+	virtual int				Type() override { return 0; }  // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT
+	virtual void			SetType(int tp) override { } // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT      
+	virtual BOOL			IsSpot() override { return FALSE; }
+	virtual BOOL			IsDir() override { return FALSE; }
+	virtual void			SetSpotShape(int s) override { }
+	virtual int				GetSpotShape(void) override { return 0; }
+	virtual void 			SetHSVColor(TimeValue t, Point3& hsv) override { }
+	virtual Point3 			GetHSVColor(TimeValue t, Interval& valid) override { return Point3(0.0f, 0.0f, 0.0f); }
+	virtual void 			SetContrast(TimeValue time, float f) override { }
+	virtual float 			GetContrast(TimeValue t, Interval& valid) override { return 0.0f; }
+	virtual void 			SetUseAttenNear(int s) override { }
+	virtual BOOL 			GetUseAttenNear(void) override { return FALSE; }
+	virtual void 			SetAttenNearDisplay(int s) override { }
+	virtual BOOL 			GetAttenNearDisplay(void) override { return FALSE; }
 
-	ExclList&		GetExclusionList() { return exclusionList; }
-	void 			SetExclusionList(ExclList &list) { }
+	virtual ExclList&		GetExclusionList() override { return exclusionList; }
+	virtual void 			SetExclusionList(ExclList &list) override { }
 
-	BOOL 			SetHotSpotControl(Control *c) { return FALSE; }
-	BOOL 			SetFalloffControl(Control *c) { return FALSE; }
-	BOOL 			SetColorControl(Control *c) { return FALSE; }
-	Control* 		GetHotSpotControl() { return NULL; }
-	Control* 		GetFalloffControl() { return NULL; }
-	Control* 		GetColorControl() { return NULL; }
+	virtual BOOL 			SetHotSpotControl(Control *c) override { return FALSE; }
+	virtual BOOL 			SetFalloffControl(Control *c) override { return FALSE; }
+	virtual BOOL 			SetColorControl(Control *c) override { return FALSE; }
+	virtual Control* 		GetHotSpotControl() override { return NULL; }
+	virtual Control* 		GetFalloffControl() override { return NULL; }
+	virtual Control* 		GetColorControl() override { return NULL; }
 	
-	void 			SetAffectDiffuse(BOOL onOff) { }
-	BOOL 			GetAffectDiffuse() { return FALSE; }
-	void 			SetAffectSpecular(BOOL onOff) { }
-	BOOL 			GetAffectSpecular() { return FALSE; }
+	virtual void 			SetAffectDiffuse(BOOL onOff) override { }
+	virtual BOOL 			GetAffectDiffuse() override { return FALSE; }
+	virtual void 			SetAffectSpecular(BOOL onOff) override { }
+	virtual BOOL 			GetAffectSpecular() override { return FALSE; }
 
-	void 			SetDecayType(BOOL onOff) { }
-	BOOL 			GetDecayType() { return FALSE; }
-	void 			SetDecayRadius(TimeValue time, float f) {}
-	float 			GetDecayRadius(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f;}
-	void 			SetDiffuseSoft(TimeValue time, float f) {}
-	float 			GetDiffuseSoft(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
+	virtual void 			SetDecayType(BOOL onOff) override { }
+	virtual BOOL 			GetDecayType() override { return FALSE; }
+	virtual void 			SetDecayRadius(TimeValue time, float f) override {}
+	virtual float 			GetDecayRadius(TimeValue t, Interval& valid) override { return 0.0f;}
+	virtual void 			SetDiffuseSoft(TimeValue time, float f) override {}
+	virtual float 			GetDiffuseSoft(TimeValue t, Interval& valid) override { return 0.0f; }
 
-	void 			SetShadColor(TimeValue t, Point3& rgb) {}
-	Point3 			GetShadColor(TimeValue t, Interval &valid = Interval(0,0)) { return Point3(0,0,0); }
-	BOOL 			GetLightAffectsShadow() { return FALSE; }
-	void 			SetLightAffectsShadow(BOOL b) {  }
-	void			SetShadMult(TimeValue t, float m) {  }
-	float			GetShadMult(TimeValue t, Interval &valid = Interval(0,0)) { return 1.0f; }
+	virtual void 			SetShadColor(TimeValue t, Point3& rgb) override {}
+	virtual Point3 			GetShadColor(TimeValue t, Interval& valid) override { return Point3(0,0,0); }
+	virtual BOOL 			GetLightAffectsShadow() override { return FALSE; }
+	virtual void 			SetLightAffectsShadow(BOOL b) override {  }
+	virtual void			SetShadMult(TimeValue t, float m) override {  }
+	virtual float			GetShadMult(TimeValue t, Interval& valid) override { return 1.0f; }
 
-	Texmap* 		GetShadowProjMap() { return NULL;  }
-	void 			SetShadowProjMap(Texmap* pmap) {}
+	virtual Texmap* 		GetShadowProjMap() override { return NULL;  }
+	virtual void 			SetShadowProjMap(Texmap* pmap) override {}
 
-	void 			SetAmbientOnly(BOOL onOff) {  }
-	BOOL 			GetAmbientOnly() { return FALSE; }
+	virtual void 			SetAmbientOnly(BOOL onOff) override {  }
+	virtual BOOL 			GetAmbientOnly() override { return FALSE; }
 
-	void			SetAtmosShadows(TimeValue t, int onOff) { }
-	int				GetAtmosShadows(TimeValue t) { return 0; }
-	void			SetAtmosOpacity(TimeValue t, float f) { }
-	float			GetAtmosOpacity(TimeValue t, Interval& valid=FOREVER) { return 0.0f; }
-	void			SetAtmosColAmt(TimeValue t, float f) { }
-	float			GetAtmosColAmt(TimeValue t, Interval& valid=FOREVER) { return 0.0f; }
+	virtual void			SetAtmosShadows(TimeValue t, int onOff) override { }
+	virtual int				GetAtmosShadows(TimeValue t) override { return 0; }
+	virtual void			SetAtmosOpacity(TimeValue t, float f) override { }
+	virtual float			GetAtmosOpacity(TimeValue t, Interval& valid) override { return 0.0f; }
+	virtual void			SetAtmosColAmt(TimeValue t, float f) override { }
+	virtual float			GetAtmosColAmt(TimeValue t, Interval& valid) override { return 0.0f; }
 
-	void			SetUseShadowColorMap(TimeValue t, int onOff) { GenLight::SetUseShadowColorMap(t, onOff); }
-	int				GetUseShadowColorMap(TimeValue t) { return GenLight::GetUseShadowColorMap(t); }
+	virtual void			SetUseShadowColorMap(TimeValue t, int onOff) override { GenLight::SetUseShadowColorMap(t, onOff); }
+	virtual int				GetUseShadowColorMap(TimeValue t) override { return GenLight::GetUseShadowColorMap(t); }
 
-	void			SetShadowGenerator(ShadowType *s) { GenLight::SetShadowGenerator(s); };
-	ShadowType*		GetShadowGenerator() { return GenLight::GetShadowGenerator(); } 
+	virtual void			SetShadowGenerator(ShadowType *s) override { GenLight::SetShadowGenerator(s); };
+	virtual ShadowType*		GetShadowGenerator() override { return GenLight::GetShadowGenerator(); } 
 };
 
 class MSLightXtnd : public MSObjectXtnd<GenLight, MSPluginLight>
@@ -847,135 +847,135 @@ public:
 	RefTargetHandle Clone(RemapDir& remap);
 
 	// From BaseObject
-	int				Display(TimeValue t, INode* inode, ViewExp *vpt, int vflags);
+	virtual int				Display(TimeValue t, INode* inode, ViewExp *vpt, int vflags) override;
 
-	void			GetWorldBoundBox(TimeValue t, INode *inode, ViewExp* vpt, Box3& abox );
-	void			GetLocalBoundBox(TimeValue t, INode *inode, ViewExp *vpt, Box3& abox );
-	void			GetDeformBBox(TimeValue t, Box3& abox, Matrix3 *tm, BOOL useSel );
-	int				HitTest(TimeValue t, INode *inode, int type, int crossing, int vflags, IPoint2 *p, ViewExp *vpt);
-	void			Snap(TimeValue t, INode* inode, SnapInfo *snap, IPoint2 *p, ViewExp *vpt);
+	virtual void			GetWorldBoundBox(TimeValue t, INode *inode, ViewExp* vpt, Box3& abox ) override;
+	virtual void			GetLocalBoundBox(TimeValue t, INode *inode, ViewExp *vpt, Box3& abox ) override;
+	virtual void			GetDeformBBox(TimeValue t, Box3& abox, Matrix3 *tm, BOOL useSel ) override;
+	virtual int				HitTest(TimeValue t, INode *inode, int type, int crossing, int vflags, IPoint2 *p, ViewExp *vpt) override;
+	virtual void			Snap(TimeValue t, INode* inode, SnapInfo *snap, IPoint2 *p, ViewExp *vpt) override;
 
 	// From LightObject
 
-	RefResult		EvalLightState(TimeValue time, Interval& valid, LightState *ls);
-	ObjLightDesc *	CreateLightDesc(INode *n, BOOL forceShadowBuf) { return delegate->CreateLightDesc(n, forceShadowBuf); }
-	void			SetUseLight(int onOff) { delegate->SetUseLight(onOff); }
-	BOOL			GetUseLight(void) { return delegate->GetUseLight(); }
-	void			SetHotspot(TimeValue time, float f) { delegate->SetHotspot(time, f); } 
-	float			GetHotspot(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetHotspot(t, valid); }
-	void			SetFallsize(TimeValue time, float f) { delegate->SetFallsize(time, f); }
-	float			GetFallsize(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetFallsize(t, valid); }
-	void			SetAtten(TimeValue time, int which, float f) { delegate->SetAtten(time, which, f); }
-	float			GetAtten(TimeValue t, int which, Interval& valid = Interval(0,0)) { return delegate->GetAtten(t, which, valid); }
-	void			SetTDist(TimeValue time, float f) { delegate->SetTDist(time, f); }
-	float			GetTDist(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetTDist(t, valid); }
-	void			SetConeDisplay(int s, int notify=TRUE) { delegate->SetConeDisplay(s, notify); }
-	BOOL			GetConeDisplay(void) { return delegate->GetConeDisplay(); }
-	int 			GetShadowMethod() {return delegate->GetShadowMethod();}
-	void 			SetRGBColor(TimeValue t, Point3& rgb) { delegate->SetRGBColor(t, rgb); }
-	Point3 			GetRGBColor(TimeValue t, Interval &valid = Interval(0,0)) {return delegate->GetRGBColor(t, valid);}        
-	void 			SetIntensity(TimeValue time, float f) { delegate->SetIntensity(time, f); }
-	float 			GetIntensity(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetIntensity(t, valid); }
-	void 			SetAspect(TimeValue t, float f) { delegate->SetAspect(t, f); }
-	float			GetAspect(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetAspect(t, valid); }    
-	void 			SetUseAtten(int s) { delegate->SetUseAtten(s); }
-	BOOL 			GetUseAtten(void) { return delegate->GetUseAtten(); }
-	void 			SetAttenDisplay(int s) { delegate->SetAttenDisplay(s); }
-	BOOL 			GetAttenDisplay(void) { return delegate->GetAttenDisplay(); }      
-	void 			Enable(int enab) { delegate->Enable(enab); }
-	void 			SetMapBias(TimeValue t, float f) { delegate->SetMapBias(t, f); }
-	float 			GetMapBias(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetMapBias(t, valid); }
-	void 			SetMapRange(TimeValue t, float f) { delegate->SetMapRange(t, f); }
-	float 			GetMapRange(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetMapRange(t, valid); }
-	void 			SetMapSize(TimeValue t, int f) { delegate->SetMapSize(t, f); }
-	int 			GetMapSize(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetMapSize(t, valid); }
-	void 			SetRayBias(TimeValue t, float f) { delegate->SetRayBias(t, f); }
-	float 			GetRayBias(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetRayBias(t, valid); }
-	int 			GetAbsMapBias() { return delegate->GetAbsMapBias(); }
-	void 			SetAbsMapBias(int a) { delegate->SetAbsMapBias(a); }
-	int 			GetOvershoot() { return delegate->GetOvershoot(); }
-	void 			SetOvershoot(int a) { delegate->SetOvershoot(a); }
-	int 			GetProjector() { return delegate->GetProjector(); }
-	void 			SetProjector(int a) { delegate->SetProjector(a); }
-	ExclList* 		GetExclList() { return delegate->GetExclList(); }
-	BOOL 			Include() { return delegate->Include(); }
-	Texmap* 		GetProjMap() { return delegate->GetProjMap(); }
-	void 			SetProjMap(Texmap* pmap) { delegate->SetProjMap(pmap); }
-	void 			UpdateTargDistance(TimeValue t, INode* inode) { delegate->UpdateTargDistance(t, inode); }
-	int				UsesWireColor();
+	virtual RefResult		EvalLightState(TimeValue time, Interval& valid, LightState *ls) override;
+	virtual ObjLightDesc *	CreateLightDesc(INode *n, BOOL forceShadowBuf) override { return delegate->CreateLightDesc(n, forceShadowBuf); }
+	virtual void			SetUseLight(int onOff) override { delegate->SetUseLight(onOff); }
+	virtual BOOL			GetUseLight(void) override { return delegate->GetUseLight(); }
+	virtual void			SetHotspot(TimeValue time, float f) override { delegate->SetHotspot(time, f); } 
+	virtual float			GetHotspot(TimeValue t, Interval& valid) override { return delegate->GetHotspot(t, valid); }
+	virtual void			SetFallsize(TimeValue time, float f) override { delegate->SetFallsize(time, f); }
+	virtual float			GetFallsize(TimeValue t, Interval& valid) override { return delegate->GetFallsize(t, valid); }
+	virtual void			SetAtten(TimeValue time, int which, float f) override { delegate->SetAtten(time, which, f); }
+	virtual float			GetAtten(TimeValue t, int which, Interval& valid) override { return delegate->GetAtten(t, which, valid); }
+	virtual void			SetTDist(TimeValue time, float f) override { delegate->SetTDist(time, f); }
+	virtual float			GetTDist(TimeValue t, Interval& valid) override { return delegate->GetTDist(t, valid); }
+	virtual void			SetConeDisplay(int s, int notify=TRUE) override { delegate->SetConeDisplay(s, notify); }
+	virtual BOOL			GetConeDisplay(void) override { return delegate->GetConeDisplay(); }
+	virtual int 			GetShadowMethod() override {return delegate->GetShadowMethod();}
+	virtual void 			SetRGBColor(TimeValue t, Point3& rgb) override { delegate->SetRGBColor(t, rgb); }
+	virtual Point3 			GetRGBColor(TimeValue t, Interval& valid) override {return delegate->GetRGBColor(t, valid);}        
+	virtual void 			SetIntensity(TimeValue time, float f) override { delegate->SetIntensity(time, f); }
+	virtual float 			GetIntensity(TimeValue t, Interval& valid) override { return delegate->GetIntensity(t, valid); }
+	virtual void 			SetAspect(TimeValue t, float f) override { delegate->SetAspect(t, f); }
+	virtual float			GetAspect(TimeValue t, Interval& valid) override { return delegate->GetAspect(t, valid); }    
+	virtual void 			SetUseAtten(int s) override { delegate->SetUseAtten(s); }
+	virtual BOOL 			GetUseAtten(void) override { return delegate->GetUseAtten(); }
+	virtual void 			SetAttenDisplay(int s) override { delegate->SetAttenDisplay(s); }
+	virtual BOOL 			GetAttenDisplay(void) override { return delegate->GetAttenDisplay(); }      
+	virtual void 			Enable(int enab) override { delegate->Enable(enab); }
+	virtual void 			SetMapBias(TimeValue t, float f) override { delegate->SetMapBias(t, f); }
+	virtual float 			GetMapBias(TimeValue t, Interval& valid) override { return delegate->GetMapBias(t, valid); }
+	virtual void 			SetMapRange(TimeValue t, float f) override { delegate->SetMapRange(t, f); }
+	virtual float 			GetMapRange(TimeValue t, Interval& valid) override { return delegate->GetMapRange(t, valid); }
+	virtual void 			SetMapSize(TimeValue t, int f) override { delegate->SetMapSize(t, f); }
+	virtual int 			GetMapSize(TimeValue t, Interval& valid) override { return delegate->GetMapSize(t, valid); }
+	virtual void 			SetRayBias(TimeValue t, float f) override { delegate->SetRayBias(t, f); }
+	virtual float 			GetRayBias(TimeValue t, Interval& valid) override { return delegate->GetRayBias(t, valid); }
+	virtual int 			GetAbsMapBias() override { return delegate->GetAbsMapBias(); }
+	virtual void 			SetAbsMapBias(int a) override { delegate->SetAbsMapBias(a); }
+	virtual int 			GetOvershoot() override { return delegate->GetOvershoot(); }
+	virtual void 			SetOvershoot(int a) override { delegate->SetOvershoot(a); }
+	virtual int 			GetProjector() override { return delegate->GetProjector(); }
+	virtual void 			SetProjector(int a) override { delegate->SetProjector(a); }
+	virtual ExclList* 		GetExclList() override { return delegate->GetExclList(); }
+	virtual BOOL 			Include() override { return delegate->Include(); }
+	virtual Texmap* 		GetProjMap() override { return delegate->GetProjMap(); }
+	virtual void 			SetProjMap(Texmap* pmap) override { delegate->SetProjMap(pmap); }
+	virtual void 			UpdateTargDistance(TimeValue t, INode* inode) override { delegate->UpdateTargDistance(t, inode); }
+	virtual int				UsesWireColor() override;
 
 	// From GenLight
 
-	GenLight *		NewLight(int type) { return delegate->NewLight(type); }
-	int				Type() { return delegate->Type(); }  // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT
-	void			SetType(int tp) { delegate->SetType(tp); } // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT      
-	BOOL			IsSpot() { return delegate->IsSpot(); }
-	BOOL			IsDir() { return delegate->IsDir(); }
-	void			SetSpotShape(int s) { delegate->SetSpotShape(s); }
-	int				GetSpotShape(void) { return delegate->GetSpotShape(); }
-	void 			SetHSVColor(TimeValue t, Point3& hsv) { delegate->SetHSVColor(t, hsv); }
-	Point3 			GetHSVColor(TimeValue t, Interval &valid = Interval(0,0)) { return delegate->GetHSVColor(t, valid); }
-	void 			SetContrast(TimeValue time, float f) { delegate->SetContrast(time, f); }
-	float 			GetContrast(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetContrast(t, valid); }
-	void 			SetUseAttenNear(int s) { delegate->SetUseAttenNear(s); }
-	BOOL 			GetUseAttenNear(void) { return delegate->GetUseAttenNear(); }
-	void 			SetAttenNearDisplay(int s) { delegate->SetAttenNearDisplay(s); }
-	BOOL 			GetAttenNearDisplay(void) { return delegate->GetAttenNearDisplay(); }
+	virtual GenLight*		NewLight(int type) override { return delegate->NewLight(type); }
+	virtual int				Type() override { return delegate->Type(); }  // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT
+	virtual void			SetType(int tp) override { delegate->SetType(tp); } // OMNI_LIGHT, TSPOT_LIGHT, DIR_LIGHT, FSPOT_LIGHT, TDIR_LIGHT      
+	virtual BOOL			IsSpot() override { return delegate->IsSpot(); }
+	virtual BOOL			IsDir() override { return delegate->IsDir(); }
+	virtual void			SetSpotShape(int s) override { delegate->SetSpotShape(s); }
+	virtual int				GetSpotShape(void) override { return delegate->GetSpotShape(); }
+	virtual void 			SetHSVColor(TimeValue t, Point3& hsv) override { delegate->SetHSVColor(t, hsv); }
+	virtual Point3 			GetHSVColor(TimeValue t, Interval& valid) override { return delegate->GetHSVColor(t, valid); }
+	virtual void 			SetContrast(TimeValue time, float f) override { delegate->SetContrast(time, f); }
+	virtual float 			GetContrast(TimeValue t, Interval& valid) override { return delegate->GetContrast(t, valid); }
+	virtual void 			SetUseAttenNear(int s) override { delegate->SetUseAttenNear(s); }
+	virtual BOOL 			GetUseAttenNear(void) override { return delegate->GetUseAttenNear(); }
+	virtual void 			SetAttenNearDisplay(int s) override { delegate->SetAttenNearDisplay(s); }
+	virtual BOOL 			GetAttenNearDisplay(void) override { return delegate->GetAttenNearDisplay(); }
 
-	ExclList&		GetExclusionList() { return delegate->GetExclusionList(); }
-	void 			SetExclusionList(ExclList &list) { delegate->SetExclusionList(list); }
+	virtual ExclList&		GetExclusionList() override { return delegate->GetExclusionList(); }
+	virtual void 			SetExclusionList(ExclList &list) override { delegate->SetExclusionList(list); }
 
-	BOOL 			SetHotSpotControl(Control *c) { return delegate->SetHotSpotControl(c); }
-	BOOL 			SetFalloffControl(Control *c) { return delegate->SetFalloffControl(c); }
-	BOOL 			SetColorControl(Control *c) { return delegate->SetColorControl(c); }
-	Control* 		GetHotSpotControl() { return delegate->GetHotSpotControl(); }
-	Control* 		GetFalloffControl() { return delegate->GetFalloffControl(); }
-	Control* 		GetColorControl() { return delegate->GetColorControl(); }
+	virtual BOOL 			SetHotSpotControl(Control *c) override { return delegate->SetHotSpotControl(c); }
+	virtual BOOL 			SetFalloffControl(Control *c) override { return delegate->SetFalloffControl(c); }
+	virtual BOOL 			SetColorControl(Control *c) override { return delegate->SetColorControl(c); }
+	virtual Control* 		GetHotSpotControl() override { return delegate->GetHotSpotControl(); }
+	virtual Control* 		GetFalloffControl() override { return delegate->GetFalloffControl(); }
+	virtual Control* 		GetColorControl() override { return delegate->GetColorControl(); }
 	
-	void 			SetAffectDiffuse(BOOL onOff) { delegate->SetAffectDiffuse(onOff); }
-	BOOL 			GetAffectDiffuse() { return delegate->GetAffectDiffuse(); }
-	void 			SetAffectSpecular(BOOL onOff) { delegate->SetAffectSpecular(onOff); }
-	BOOL 			GetAffectSpecular() { return delegate->GetAffectSpecular(); }
+	virtual void 			SetAffectDiffuse(BOOL onOff) override { delegate->SetAffectDiffuse(onOff); }
+	virtual BOOL 			GetAffectDiffuse() override { return delegate->GetAffectDiffuse(); }
+	virtual void 			SetAffectSpecular(BOOL onOff) override { delegate->SetAffectSpecular(onOff); }
+	virtual BOOL 			GetAffectSpecular() override { return delegate->GetAffectSpecular(); }
 
-	void 			SetDecayType(BOOL onOff) { delegate->SetDecayType(onOff); }
-	BOOL 			GetDecayType() { return delegate->GetDecayType(); }
-	void 			SetDecayRadius(TimeValue time, float f) { delegate->SetDecayRadius(time, f); }
-	float 			GetDecayRadius(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetDecayRadius(t, valid);}
-	void 			SetDiffuseSoft(TimeValue time, float f) { delegate->SetDiffuseSoft(time, f); }
-	float 			GetDiffuseSoft(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetDiffuseSoft(t, valid); }
+	virtual void 			SetDecayType(BOOL onOff) override { delegate->SetDecayType(onOff); }
+	virtual BOOL 			GetDecayType() override { return delegate->GetDecayType(); }
+	virtual void 			SetDecayRadius(TimeValue time, float f) override { delegate->SetDecayRadius(time, f); }
+	virtual float 			GetDecayRadius(TimeValue t, Interval& valid) override { return delegate->GetDecayRadius(t, valid);}
+	virtual void 			SetDiffuseSoft(TimeValue time, float f) override { delegate->SetDiffuseSoft(time, f); }
+	virtual float 			GetDiffuseSoft(TimeValue t, Interval& valid) override { return delegate->GetDiffuseSoft(t, valid); }
 
-	int 			GetUseGlobal() { return delegate->GetUseGlobal(); }
-	void 			SetUseGlobal(int a) { delegate->SetUseGlobal(a); }
-	int 			GetShadow() { return delegate->GetShadow(); }
-	void 			SetShadow(int a) { delegate->SetShadow(a); }
-	int 			GetShadowType() { return delegate->GetShadowType(); }
-	void 			SetShadowType(int a) { delegate->SetShadowType(a); }
+	virtual int 			GetUseGlobal() override { return delegate->GetUseGlobal(); }
+	virtual void 			SetUseGlobal(int a) override { delegate->SetUseGlobal(a); }
+	virtual int 			GetShadow() override { return delegate->GetShadow(); }
+	virtual void 			SetShadow(int a) override { delegate->SetShadow(a); }
+	virtual int 			GetShadowType() override { return delegate->GetShadowType(); }
+	virtual void 			SetShadowType(int a) override { delegate->SetShadowType(a); }
 
-	void 			SetShadColor(TimeValue t, Point3& rgb) { delegate->SetShadColor(t, rgb); }
-	Point3 			GetShadColor(TimeValue t, Interval &valid = Interval(0,0)) { return delegate->GetShadColor(t, valid); }
-	BOOL 			GetLightAffectsShadow() { return delegate->GetLightAffectsShadow(); }
-	void 			SetLightAffectsShadow(BOOL b) { delegate->SetLightAffectsShadow(b); }
-	void			SetShadMult(TimeValue t, float m) { delegate->SetShadMult(t, m); }
-	float			GetShadMult(TimeValue t, Interval &valid = Interval(0,0)) { return delegate->GetShadMult(t, valid); }
+	virtual void 			SetShadColor(TimeValue t, Point3& rgb) override { delegate->SetShadColor(t, rgb); }
+	virtual Point3 			GetShadColor(TimeValue t, Interval& valid) override { return delegate->GetShadColor(t, valid); }
+	virtual BOOL 			GetLightAffectsShadow() override { return delegate->GetLightAffectsShadow(); }
+	virtual void 			SetLightAffectsShadow(BOOL b) override { delegate->SetLightAffectsShadow(b); }
+	virtual void			SetShadMult(TimeValue t, float m) override { delegate->SetShadMult(t, m); }
+	virtual float			GetShadMult(TimeValue t, Interval& valid) override { return delegate->GetShadMult(t, valid); }
 
-	Texmap* 		GetShadowProjMap() { return delegate->GetShadowProjMap();  }
-	void 			SetShadowProjMap(Texmap* pmap) { delegate->SetShadowProjMap(pmap); }
+	virtual Texmap* 		GetShadowProjMap() override { return delegate->GetShadowProjMap();  }
+	virtual void 			SetShadowProjMap(Texmap* pmap) override { delegate->SetShadowProjMap(pmap); }
 
-	void 			SetAmbientOnly(BOOL onOff) { delegate->SetAmbientOnly(onOff); }
-	BOOL 			GetAmbientOnly() { return delegate->GetAmbientOnly(); }
+	virtual void 			SetAmbientOnly(BOOL onOff) override { delegate->SetAmbientOnly(onOff); }
+	virtual BOOL 			GetAmbientOnly() override { return delegate->GetAmbientOnly(); }
 
-	void			SetAtmosShadows(TimeValue t, int onOff) { delegate->SetAtmosShadows(t, onOff);}
-	int				GetAtmosShadows(TimeValue t) { return delegate->GetAtmosShadows(t); }
-	void			SetAtmosOpacity(TimeValue t, float f) { delegate->SetAtmosOpacity(t, f);}
-	float			GetAtmosOpacity(TimeValue t, Interval& valid=FOREVER) { return delegate->GetAtmosOpacity(t); }
-	void			SetAtmosColAmt(TimeValue t, float f) { delegate->SetAtmosColAmt(t, f);}
-	float			GetAtmosColAmt(TimeValue t, Interval& valid=FOREVER) { return delegate->GetAtmosColAmt(t); }
+	virtual void			SetAtmosShadows(TimeValue t, int onOff) override { delegate->SetAtmosShadows(t, onOff);}
+	virtual int				GetAtmosShadows(TimeValue t) override { return delegate->GetAtmosShadows(t); }
+	virtual void			SetAtmosOpacity(TimeValue t, float f) override { delegate->SetAtmosOpacity(t, f);}
+	virtual float			GetAtmosOpacity(TimeValue t, Interval& valid) override { return delegate->GetAtmosOpacity(t); }
+	virtual void			SetAtmosColAmt(TimeValue t, float f) override { delegate->SetAtmosColAmt(t, f);}
+	virtual float			GetAtmosColAmt(TimeValue t, Interval& valid) override { return delegate->GetAtmosColAmt(t); }
 	
-	void			SetUseShadowColorMap(TimeValue t, int onOff) { delegate->SetUseShadowColorMap(t, onOff); }
-	int				GetUseShadowColorMap(TimeValue t) { return delegate->GetUseShadowColorMap(t); }
+	virtual void			SetUseShadowColorMap(TimeValue t, int onOff) override { delegate->SetUseShadowColorMap(t, onOff); }
+	virtual int				GetUseShadowColorMap(TimeValue t) override { return delegate->GetUseShadowColorMap(t); }
 
-	void			SetShadowGenerator(ShadowType *s) { delegate->SetShadowGenerator(s); }
-	ShadowType*		GetShadowGenerator() { return delegate->GetShadowGenerator(); } 
+	virtual void			SetShadowGenerator(ShadowType *s) override { delegate->SetShadowGenerator(s); }
+	virtual ShadowType*		GetShadowGenerator() override { return delegate->GetShadowGenerator(); } 
 };
 
 // ----------------------- MSPluginCamera ----------------------
@@ -993,44 +993,44 @@ public:
 
 	// From CameraObject
 
-	RefResult		EvalCameraState(TimeValue time, Interval& valid, CameraState* cs) { return REF_SUCCEED; }
-	void			SetOrtho(BOOL b) { }
-	BOOL			IsOrtho() { return FALSE; }
-	void			SetFOV(TimeValue time, float f) { } 
-	float			GetFOV(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
-	void			SetTDist(TimeValue time, float f) { } 
-	float			GetTDist(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
-	int				GetManualClip() {return 0;}
-	void			SetManualClip(int onOff) { }
-	float			GetClipDist(TimeValue t, int which, Interval &valid=Interval(0,0)) { return 0.0f; }
-	void			SetClipDist(TimeValue t, int which, float val) { }
-	void			SetEnvRange(TimeValue time, int which, float f) { } 
-	float			GetEnvRange(TimeValue t, int which, Interval& valid = Interval(0,0)) { return 0.0f; }
-	void			SetEnvDisplay(BOOL b, int notify=TRUE) { }
-	BOOL			GetEnvDisplay(void) { return FALSE; }
-	void			RenderApertureChanged(TimeValue t) { }
-	void			UpdateTargDistance(TimeValue t, INode* inode) { }
-	int				UsesWireColor() { return CameraObject::UsesWireColor(); }   // TRUE if the object color is used for display
+	virtual RefResult		EvalCameraState(TimeValue time, Interval& valid, CameraState* cs) override { return REF_SUCCEED; }
+	virtual void			SetOrtho(BOOL b) override { }
+	virtual BOOL			IsOrtho() override { return FALSE; }
+	virtual void			SetFOV(TimeValue time, float f) override { } 
+	virtual float			GetFOV(TimeValue t, Interval& valid) override { return 0.0f; }
+	virtual void			SetTDist(TimeValue time, float f) override { } 
+	virtual float			GetTDist(TimeValue t, Interval& valid) override { return 0.0f; }
+	virtual int				GetManualClip() override {return 0;}
+	virtual void			SetManualClip(int onOff) override { }
+	virtual float			GetClipDist(TimeValue t, int which, Interval &valid) override { return 0.0f; }
+	virtual void			SetClipDist(TimeValue t, int which, float val) override { }
+	virtual void			SetEnvRange(TimeValue time, int which, float f) override { } 
+	virtual float			GetEnvRange(TimeValue t, int which, Interval& valid) override { return 0.0f; }
+	virtual void			SetEnvDisplay(BOOL b, int notify=TRUE) override { }
+	virtual BOOL			GetEnvDisplay(void) override { return FALSE; }
+	virtual void			RenderApertureChanged(TimeValue t) override { }
+	virtual void			UpdateTargDistance(TimeValue t, INode* inode) override { }
+	virtual int				UsesWireColor() override { return CameraObject::UsesWireColor(); }   // TRUE if the object color is used for display
 
 	// From GenCamera
 
-	GenCamera *		NewCamera(int type) { return NULL; }
-	void			SetConeState(int s) { }
-	int				GetConeState() { return 0; }
-	void			SetHorzLineState(int s) { }
-	int				GetHorzLineState() { return 0; }
-	void			Enable(int enab) { }
-	BOOL			SetFOVControl(Control *c) { return FALSE; }
-	void			SetFOVType(int ft) { }
-	int				GetFOVType() { return 0; }
-	Control *		GetFOVControl() { return NULL; }
-	int				Type() { return 0; }
-	void			SetType(int tp) { }
+	virtual GenCamera *		NewCamera(int type) override { return NULL; }
+	virtual void			SetConeState(int s) override { }
+	virtual int				GetConeState() override { return 0; }
+	virtual void			SetHorzLineState(int s) override { }
+	virtual int				GetHorzLineState() override { return 0; }
+	virtual void			Enable(int enab) override { }
+	virtual BOOL			SetFOVControl(Control *c) override { return FALSE; }
+	virtual void			SetFOVType(int ft) override { }
+	virtual int				GetFOVType() override { return 0; }
+	virtual Control*		GetFOVControl() override { return NULL; }
+	virtual int				Type() override { return 0; }
+	virtual void			SetType(int tp) override { }
 
-	void			SetDOFEnable(TimeValue t, BOOL onOff) {}
-	BOOL			GetDOFEnable(TimeValue t, Interval& valid = Interval(0,0)) { return 0; }
-	void			SetDOFFStop(TimeValue t, float fs) {}
-	float			GetDOFFStop(TimeValue t, Interval& valid = Interval(0,0)) { return 1.0f; }
+	virtual void			SetDOFEnable(TimeValue t, BOOL onOff) override {}
+	virtual BOOL			GetDOFEnable(TimeValue t, Interval& valid) override { return 0; }
+	virtual void			SetDOFFStop(TimeValue t, float fs) override {}
+	virtual float			GetDOFFStop(TimeValue t, Interval& valid) override { return 1.0f; }
 
 };
 
@@ -1042,62 +1042,62 @@ public:
 	RefTargetHandle Clone(RemapDir& remap);
 
 	// From BaseObject
-	int				Display(TimeValue t, INode* inode, ViewExp *vpt, int vflags);
+	virtual int				Display(TimeValue t, INode* inode, ViewExp *vpt, int vflags) override;
 
-	void			GetWorldBoundBox(TimeValue t, INode *inode, ViewExp* vpt, Box3& abox );
-	void			GetLocalBoundBox(TimeValue t, INode *inode, ViewExp *vpt, Box3& abox );
-	void			GetDeformBBox(TimeValue t, Box3& abox, Matrix3 *tm, BOOL useSel );
-	int				HitTest(TimeValue t, INode *inode, int type, int crossing, int vflags, IPoint2 *p, ViewExp *vpt);
-	void			Snap(TimeValue t, INode* inode, SnapInfo *snap, IPoint2 *p, ViewExp *vpt);
+	virtual void			GetWorldBoundBox(TimeValue t, INode *inode, ViewExp* vpt, Box3& abox ) override;
+	virtual void			GetLocalBoundBox(TimeValue t, INode *inode, ViewExp *vpt, Box3& abox ) override;
+	virtual void			GetDeformBBox(TimeValue t, Box3& abox, Matrix3 *tm, BOOL useSel ) override;
+	virtual int				HitTest(TimeValue t, INode *inode, int type, int crossing, int vflags, IPoint2 *p, ViewExp *vpt) override;
+	virtual void			Snap(TimeValue t, INode* inode, SnapInfo *snap, IPoint2 *p, ViewExp *vpt) override;
 
 
 	// From CameraObject
 
-	RefResult		EvalCameraState(TimeValue time, Interval& valid, CameraState* cs);
-	void			SetOrtho(BOOL b) { delegate->SetOrtho(b); }
-	BOOL			IsOrtho() { return delegate->IsOrtho(); }
-	void			SetFOV(TimeValue time, float f) { delegate->SetFOV(time, f); } 
-	float			GetFOV(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetFOV(t, valid); }
-	void			SetTDist(TimeValue time, float f) { delegate->SetTDist(time, f); } 
-	float			GetTDist(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetTDist(t, valid); }
-	int				GetManualClip() { return delegate->GetManualClip(); }
-	void			SetManualClip(int onOff) { delegate->SetManualClip(onOff); }
-	float			GetClipDist(TimeValue t, int which, Interval &valid=Interval(0,0)) { return delegate->GetClipDist(t, which, valid); }
-	void			SetClipDist(TimeValue t, int which, float val) { delegate->SetClipDist(t, which, val); }
-	void			SetEnvRange(TimeValue time, int which, float f) { delegate->SetEnvRange(time, which, f); } 
-	float			GetEnvRange(TimeValue t, int which, Interval& valid = Interval(0,0)) { return delegate->GetEnvRange(t, which, valid); }
-	void			SetEnvDisplay(BOOL b, int notify=TRUE) { delegate->SetEnvDisplay(b, notify); }
-	BOOL			GetEnvDisplay(void) { return delegate->GetEnvDisplay(); }
-	void			RenderApertureChanged(TimeValue t);
-	void			UpdateTargDistance(TimeValue t, INode* inode) { delegate->UpdateTargDistance(t, inode); }
-	int				UsesWireColor();
+	virtual RefResult		EvalCameraState(TimeValue time, Interval& valid, CameraState* cs) override;
+	virtual void			SetOrtho(BOOL b) override { delegate->SetOrtho(b); }
+	virtual BOOL			IsOrtho() override { return delegate->IsOrtho(); }
+	virtual void			SetFOV(TimeValue time, float f) override { delegate->SetFOV(time, f); } 
+	virtual float			GetFOV(TimeValue t, Interval& valid) override { return delegate->GetFOV(t, valid); }
+	virtual void			SetTDist(TimeValue time, float f) override { delegate->SetTDist(time, f); } 
+	virtual float			GetTDist(TimeValue t, Interval& valid) override { return delegate->GetTDist(t, valid); }
+	virtual int				GetManualClip() override { return delegate->GetManualClip(); }
+	virtual void			SetManualClip(int onOff) override { delegate->SetManualClip(onOff); }
+	virtual float			GetClipDist(TimeValue t, int which, Interval &valid) override { return delegate->GetClipDist(t, which, valid); }
+	virtual void			SetClipDist(TimeValue t, int which, float val) override { delegate->SetClipDist(t, which, val); }
+	virtual void			SetEnvRange(TimeValue time, int which, float f) override { delegate->SetEnvRange(time, which, f); } 
+	virtual float			GetEnvRange(TimeValue t, int which, Interval& valid) override { return delegate->GetEnvRange(t, which, valid); }
+	virtual void			SetEnvDisplay(BOOL b, int notify=TRUE) override { delegate->SetEnvDisplay(b, notify); }
+	virtual BOOL			GetEnvDisplay(void) override { return delegate->GetEnvDisplay(); }
+	virtual void			RenderApertureChanged(TimeValue t) override;
+	virtual void			UpdateTargDistance(TimeValue t, INode* inode) override { delegate->UpdateTargDistance(t, inode); }
+	virtual int				UsesWireColor() override;
 
-	void			SetMultiPassEffectEnabled(TimeValue t, BOOL enabled) { delegate->SetMultiPassEffectEnabled(t, enabled); }
-	BOOL			GetMultiPassEffectEnabled(TimeValue t, Interval& valid) { return delegate->GetMultiPassEffectEnabled(t, valid); }
-	void			SetMPEffect_REffectPerPass(BOOL enabled) { delegate->SetMPEffect_REffectPerPass(enabled); }
-	BOOL			GetMPEffect_REffectPerPass() { return delegate->GetMPEffect_REffectPerPass(); }
-	void			SetIMultiPassCameraEffect(IMultiPassCameraEffect *pIMultiPassCameraEffect) { delegate->SetIMultiPassCameraEffect(pIMultiPassCameraEffect); }
-	IMultiPassCameraEffect *GetIMultiPassCameraEffect() { return delegate->GetIMultiPassCameraEffect(); }
+	virtual void			SetMultiPassEffectEnabled(TimeValue t, BOOL enabled) override { delegate->SetMultiPassEffectEnabled(t, enabled); }
+	virtual BOOL			GetMultiPassEffectEnabled(TimeValue t, Interval& valid) override { return delegate->GetMultiPassEffectEnabled(t, valid); }
+	virtual void			SetMPEffect_REffectPerPass(BOOL enabled) override { delegate->SetMPEffect_REffectPerPass(enabled); }
+	virtual BOOL			GetMPEffect_REffectPerPass() override { return delegate->GetMPEffect_REffectPerPass(); }
+	virtual void			SetIMultiPassCameraEffect(IMultiPassCameraEffect *pIMultiPassCameraEffect) override { delegate->SetIMultiPassCameraEffect(pIMultiPassCameraEffect); }
+	virtual IMultiPassCameraEffect *GetIMultiPassCameraEffect() override { return delegate->GetIMultiPassCameraEffect(); }
 
 	// From GenCamera
 
-	GenCamera *		NewCamera(int type) { return delegate->NewCamera(type); }
-	void			SetConeState(int s) { delegate->SetConeState(s); }
-	int				GetConeState() { return delegate->GetConeState(); }
-	void			SetHorzLineState(int s) { delegate->SetHorzLineState(s); }
-	int				GetHorzLineState() { return delegate->GetHorzLineState(); }
-	void			Enable(int enab) { delegate->Enable(enab); }
-	BOOL			SetFOVControl(Control *c) { return delegate->SetFOVControl(c); }
-	void			SetFOVType(int ft) { delegate->SetFOVType(ft); }
-	int				GetFOVType() { return delegate->GetFOVType(); }
-	Control *		GetFOVControl() { return delegate->GetFOVControl(); }
-	int				Type() { return delegate->Type(); }
-	void			SetType(int tp) { delegate->SetType(tp); }
+	virtual GenCamera*		NewCamera(int type) override { return delegate->NewCamera(type); }
+	virtual void			SetConeState(int s) override { delegate->SetConeState(s); }
+	virtual int				GetConeState() override { return delegate->GetConeState(); }
+	virtual void			SetHorzLineState(int s) override { delegate->SetHorzLineState(s); }
+	virtual int				GetHorzLineState() override { return delegate->GetHorzLineState(); }
+	virtual void			Enable(int enab) override { delegate->Enable(enab); }
+	virtual BOOL			SetFOVControl(Control *c) override { return delegate->SetFOVControl(c); }
+	virtual void			SetFOVType(int ft) override { delegate->SetFOVType(ft); }
+	virtual int				GetFOVType() override { return delegate->GetFOVType(); }
+	virtual Control*		GetFOVControl() override { return delegate->GetFOVControl(); }
+	virtual int				Type() override { return delegate->Type(); }
+	virtual void			SetType(int tp) override { delegate->SetType(tp); }
 
-	void			SetDOFEnable(TimeValue t, BOOL onOff) { delegate->SetDOFEnable(t, onOff); }
-	BOOL			GetDOFEnable(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetDOFEnable(t, valid); }
-	void			SetDOFFStop(TimeValue t, float fs) { delegate->SetDOFFStop(t, fs); }
-	float			GetDOFFStop(TimeValue t, Interval& valid = Interval(0,0)) { return delegate->GetDOFFStop(t, valid); }
+	virtual void			SetDOFEnable(TimeValue t, BOOL onOff) override { delegate->SetDOFEnable(t, onOff); }
+	virtual BOOL			GetDOFEnable(TimeValue t, Interval& valid) override { return delegate->GetDOFEnable(t, valid); }
+	virtual void			SetDOFFStop(TimeValue t, float fs) override { delegate->SetDOFFStop(t, fs); }
+	virtual float			GetDOFFStop(TimeValue t, Interval& valid) override { return delegate->GetDOFFStop(t, valid); }
 };
 
 // ----------------------- MSPluginShape ----------------------
@@ -1910,17 +1910,12 @@ public:
 	BOOL			DependOnTopology(ModContext &mc) { return Modifier::DependOnTopology(mc); }
 
 	Class_ID		InputType() { return triObjectClassID; }
-
-	// local methods
-	// Find first dependent node that contains specified ModContext
-	INode* GetNodeFromModContext(const ModContext *smd);
-
 };
 
 // ----------------------- MSPluginSimpleMod ----------------------
 // scripted SimpleMod  (this one has full-implementation handler calls)
 
-class MSPluginSimpleMod : public MSPlugin, public SimpleMod
+class MSPluginSimpleMod : public MSPlugin, public SimpleModBase
 {
 public:
 	IObjParam*		ip;					// ip for any currently open command panel dialogs
@@ -1958,7 +1953,7 @@ public:
 	ReferenceTarget* get_delegate() { return NULL; }  // no delegate 
 
 	// From Animatable
-    using SimpleMod::GetInterface;
+    using SimpleModBase::GetInterface;
     
 	void			GetClassName(MSTR& s) { s = pc->name->to_string(); }  // non-localized name
 	Class_ID		ClassID() { return pc->class_id; }
@@ -1970,14 +1965,14 @@ public:
 	int				NumParamBlocks() { return pblocks.Count(); }
 	IParamBlock2*	GetParamBlock(int i) { return pblocks[i]; }
 	IParamBlock2*	GetParamBlockByID(BlockID id) { return MSPlugin::GetParamBlockByID(id); }
-	void*			GetInterface(ULONG id) { if (id == I_MAXSCRIPTPLUGIN) return (MSPlugin*)this; else return SimpleMod::GetInterface(id); }
+	void*			GetInterface(ULONG id) { if (id == I_MAXSCRIPTPLUGIN) return (MSPlugin*)this; else return SimpleModBase::GetInterface(id); }
 
 	// From ReferenceMaker
 	RefResult		NotifyRefChanged(const Interval& changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message, BOOL propagate) 
 					{ 
 						if (message == REFMSG_CHANGE) 
 							last_time = TIME_NegInfinity;
-						SimpleMod::NotifyRefChanged(changeInt, hTarget, partID, message, propagate);
+						SimpleModBase::NotifyRefChanged(changeInt, hTarget, partID, message, propagate);
 						return ((MSPlugin*)this)->NotifyRefChanged(changeInt, hTarget, partID, message, propagate); 
 					}
 
@@ -1990,8 +1985,8 @@ public:
 	void			RefDeleted() { MSPlugin::RefDeleted(); }
 	void			RefAdded(RefMakerHandle rm) { MSPlugin::RefAdded( rm); }
 	RefTargetHandle Clone(RemapDir& remap);
-	IOResult		Save(ISave *iSave) { MSPlugin::Save(iSave); return SimpleMod::Save(iSave); }
-    IOResult		Load(ILoad *iLoad) { MSPlugin::Load(iLoad); return SimpleMod::Load(iLoad); }
+	IOResult		Save(ISave *iSave) { MSPlugin::Save(iSave); return SimpleModBase::Save(iSave); }
+    IOResult		Load(ILoad *iLoad) { MSPlugin::Load(iLoad); return SimpleModBase::Load(iLoad); }
 	void			NotifyTarget(int msg, RefMakerHandle rm) { MSPlugin::NotifyTarget(msg, rm); }  // LAM - 9/7/01 - ECO 624
 
 	// From BaseObject
@@ -2800,14 +2795,14 @@ public:
 	ReferenceTarget* get_delegate() { return delegate; } 
 
 	// From Animatable
-	void			GetClassName(MSTR& s) { s = pc->name->to_string(); }  // non-localized name
-	Class_ID		ClassID() { return pc->class_id; }
+	void			GetClassName(MSTR& s) { s = MS_SUPER::pc->name->to_string(); }  // non-localized name
+	Class_ID		ClassID() { return MS_SUPER::pc->class_id; }
 	void			FreeCaches() { delegate->FreeCaches(); } 		
-	int				NumSubs() { return pblocks.Count() + 1; }  
-	Animatable*		SubAnim(int i) { if (i == 0) { return delegate; } else return pblocks[i-1]; }
-	MSTR			SubAnimName(int i) { if (i == 0) { MSTR n; delegate->GetClassName(n); return n; } else return pblocks[i-1]->GetLocalName(); }
-	int				NumParamBlocks() { return pblocks.Count(); }
-	IParamBlock2*	GetParamBlock(int i) { return pblocks[i]; }
+	int				NumSubs() { return MS_SUPER::pblocks.Count() + 1; }  
+	Animatable*		SubAnim(int i) { if (i == 0) { return delegate; } else return MS_SUPER::pblocks[i-1]; }
+	MSTR			SubAnimName(int i) { if (i == 0) { MSTR n; delegate->GetClassName(n); return n; } else return MS_SUPER::pblocks[i-1]->GetLocalName(); }
+	int				NumParamBlocks() { return MS_SUPER::pblocks.Count(); }
+	IParamBlock2*	GetParamBlock(int i) { return MS_SUPER::pblocks[i]; }
 	IParamBlock2*	GetParamBlockByID(BlockID id) { return MSPlugin::GetParamBlockByID(id); }
 	void*			GetInterface(ULONG id) { if (id == I_MAXSCRIPTPLUGIN) return (MSPlugin*)this; else return MS_SUPER::GetInterface(id); }
 

@@ -73,7 +73,20 @@ public:
 	// solution. Each instance in MAX is assigned a unique mesh
 	// in the solution.
 	virtual bool GetMesh(INode* node, Mesh*& mesh,
-		::Interval& validity = ::Interval(0,0)) = 0;
+		::Interval& validity) = 0;
+
+	// Get the mesh for a node. Returns true if the mesh exists.
+	// The address of the mesh is returned in mesh. You shouldn't
+	// keep this address for an extended period. The mesh could
+	// be deleted when the radiosity solution calculates a new
+	// solution. There is no instancing for meshes in the radiosity
+	// solution. Each instance in MAX is assigned a unique mesh
+	// in the solution.
+	bool GetMesh(INode* node, Mesh*& mesh)
+	{
+		::Interval validity(0,0);
+		return GetMesh(node, mesh, validity);
+	}
 
 	// Get the TM for the node. Returns true if the mesh exists.
 	// Also restricts validity to the validity interval for the TM.
@@ -83,7 +96,18 @@ public:
 	// The transform returned is usually just a scale to translate
 	// the radiosity plugins units, meters, to the MAX units.
 	virtual bool GetMeshTM(INode* node, Matrix3& TM,
-		::Interval& validity = ::Interval(0,0)) = 0;
+		::Interval& validity) = 0;
+
+	// Get the TM for the node. Returns true if the mesh exists.
+	// TM is the mesh to world space transform. The radiosity
+	// solution does not keep track of object to world transforms.
+	// The transform returned is usually just a scale to translate
+	// the radiosity plugins units, meters, to the MAX units.
+	bool GetMeshTM(INode* node, Matrix3& TM)
+	{
+		::Interval validity(0,0);
+		return GetMeshTM(node, TM, validity);
+	}
 
 	// Get the mesh and TM for a node. Returns NULL if the mesh doesn't
 	// exist. TM is the mesh to world space transform (See GetMeshTM).
@@ -91,8 +115,28 @@ public:
 	// and tmValid to the validity interval for the TM. If the mesh
 	// doesn't exist, neither validity interval is changed.
 	virtual Mesh* GetMeshAndTM(INode* node, Matrix3& TM,
-		::Interval& meshValid = ::Interval(0,0),
-		::Interval& tmValid = ::Interval(0,0)) = 0;
+		::Interval& meshValid,
+		::Interval& tmValid) = 0;
+
+	// Get the mesh and TM for a node. Returns NULL if the mesh doesn't
+	// exist. TM is the mesh to world space transform (See GetMeshTM).
+	// Also restricts meshValid to the validity interval for the mesh.
+	// If the mesh doesn't exist, the validity interval is not changed.
+	Mesh* GetMeshAndTM(INode* node, Matrix3& TM,
+		::Interval& meshValid)
+	{
+		::Interval tmValid(0,0);
+		return GetMeshAndTM(node, TM, meshValid, tmValid);
+	}
+
+	// Get the mesh and TM for a node. Returns NULL if the mesh doesn't
+	// exist. TM is the mesh to world space transform (See GetMeshTM).
+	Mesh* GetMeshAndTM(INode* node, Matrix3& TM)
+	{
+		::Interval meshValid(0,0);
+		return GetMeshAndTM(node, TM, meshValid);
+	}
+
 };
 
 #pragma warning(pop)

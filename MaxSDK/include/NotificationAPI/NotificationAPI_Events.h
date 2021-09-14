@@ -98,6 +98,7 @@ namespace NotificationAPI
 		EventType_View_Properties = 1<<0,		//!< View properties updated -transform, FOV, etc. - (view can be a camera, light or viewport) , you will receive a IViewEvent
         EventType_View_Active    = 1<<1,	    //!< Active view switched to another view (new view can be a camera, light or viewport) , you will receive a IViewEvent
         EventType_View_Deleted   = 1<<2,	    //!< Active view was deleted (camera node was deleted for example), new view type is monitored automatically, you will receive a IViewEvent
+        EventType_View_Type      = 1<<3,	    //!< Active view type has changed say from perspective to top view or from a camera to persp. view, you will receive a IViewEvent
 		//@}
     };
 

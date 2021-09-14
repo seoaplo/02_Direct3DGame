@@ -243,6 +243,7 @@ public:
    // Comparison
    /*! \remarks Returns nonzero if the quaternions are equal; otherwise 0. */
    GEOMEXPORT int operator==(const Quat& a) const;
+   GEOMEXPORT int operator!=(const Quat& a) const;
    GEOMEXPORT int Equals(const Quat& a, float epsilon = 1E-6f) const;
 
    /*! \remarks Sets this quaternion to the identity quaternion (<b>x=y=z=0.0;

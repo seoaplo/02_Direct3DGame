@@ -15,6 +15,7 @@
 #include <ObjIdl.h>
 #include <vector>
 #include <memory>
+#include "strbasic.h"
 
 #ifdef DllExport
 #undef DllExport
@@ -29,11 +30,11 @@
 other OLE Structured Storage based files.  See https://msdn.microsoft.com/en-us/library/windows/desktop/aa380369(v=vs.85).aspx for
 a description of OLE Structured Storage.
 Within 3ds Max, this API is used by CustomFileStream.dlu and implemented by CustomFileStreamAPI.dll source.  The source for these are in 
-maxsdk\samples\utilities\CustomFileStream.
+maxsdk\\samples\\utilities\\CustomFileStream.
 CustomFileStream.dlu defines the CustomSceneStreamManager and CustomFileStream FPS (Function Publishing System) interfaces.
 CustomFileStreamAPI.dll defines the low level file access methods that are used by CustomFileStream.dlu, and can be used by external applications 
 to read, write, and modify the CustomFileStream as supported by the CustomSceneStreamManager and CustomFileStream interfaces. 
-To use this dll, you would link against CustomFileStreamAPI.lib in maxsdk\libs.  There are no dependencies by CustomFileStreamAPI.dll on other 3ds 
+To use this dll, you would link against CustomFileStreamAPI.lib in maxsdk\\libs.  There are no dependencies by CustomFileStreamAPI.dll on other 3ds 
 Max dlls. To see how these low level methods should be tied together, see the CustomFileStream.dlu source.
 This API will read and write CustomFileStream to 3ds Max scene files written by any version of 3ds Max. 
 The CustomSceneStreamManager is required to persist the custom data streams across scene file load and save operations.
@@ -60,7 +61,7 @@ namespace MaxSDK
 	namespace CustomFileStreamAPI
 	{
 		static const WORD kCustomFileStreamVersion = 1;		//!< the current stream format version number
-		static const TCHAR* kCustomFileStreamStorageName = _T("CustomFileStreamDataStorage"); //!< the CustomFileStream IStorage name
+		static const MCHAR* kCustomFileStreamStorageName = _T("CustomFileStreamDataStorage"); //!< the CustomFileStream IStorage name
 		static const int kMaxStreamNameLength = 31;		//!< OLE limit of 31 chars for stream name
 
 		//! \brief stream header consists of WORD version number, a private flag DWORD, and a public flag DWORD
@@ -100,7 +101,7 @@ namespace MaxSDK
 		\param fileName The file name.
 		\return true if the file exists and contains a storage called CustomFileStreamDataStorage
 		*/
-		DllExport bool DoesCustomFileStreamStorageExist(const TCHAR* fileName);
+		DllExport bool DoesCustomFileStreamStorageExist(const MCHAR* fileName);
 
 		/*! \brief Open a file as an OLE structured storage file with read/write access.
 		\param fileName The file name.
@@ -108,7 +109,7 @@ namespace MaxSDK
 		be Released at the same time as the returned IStorage is released.
 		\return The CustomFileStream IStorage
 		*/
-		DllExport IStorage* OpenStorageForWrite(const TCHAR* fileName, IStorage* & pFileIStorage);
+		DllExport IStorage* OpenStorageForWrite(const MCHAR* fileName, IStorage* & pFileIStorage);
 
 		/*! \brief Open a file as an OLE structured storage file with read access.
 		\param fileName The file name.
@@ -116,7 +117,7 @@ namespace MaxSDK
 		be Released at the same time as the returned IStorage is released.
 		\return The CustomFileStream IStorage
 		*/
-		DllExport IStorage* OpenStorageForRead(const TCHAR* fileName, IStorage* & pFileIStorage);
+		DllExport IStorage* OpenStorageForRead(const MCHAR* fileName, IStorage* & pFileIStorage);
 
 		/*! \brief Open a stream with read/write access, creating it if not present. 
 		\param pIStorage The CustomFileStream IStorage.
@@ -128,7 +129,7 @@ namespace MaxSDK
 		\note After opening the stream, validate the stream using ValidateStream before using other 
 		functions in this API.
 		*/
-		DllExport IStream* OpenStreamForWrite(IStorage* pIStorage, const TCHAR* streamName, DWORD privateFlags, DWORD publicFlags = 0, WORD version = kCustomFileStreamVersion);
+		DllExport IStream* OpenStreamForWrite(IStorage* pIStorage, const MCHAR* streamName, DWORD privateFlags, DWORD publicFlags = 0, WORD version = kCustomFileStreamVersion);
 
 		/*! \brief Open a stream with read access.
 		\param pIStorage The CustomFileStream IStorage.
@@ -137,7 +138,7 @@ namespace MaxSDK
 		\note After opening the stream, validate the stream using ValidateStream before using other
 		functions in this API on the stream.
 		*/
-		DllExport IStream* OpenStreamForRead(IStorage* pIStorage, const TCHAR* streamName);
+		DllExport IStream* OpenStreamForRead(IStorage* pIStorage, const MCHAR* streamName);
 
 		/*! \brief Validates that stream was created via CustomFileStream methods, captures private and public
 		flag values if wanted, leaves IStream positioned immediately past header. Verifies the stream is long enough
@@ -193,7 +194,7 @@ namespace MaxSDK
 
 		/*! \brief Write the stream contents (the data past the header), erasing any previous content
 		\param pIStream The IStream.
-		\param content [out] The content to write to the stream.
+		\param content The content to write to the stream.
 		\return true if successfully written.
 		*/
 		DllExport bool WriteStreamContents(IStream* pIStream, const std::vector<std::wstring>& content);
@@ -211,11 +212,11 @@ namespace MaxSDK
 		\param streamName The stream name. The stream name must be less than 32 characters.
 		\return The success status
 		*/
-		DllExport kDeleteStream_result DeleteFileStream(const TCHAR* fileName, const TCHAR* streamName);
+		DllExport kDeleteStream_result DeleteFileStream(const MCHAR* fileName, const MCHAR* streamName);
 
 		/*! \brief Get the last character of content in a stream.
-		\param fileName The file name.
-		\param streamName The stream name. The stream name must be less than 32 characters.
+		\param pIStream The IStream.
+		\param theChar [out] The last character of content in the stream.
 		\return The success status
 		*/
 		DllExport kGetLastCharacterOfContent_result GetLastCharacterOfContent(IStream* pIStream, wchar_t& theChar);

@@ -592,15 +592,13 @@ public:
 	*/
 	virtual void GetProjectDirectoryCreateFilters(Tab<int> &filterIDs) = 0;
 
-	/*! \brief Returns the installation path of a plug-in installed via Autodesk Exchange Store based on the product code.
-
-	Gets the installation path of a plug-in installed via Autodesk Exchange Store based on the product code.
-	\param[in] productCode the product code of the installed plug-in. The product code is a standard UUID string
-	("{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}") must be provided during the creation of the plug-in installer for 
-	Autodesk Exchange Store. The product code can be found in the PackageContents.xml while creating the plug-in installer.
-	\return the installation path of the plug-in.
+#pragma warning( push )
+#pragma warning( disable : 4481 )
+	/*! \brief Returns the installation path of a plugin package loaded via Plug-in Package Manager based on the upgrade code.
+	\deprecated Use MaxSDK::PluginPackageManager::GetInstance()->GetPackageInstallPathByUpgradeCode(const MCHAR* upgradeCode).
 	*/
-	virtual const MCHAR* GetExchangeStorePlugInInstallPath(const MSTR& productCode) = 0;
+	MAX_DEPRECATED virtual const MCHAR* GetExchangeStorePlugInInstallPath(const MSTR& /*upgradeCode*/) const MAX_SEALED { return nullptr; }
+#pragma warning( pop )
 
 	/*! \brief Returns the single instance of this manager.
 

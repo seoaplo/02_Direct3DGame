@@ -110,8 +110,10 @@ class GenCamera: public CameraObject {
 		virtual void SetType(int tp)=0;
 
 		virtual void SetDOFEnable(TimeValue t, BOOL onOff) {}
-		virtual BOOL GetDOFEnable(TimeValue t, Interval& valid = Interval(0,0)) { return 0; }
+		virtual BOOL GetDOFEnable(TimeValue t, Interval& valid) { return 0; }
+		BOOL GetDOFEnable(TimeValue t) { Interval valid(0,0); return GetDOFEnable(t, valid); }
 		virtual void SetDOFFStop(TimeValue t, float fs) {}
-		virtual float GetDOFFStop(TimeValue t, Interval& valid = Interval(0,0)) { return 1.0f; }
+		virtual float GetDOFFStop(TimeValue t, Interval& valid) { return 1.0f; }
+		float GetDOFFStop(TimeValue t) { Interval valid(0,0); return GetDOFFStop(t, valid); }
 	};
 #pragma warning(pop)

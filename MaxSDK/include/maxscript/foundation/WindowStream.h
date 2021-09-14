@@ -35,7 +35,9 @@
  	void		gc_trace();
  	ScripterExport void	sprin1(CharStream* s);
  
+ #ifndef DOXYGEN
  #include "../macros/define_implementations.h"
+ #endif
  	def_generic(sprint,	  "sprint");
   	use_generic( coerce,  "coerce");
  	use_generic( flush,   "flush"); 

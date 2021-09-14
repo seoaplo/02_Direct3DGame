@@ -218,7 +218,9 @@ enum epolyModParameters {
 	epm_edge_chamfer_quad_intersections,	// bool - Quad intersections option
 	epm_debug_last_delta,  //this is a debugging tool used to stop evaling after a certain number of delta ops used to tracck down which
 
-	epm_extrude_face_bias, epm_bevel_face_bias
+	// New for 2019
+	epm_extrude_face_bias,		// float - indicates how much to blend between surface distance and local normal (ep_op_extrude_face)
+	epm_bevel_face_bias,		// float - "bias" amount blends between surface distance and local normal values (ep_op_bevel)
 };
 // In order to preserve forward file IO compatibility with Makalu (Max 9), the new chamfer parameter
 // for Velveeta (Max 9.5) has to take on the value of epm_reserved1. See the implementation of
@@ -334,6 +336,7 @@ enum epolyModMethods {
 	// New for 2016
 	epmod_set_vertex_float,
 	epmod_set_edge_float,
+    epmod_get_last,
 
 	epmod_list_delta_ops
 
@@ -504,6 +507,8 @@ public:
 		FN_0(epmod_matid_floatervisible,TYPE_BOOL, MatIDFloaterVisible);
 
 		VFN_0(epmod_list_delta_ops, ListDeltaOps);
+
+        FN_0(epmod_get_last, TYPE_INT, EpModGetLast);
 
 	END_FUNCTION_MAP
 	#pragma warning(pop)
@@ -1896,6 +1901,8 @@ public:
 	//!  \brief Prints the delta operations to script window
 	virtual  void ListDeltaOps() = 0;
 
+    //!  \brief Returns the last operation used or -1 if none
+    virtual int EpModGetLast() { return -1; }
 };
 
 // Controls whether or not "inherently" nonanimatable operations are available in Animation mode.
@@ -1979,7 +1986,11 @@ protected:
 class EPolyMod18 : public EPolyMod13
 {
 public:
-	// Support for editing Vertex and Edge data (initially, Weight and Crease values for OpenSubDiv)
+    BEGIN_FUNCTION_MAP_PARENT(EPolyMod13)
+        FN_0(epmod_get_last, TYPE_INT, EpModGetLast);
+    END_FUNCTION_MAP
+
+    // Support for editing Vertex and Edge data (initially, Weight and Crease values for OpenSubDiv)
 	/**
 	* Gets float data and other information from the specified float vertex channel.
 	* \param[in] channel - See mesh.h for vertex channel numbers (VDATA_XXX).
@@ -2036,5 +2047,9 @@ public:
 	* \param success - If true, this commits the operation and puts the restore objects to the undo system. If false, the restore objects are destroyed.
 	*/
 	virtual void  EndPerDataModify (bool success)=0;
+    /**
+    * Returns the ID of the last operation performed
+    */
+    virtual int EpModGetLast() = 0;
 };
 #pragma warning(pop)

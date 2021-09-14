@@ -1866,7 +1866,7 @@ class IRollupWindow : public ICustomControl {
 		 * \param[in] index Specifies the rollup whose title is to be returned. 
 		 * \return The title of the specified rollup.
 		 * \see SetPanelTitle */
-		virtual TSTR GetPanelTitle( int index ) const = 0;
+		virtual MSTR GetPanelTitle( int index ) const = 0;
 
 		// returns index of new panel
 		/*! \remarks This method is used to add a rollup page.

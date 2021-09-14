@@ -53,7 +53,7 @@ public:
         This method is called automatically by this class (BaseTranslator_MtlBase) before the material is translated, but exposed here
         in case any external code might need to access it independently.
         \param mtlBase The material/texmap that forms the root of the material/texmap tree to be updated.
-        \param translationTime The time at which the material is to be updated.
+        \param t The time at which the material is to be updated.
         \param [in, out] validity The validity of the material at the given time, to be intersected with the input value. */
     static void UpdateMaterialHierarchy(MtlBase& mtlBase, const TimeValue t, Interval& validity);
 

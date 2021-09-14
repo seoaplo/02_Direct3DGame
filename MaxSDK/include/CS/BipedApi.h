@@ -119,8 +119,9 @@ struct SaveSubAnimInfo: public MaxHeapOperators
 //! \brief Structure specifying which controllers to load from a BIP file
 struct LoadSubAnimInfo: public MaxHeapOperators
 {
-	//! \brief The name of the node whose controller will be loaded 
-	MCHAR name[256];
+	//! \brief The name of the node whose controller will be loaded
+	static const size_t nameLength = 256;
+	MCHAR name[nameLength];
 	//! \brief The type of controller to load: position = 0, rotation = 1, scale = 2
 	int type;
 };

@@ -251,6 +251,12 @@ class TriObject:
 		BOOL threaded whether when building the cache it can use additional threads.  This is needed since the system may be creating many meshes at the same time\n
 		*/
 		CoreExport void BuildGWCache(GraphicsWindow *gw, Material *ma, int numMat,BOOL threaded);
+
+		/*! \brief This are called right before and after a modifier is applied to an object.  This allows for certain types of opitimizations to happens since durinng modifier modification the object
+		knows what channels are changing and can do optimizations to speed things up like invalidating specific display channels which it does not know about when say a baseobject is evaluated.
+		*/
+		CoreExport virtual void StartStackEval() override;
+		CoreExport virtual void EndStackEval() override;
 	};
 
 #pragma warning(pop)

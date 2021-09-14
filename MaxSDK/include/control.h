@@ -100,6 +100,19 @@ class ScaleValue: public MaxHeapOperators {
    Specifies the element to access: 0=x, 1=y, 2=z.\n\n
 	 */
    float& operator[](int el) {return s[el];}
+
+   // Test for equality
+   /*! \remarks Equality operator. Test for equality between two ScaleValue's.
+   \return  Nonzero if the ScaleValue's are equal; otherwise 0. */
+   int operator==(const ScaleValue& sv) const {
+	   return ((sv.s == s) && (sv.q == q));
+   }
+   int operator!=(const ScaleValue& sv) const {
+	   return ((sv.s != s) || (sv.q != q));
+   }
+   int Equals(const ScaleValue& sv, float epsilon = 1E-6f) const {
+	   return sv.s.Equals(s, epsilon) && sv.q.Equals(q, epsilon);
+   }
    };
 
 // Types of ORTs

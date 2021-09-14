@@ -19,27 +19,27 @@ BOOL SParser::GetData(VOID* pData, INT DataType)
 		switch (DataType)
 		{
 		case INT_DATA:
-			_stscanf_s(m_pBuffer, _T("%s%d"), m_pString, MAX_PATH, pData);
+			_stscanf_s(m_pBuffer, _T("%s%d"), m_pString, MAX_PASER_SIZE, pData);
 			break;
 		case FLOAT_DATA:
-			_stscanf_s(m_pBuffer, _T("%s%f"), m_pString, MAX_PATH, pData);
+			_stscanf_s(m_pBuffer, _T("%s%f"), m_pString, MAX_PASER_SIZE, pData);
 			break;
 		case STRING_DATA:
 		{
 			TCHAR szTexPath[MAX_PATH] = TEXT("");
-			_stscanf_s(m_pBuffer, _T("%s %s"), m_pString, MAX_PATH, szTexPath);
+			_stscanf_s(m_pBuffer, _T("%s %s"), m_pString, MAX_PASER_SIZE, szTexPath);
 			if (szTexPath[0] == '"')
 			{
 				// 문자열의 시작과 끝에 있는 (")문자를 삭제한다.
 				// 또한 문자열중간에 공백까지도 반환문자열에 포함한다.
-				_tcscpy_s(szTexPath, MAX_PATH, _tcsstr(m_pBuffer, _T("\"")));
+				_tcscpy_s(szTexPath, MAX_PASER_SIZE, _tcsstr(m_pBuffer, _T("\"")));
 				size_t filelen = _tcslen(szTexPath);
 				szTexPath[filelen - 2] = 0;
-				_tcscpy_s((TCHAR*)pData, MAX_PATH, &szTexPath[1]);
+				_tcscpy_s((TCHAR*)pData, MAX_PASER_SIZE, &szTexPath[1]);
 			}
 			else
 			{
-				_tcscpy_s((TCHAR*)pData, MAX_PATH, &szTexPath[0]);
+				_tcscpy_s((TCHAR*)pData, MAX_PASER_SIZE, &szTexPath[0]);
 			}
 		}
 		break;
@@ -99,15 +99,15 @@ BOOL SParser::GetData(VOID* pData, INT DataType)
 }
 void SParser::GetNextLine()
 {
-	_fgetts(m_pBuffer, MAX_PATH, m_pStream);
+	_fgetts(m_pBuffer, MAX_PASER_SIZE, m_pStream);
 }
 BOOL SParser::GetDataFromFileNext(const TCHAR* pString, VOID* pData, INT DataType)
 {
 
 	if (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
-		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
+		_fgetts(m_pBuffer, MAX_PASER_SIZE, m_pStream);
+		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PASER_SIZE);
 		if (!_tcsicmp(m_pString, pString))
 		{
 			return GetData(pData, DataType);
@@ -127,8 +127,8 @@ BOOL SParser::GetDataFromFile(const TCHAR* pString, VOID* pData, INT DataType)
 	}
 	if (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
-		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
+		_fgetts(m_pBuffer, MAX_PASER_SIZE, m_pStream);
+		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PASER_SIZE);
 		if (!_tcsicmp(m_pString, pString))
 		{
 			return GetData(pData, DataType);
@@ -155,8 +155,8 @@ BOOL SParser::GetDataFromFileString(const TCHAR* pString, VOID* pData, INT DataT
 		{
 			ErrorCloseStream(_T("작업도중 파일포인터를 잃어 버렸습니다."));
 		}
-		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
-		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
+		_fgetts(m_pBuffer, MAX_PASER_SIZE, m_pStream);
+		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PASER_SIZE);
 		if (!_tcsicmp(m_pString, pString))
 		{
 			if (GetData(pData, DataType))
@@ -182,8 +182,8 @@ BOOL SParser::GetNodeName(const TCHAR* pString, VOID* pData, INT DataType)
 	}
 	if (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
-		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
+		_fgetts(m_pBuffer, MAX_PASER_SIZE, m_pStream);
+		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PASER_SIZE);
 		if (!_tcsicmp(m_pString, pString))
 		{
 			if (pData != NULL)
@@ -226,7 +226,7 @@ BOOL SParser::GetNodeName(const TCHAR* pString, VOID* pData, INT DataType)
 
 					}
 					//String2[filelen-1] = 0;					
-					_tcscpy_s((TCHAR*)pData, MAX_PATH, &String2[0]);
+					_tcscpy_s((TCHAR*)pData, MAX_PASER_SIZE, &String2[0]);
 				}
 				break;
 				}
@@ -249,8 +249,8 @@ BOOL SParser::GetDataFromFileLoop(const TCHAR* pString, VOID* pData, INT DataTyp
 {
 	while (!feof(m_pStream))
 	{
-		_fgetts(m_pBuffer, MAX_PATH, m_pStream);
-		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PATH);
+		_fgetts(m_pBuffer, MAX_PASER_SIZE, m_pStream);
+		_stscanf_s(m_pBuffer, _T("%s"), m_pString, MAX_PASER_SIZE);
 		if (!_tcsicmp(m_pString, pString))
 		{
 			return GetData(pData, DataType);

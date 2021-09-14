@@ -34,7 +34,12 @@ class IViewPanel;
 * IViewPanelManager* pViewPanelMgr = GetViewPanelManager();
 * ...
 * \endcode
+*
+* In a future release of 3ds Max we will introduce the notion of visible and floating view panels. When this is done, more than one view panel at a time can be visible. 
+* There will always be the main view panel attached to 3ds Max main window but you will be able to set visible, floating view panels, which could be put on another monitor.
+* To support these visible view panels, instead of using GetActiveViewPanel() and do things on its viewports, use the new methods IsViewPanelVisible and IsViewPanelFloating when iterating on all view panels.
 */
+
 class IViewPanelManager : public FPStaticInterface
 {
 public:
@@ -60,7 +65,7 @@ public:
 	* \param[in] bActive if true, the new tabbed view panel will be set as active view panel after creation.
 	* \return Return the index of the new tabbed view panel.  If creation fails, -1 will be returned.
 	*/
-	virtual int			CreateViewPanel(int layout, bool bActive) = 0;
+	virtual int	CreateViewPanel(int layout, bool bActive) = 0;
 
 	/**
 	* Destroy the specified tabbed view panel.
@@ -74,8 +79,7 @@ public:
 
 	/**
 	* Get the IViewPanel interface of the active tabbed view panel.
-	* \return Return the IViewPanel interface of the current active view panel.
-	* Return NULL if there is no active view panel.
+	* \return Return the IViewPanel interface of the current active view panel or NULL if there is no active view panel.
 	*/
 	virtual IViewPanel* GetActiveViewPanel() const = 0;
 
@@ -86,12 +90,18 @@ public:
 	*/
 	virtual bool SetActiveViewPanel(int index) = 0;
 
-	/**
+    /**
 	* Get the index of the active view panel.
-	* \return Return the index of the current active view panel.
-	* Return -1 is there is no active view panel.
+	* \return Return the index of the current active view panel or -1 if is there is no active view panel.
 	*/
 	virtual int GetActiveViewPanelIndex() const = 0;
+
+    /**
+    * Get the index of the view panel.
+    * \param[in] pViewPanel the view panel.
+    * \return Return the index of the view panel or -1 if pViewPanel is a nullptr or if pViewPanel is not in the view panel array.
+    */
+    virtual int GetViewPanelIndex(const IViewPanel* pViewPanel) const = 0;
 
 	/**
 	* Get the count of current existing view panels.
@@ -123,11 +133,80 @@ public:
 	virtual bool SetViewPanelName(int index, const MCHAR* newName) = 0;
 
 	/**
-	 * A locked view panel is one that cannot be deleted by the user.
+	 * A locked view panel is one that cannot be deleted by the user, such as the default view panel or a floating view panel
 	 * \param[in] index of the panel to check
 	 * \return true if the index is valid and the panel is considered 'locked' by the manager
 	 */
 	virtual bool IsViewPanelLocked(int index) const = 0;
+
+    /**
+    * This method gets if a view panel is currently visible by its index in the view panels array
+    * \param[in] viewpanelIndex the index in the view panel array
+    * \return Returns true if the view panel is visible, false if it is not or if viewpanelIndex is out of range
+    */
+    virtual bool IsViewPanelVisible(int viewpanelIndex)const = 0;
+
+    /**
+    * This method gets if a view panel has the floating view panel property, whether or not it is currently visible
+    * \param[in] viewpanelIndex the index in the view panel array
+    * \return Returns true if the view panel is a floating view panel, false if it is not or if viewpanelIndex is out of range
+    */
+    virtual bool IsViewPanelFloating(int viewpanelIndex)const = 0;
+
+    /**
+    * Get the number of floating view panels
+    * \return Returns the number of floating view panels
+    */
+    virtual int GetNumFloatingViewPanels(void)const = 0;
+    
+    /**
+    * Hides all the floating view panels
+    */
+    virtual void HideAllFloatingViewPanels(void) = 0;
+
+    /**
+    * Enum for our 3 floating view panels
+    */
+    enum class ViewPanelFloatingID
+    {
+        NotFloating,
+        ViewPanel_1,
+        ViewPanel_2,
+        ViewPanel_3,
+    };
+
+    /**
+    * This method gets the view panel floating ID by its index in the array of view panels
+    * \param[in] viewpanelIndex the index in the view panel array
+    * \return Returns the ViewPanelFloatingID of this view panel. If it's not a floating view panel, it returns ViewPanelFloatingID::NotFloating
+    */
+    virtual ViewPanelFloatingID GetViewPanelFloatingID(int viewpanelIndex)const = 0;
+
+    /**
+    * This method gets the index of a view panel from its ViewPanelFloatingID
+    * \param[in] viewPanelFloatingID the ViewPanelFloatingID of the view panel to retrieve
+    * \return Returns the index of the view panel whose ViewPanelFloatingID is viewPanelFloatingID or -1 if not found.
+    */
+    virtual int GetViewPanelIndexFromFloatingID(int viewPanelFloatingID)const = 0;
+
+    /**
+    * This method sets a floating view panel visible and active at the same time
+    * \param[in] viewPanelFloatingID the ViewPanelFloatingID of the view panel
+    * \param[in] bVisible is true if we want the floating view panel to be visible and active or false if we want to hide it
+    */
+    virtual void SetFloatingViewPanelVisibility(int viewPanelFloatingID, bool bVisible) = 0;
+
+    /**
+    * This method sums the viewports from all visible view panels by calling getNumViews() on each of the view panel
+    * \return Return the number of viewports from all visible view panels
+    */
+    virtual int GetNumViewportsFromAllVisibleViewPanels()const = 0;
+
+    /**
+    * Gets the number of view panels currently visible
+    * \return Returns the number of visible view panels.
+    */
+    virtual int GetNumVisibleViewPanels(void) const = 0;
 
 	/**
 	 * Returns the index of the currently highlighted ViewPanel.

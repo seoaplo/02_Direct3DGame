@@ -373,7 +373,6 @@ public:
 	);
 
 	/*----- member functions -----*/
-
 	//@{
 	//! \brief Sets the light type.
 	/*! \post The light type is changed. When setting the light type to an invalid value,
@@ -464,8 +463,20 @@ public:
 		\see For an explanation for flux, see LightscapeLight::SetFlux() */
 	virtual float GetFlux(
 	  TimeValue t,
-	  Interval &valid = Interval( 0,0 )
+	  Interval &valid
 	) const = 0;
+
+	//! \brief Returns the flux of the light.
+	/*! \param[in] t - The time at which the flux is retrieved.
+		\return The flux is returned in lumens.
+		\see For an explanation for flux, see LightscapeLight::SetFlux() */
+	float GetFlux(
+	  TimeValue t
+	) const
+	{
+		Interval valid( 0,0 );
+		return GetFlux(t, valid);
+	}
 	//@}
 
 	//@{
@@ -489,8 +500,21 @@ public:
 		\see For an explanation of the light filter, see LightscapeLight::SetRBGFilter() */
 	virtual Point3 GetRGBFilter(
 	  TimeValue t,
-	  Interval &valid = Interval( 0,0 )
+	  Interval &valid
 	) = 0;
+
+	//! \brief Returns the color of the light filter.
+	/*! \param[in] t - The time at which the filter color is retrieved.
+		\return The filter color is returned in either RGB format.
+		\see For an explanation of the light filter, see LightscapeLight::SetRBGFilter() */
+	Point3 GetRGBFilter(
+	  TimeValue t
+	)
+	{
+		Interval valid(0, 0);
+		return GetRGBFilter(t, valid);
+	}
+
 	//! \brief Sets the color of the light filter.
 	/*! \post The filter color is changed or returned.
 		\param[in] t - The time at which the filter color is set.
@@ -507,8 +531,19 @@ public:
 		\see For an explanation of the light filter, see LightscapeLight::SetRBGFilter() */
 	virtual Point3 GetHSVFilter(
 	  TimeValue t,
-	  Interval &valid = Interval( 0,0 )
+	  Interval &valid
 	) = 0;
+	//! \brief Returns the color of the light filter.
+	/*! \param[in] t - The time at which the filter color is retrieved.
+		\return The filter color is returned in either HSV format.
+		\see For an explanation of the light filter, see LightscapeLight::SetRBGFilter() */
+	Point3 GetHSVFilter(
+	  TimeValue t
+	)
+	{
+		Interval valid( 0,0 );
+		return GetHSVFilter(t, valid);
+	}
 	//@}
 
 
@@ -522,10 +557,6 @@ public:
 		return and set the shadow generator based on the value of the use global parameter.
 		\return The shadow generator is returned. */
 	virtual ShadowType* ActiveShadowType( ) = 0;
-	//! \brief Returns the plug-in shadow generator
-	/*! \return The local shadow generator. Always returns the local shadow generator, not the global generator.
-		\see For an explanation of local and global shadow generators, see LightscapeLight::ActiveShadowType() */
-	virtual ShadowType* GetShadowGenerator( ) = 0;
 	//! \brief Returns the plug-in shadow generator name
 	/*! \return The local or global shadow generator name, depending on the value of the use global parameter.
 		\see For an explanation of local and global shadow generators, see LightscapeLight::ActiveShadowType() */
@@ -535,27 +566,12 @@ public:
 		\param[in] s - An instance of the shadow type to be set. The light establishes a reference
 		to this object.
 		\see For an explanation of local and global shadow generators, see LightscapeLight::ActiveShadowType() */
-	virtual void SetShadowGenerator( ShadowType* s ) = 0;
+	virtual void SetShadowGenerator( ShadowType* s ) override = 0;
 	//! \brief Sets the plug-in shadow generator
 	/*! \post The shadow generator is set.
 		\param[in] name - The class name of the shadow type to be set.
 		\see For an explanation of local and global shadow generators, see LightscapeLight::ActiveShadowType() */
 	virtual void SetShadowGenerator( const MCHAR* name ) = 0;
-	//@}
-
-	//@{
-	//! \brief Sets whether a shadow color map is used by the light
-	/*! \post The flag value is set.
-		\param[in] t - The time at which the flag value is set.
-		\param[in] onOff - The value to be set. TRUE indicates the the light should use a shadow color map. */
-	virtual void SetUseShadowColorMap(
-	  TimeValue t,
-	  int onOff
-	) = 0;
-	//! \brief Returns whether a shadow color map is used by the light
-	/*! \param[in] t - The time at which the flag value is set.
-		\return The flag value is returned. */
-	virtual int GetUseShadowColorMap( TimeValue t ) = 0;
 	//@}
 
 	//! \brief Sets whether the Include/Exclude list should include or exclude objects.
@@ -602,8 +618,20 @@ public:
 		\return The current kelvin temperature. */
 	virtual float GetKelvin(
 	  TimeValue t,
-	  Interval& v = Interval(0,0)
+	  Interval& v
 	) = 0;
+	//! \brief Returns the Kelvin temperature of the light
+	/*! Kelvin temperature is a method for retrieving light color based on black
+		body radiation from physics.
+		\param[in] t - The time at which the color is retrieved.
+		\return The current kelvin temperature. */
+	float GetKelvin(
+	  TimeValue t
+	)
+	{
+		Interval v(0,0);
+		return GetKelvin(t, v);
+	}
 	//! \brief Sets the Kelvin temperature of the light
 	/*! Kelvin temperature is a method for specifying light color based on black
 		body radiation from physics.
@@ -674,7 +702,12 @@ public:
 		\param[in] t - The time at which the dimmer value is retrieved.
 		\param[in,out] valid - The validity of the dimmer is intersected with the validity in this argument.
 		\return the dimmer value is returned. */
-	virtual float GetDimmerValue(TimeValue t, Interval &valid = Interval( 0,0 )) const = 0;
+	virtual float GetDimmerValue(TimeValue t, Interval& valid) const = 0;
+	//! \brief Returns the dimmer value for the light.
+	/*! An additional dimmer can be used to independently modify the light intensity.
+		\param[in] t - The time at which the dimmer value is retrieved.
+		\return the dimmer value is returned. */
+	float GetDimmerValue(TimeValue t) const { Interval valid( 0,0 ); return GetDimmerValue(t, valid); }
 	//! \brief Sets the dimmer value for the light.
 	/*! An additional dimmer can be used to independently modify the light intensity.
 		\post The dimmer value is set.
@@ -713,14 +746,26 @@ public:
 		\param[in,out] valid - The validity of the effective intensity is intersected with this argument.
 		This includes the validity of the dimmer.
 		\return The effective intensity in candelas. */
-	virtual float GetResultingIntensity(TimeValue t, Interval &valid = Interval( 0,0 )) const = 0;
+	virtual float GetResultingIntensity(TimeValue t, Interval& valid) const = 0;
+	//! \brief Returns the intensity including the dimmer multiplier if it is used.
+	/*! This utility method returns the effective intensity of a light including the dimmer value if there is one.
+		\param[in] t - The time at which to retrieve the intensity or flux.
+		This includes the validity of the dimmer.
+		\return The effective intensity in candelas. */
+	float GetResultingIntensity(TimeValue t) const { Interval valid( 0,0 ); return GetResultingIntensity(t, valid); }
 	//! \brief Returns the flux including the dimmer multiplier if it is used.
 	/*! This utility method returns the effective flux of a light including the dimmer value if there is one.
 		\param[in] t - The time at which to retrieve the intensity or flux.
 		\param[in,out] valid - The validity of the effective flux is intersected with this argument.
 		This includes the validity of the dimmer.
 		\return The effective flux in lumens. */
-	virtual float GetResultingFlux(TimeValue t, Interval &valid = Interval( 0,0 )) const = 0;
+	virtual float GetResultingFlux(TimeValue t, Interval& valid) const = 0;
+	//! \brief Returns the flux including the dimmer multiplier if it is used.
+	/*! This utility method returns the effective flux of a light including the dimmer value if there is one.
+		\param[in] t - The time at which to retrieve the intensity or flux.
+		This includes the validity of the dimmer.
+		\return The effective flux in lumens. */
+	float GetResultingFlux(TimeValue t) const { Interval valid( 0,0 ); return GetResultingFlux(t, valid); }
 	//@}
 
 	//! \brief Returns the location of the center of the light. 
@@ -734,7 +779,12 @@ public:
 		\param[in] t - The time at which the radius is retrieved.
 		\param[in,out] valid - The validity interval of the radius is intersected with this argument.
 		\return The radius of the light, or zero if the light is not of any of the above mentioned types.  */
-	virtual float GetRadius(TimeValue t, Interval &valid = Interval(0,0)) const = 0;
+	virtual float GetRadius(TimeValue t, Interval& valid) const = 0;
+	//! \brief Returns the radius of a disc, sphere, cylinder light.
+	/*! This method allows to access the radius of a disc, sphere or cylinder light type.
+		\param[in] t - The time at which the radius is retrieved.
+		\return The radius of the light, or zero if the light is not of any of the above mentioned types.  */
+	float GetRadius(TimeValue t) const { Interval valid(0,0); return GetRadius(t, valid); }
 
 	//! \brief Sets the radius of a disc, sphere, cylinder light.
 	/*! This method allows to set the radius of a disc, sphere or cylinder light.
@@ -750,7 +800,13 @@ public:
 		\param[in] t - The time at which the length is retrieved.
 		\param[in,out] valid - The validity interval of the length is intersected with this argument.
 		\return The length of the light, or zero if the light is not of any of the above mentioned types.  */
-	virtual float GetLength(TimeValue t, Interval &valid = Interval(0,0)) const = 0;
+	virtual float GetLength(TimeValue t, Interval& valid) const = 0;
+	//@{
+	//! \brief Returns the length of a linear, area, cylinder light. 
+	/*! This method allows to access the length of a linear, area, or cylinder light.
+		\param[in] t - The time at which the length is retrieved.
+		\return The length of the light, or zero if the light is not of any of the above mentioned types.  */
+	float GetLength(TimeValue t) const { Interval valid(0,0); return GetLength(t, valid); }
 
 	//! \brief Sets the length of a linear, area, cylinder light.
 	/*! This method allow to set the length of a linear, area, cylinder light.
@@ -766,7 +822,12 @@ public:
 		\param[in] t - The time at which the width is retrieved.
 		\param[in,out] valid - The validity interval of the width is intersected with this argument.
 		\return The width of the light, or zero if the light is not of any of the above mentioned types.  */
-	virtual float GetWidth(TimeValue t, Interval &valid = Interval(0,0)) const = 0;
+	virtual float GetWidth(TimeValue t, Interval& valid) const = 0;
+	//! \brief Returns the width of an area light. 
+	/*! This method allows to access the width of an area light. 
+		\param[in] t - The time at which the width is retrieved.
+		\return The width of the light, or zero if the light is not of any of the above mentioned types.  */
+	float GetWidth(TimeValue t) const { Interval valid(0,0); return GetWidth(t, valid); }
 
 	//! \brief Sets the width of an area light. 
 	/*! This method allows to set the width of an area light. 

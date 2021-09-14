@@ -13,6 +13,7 @@
 #include <WTypes.h>
 #include "point2.h"
 #include "point3.h"
+#include "tab.h"
 
 // forward declarations
 class Box3;
@@ -62,6 +63,25 @@ GEOMEXPORT float  DistPtToLine(Point2 *p0, Point2 *p1, Point2 *q );
 */ 
 GEOMEXPORT float  Dist3DPtToLine(Point3* p0, Point3* p1, Point3*  q );
 
+/**
+* Compute the point of intersection, or a least squares approximation to it, for an arbitrary number N of lines in three
+* dimensions. The ith of the N lines is presumed to be defined in terms of the parameter s_i according to:
+*
+*     x = fixedCoeffs[i] + s_i * (directionVecs[i])
+*
+* A least squares problem is solved for the vector s' of parameters representing (the approximations to) the point of
+* intersection, and intersectionPoint is computed by averaging estimates from each line, as:
+*
+*     intersectionPoint = (1 / N) * (SUM_OVER_I(fixedCoeffs[i] + s'_i * (directionVecs[i])))
+*
+* \param [out] intersectionPoint: least squares approximation to intersection point
+* \param [in] fixedCoeffs: fixed coefficients of line representation
+* \param [in] directionVecs: line direction vectors
+* \param [in] doNormalize: when true, normalized forms of the direction vectors are used in the least squares system
+* \return Flag indicating whether solution of least squares problem was successful. If it was not, intersectionPoint will be
+* returned as a zero vector.
+*/ 
+GEOMEXPORT bool ComputeIntersectionPoint(Point3& intersectionPoint, const Tab<Point3>& fixedCoeffs, const Tab<Point3>& directionVecs, bool doNormalize = true);
 
 /**
  * \deprecated Do not use this function. Use ComputeBumpVec2D() instead.

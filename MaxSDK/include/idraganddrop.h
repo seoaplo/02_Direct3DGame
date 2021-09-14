@@ -977,7 +977,7 @@ public:
    in which package drops are downloaded. */
    CoreExport static const MCHAR* GetDownloadDirectory();
    
-   CoreExport static void SetDragSetting(TCHAR* setting);
+   CoreExport static void SetDragSetting(MCHAR* setting);
    CoreExport static const MCHAR* GetDragSetting();
    /*! \remarks This method allows you to download the file referenced by the
    URL to disk.

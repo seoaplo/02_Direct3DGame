@@ -122,6 +122,9 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "..\\..\\output\\MaxSDK\\Debug\\$(TargetName)$(TargetExt)" "C:\\Program Files\\Autodesk\\3ds Max 2020\\Plugins\\SCAExport$(TargetExt)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

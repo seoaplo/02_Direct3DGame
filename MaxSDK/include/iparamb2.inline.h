@@ -283,35 +283,29 @@ inline bool IParamBlock2::ParameterIterator::operator!=(const ParameterIterator&
 inline MaxSDK::QMaxParamBlockWidget* ClassDesc2::CreateQtWidget(
     ReferenceMaker& /*owner*/,
     IParamBlock2& /*paramBlock*/,
-    const MapID /*paramMapID*/,  
-    MSTR& /*rollupTitle*/, 
-    int& /*rollupFlags*/, 
+    const MapID /*paramMapID*/,
+    MSTR& /*rollupTitle*/,
+    int& /*rollupFlags*/,
     int& /*rollupCategory*/)
 {
-    // Default implementation returns null, only needs to be implemented for new Qt-based plugins.
+    // Default implementation returns null.
+    // This method only needs to be implemented in plugins with a Qt-based UI that add a Qt widget to any dialog except the Render Settings dialog.
     return nullptr;
 }
 
+
 inline MaxSDK::QMaxParamBlockWidget* ClassDesc2::CreateQtWidget(
-	ReferenceMaker& owner,
-	IParamBlock2& paramBlock,
-	const MapID paramMapID,
-	MSTR& rollupTitle,
-	int& rollupFlags,
-	int& rollupCategory,
-	Class_ID& tabID)
+    ReferenceMaker& owner,
+    IParamBlock2& paramBlock,
+    const MapID paramMapID,
+    MSTR& rollupTitle,
+    int& rollupFlags,
+    int& rollupCategory,
+    Class_ID& /*tabID*/)
 {
-	// Use the new interface if available
-	ClassDesc2_Extension2017SP2* const ext = dynamic_cast<ClassDesc2_Extension2017SP2*>(this);
-	if(ext != nullptr)
-	{
-		return ext->CreateQtWidget(owner, paramBlock, paramMapID, rollupTitle, rollupFlags, rollupCategory, tabID);
-	}
-	else
-	{
-		// Otherwise revert to the non-tabbed method
-		return CreateQtWidget(owner, paramBlock, paramMapID, rollupTitle, rollupFlags, rollupCategory);
-	}
+    // Default implementation calls the method above, ignoring the tabID parameter.
+    // This method only needs to be implemented in plugins with a Qt-based UI that add a Qt widget to the Render Settings dialog.
+    return CreateQtWidget(owner, paramBlock, paramMapID, rollupTitle, rollupFlags, rollupCategory);
 }
 
 

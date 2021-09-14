@@ -51,7 +51,7 @@ public:
 	AColor(int R, int G, int B, int A=0) { 
 		r = (float)R; g = (float)G; b = (float)B; a = (float)A; }
 	/*! \remarks Constructor. Initializes the AColor to the AColor passed. */
-	AColor(const AColor& c) { r = c.r; g = c.g; b = c.b; a = c.a; } 
+	AColor(const AColor&) = default;
 	/*! \remarks Constructor. Initializes the AColor to the Color passed,
 	optionally specifying an alpha value. */
 	AColor(const Color& c, float alph=1.0f) { r = c.r; g = c.g; b = c.b; a = alph; } 
@@ -175,11 +175,10 @@ public:
 	\return  A Windows RGB color. */
 	DWORD toRGB() { return RGB(FLto255(r),FLto255(g), FLto255(b)); };
 
-	// Convert to Point3, 4
-	/*! \remarks Convert the AColor to a Point3.
-	\return  A Point3. x=r, y=g, z=b. */
-	operator Point3() { return Point3(r,g,b); }
-	operator Point4() { return Point4(r,g,b,a); }
+	// Convert to Point4
+	/*! \remarks Convert the AColor to a Point4.
+	\return  A Point4. x=r, y=g, z=b, w=a. */
+	operator Point4() { return Point4(r, g, b, a); }
 
 	// Unary operators
 	/*! \remarks Unary - operator.

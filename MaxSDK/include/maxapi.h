@@ -2808,7 +2808,7 @@ class AxisChangeCallback: public MaxHeapOperators {
 The data members of this class are used to specify the options for creating a
 preview of the active viewport. A pointer to an instance of this class is
 passed into the <b>Interface</b> method:\n\n
-<b>virtual void CreatePreview(PreviewParams *pvp=NULL)=0;</b>
+<b>virtual void CreatePreview(PreviewParams *pvp=NULL, MSTR *filename=NULL, MSTR *snippet = NULL)=0;</b>
 */
 class PreviewParams: public MaxHeapOperators {
 public:
@@ -3628,10 +3628,14 @@ class Interface : public FPStaticInterface {
 		(viewport) renderer.\n\n
 		\par Parameters:
 		<b>PreviewParams *pvp=NULL</b>\n\n
-		This class defines the way the preview is generated (via its data
-		members). If this is passed as NULL the parameters from the preview
-		rendering dialog box are used. See Class PreviewParams. */
-		virtual void CreatePreview(PreviewParams *pvp=NULL)=0;
+		This class defines the way the preview is generated (via its data members). If NULL, the parameters
+		from the preview rendering dialog box are used. See Class PreviewParams\n\n
+		<b>MSTR *filename=NULL</b>\n\n
+		The filename for the preview.  If NULL, the filename setting from the preview rendering dialog is used.
+		<b>MSTR *snippet=NULL</b>\n\n
+		The MXS code snippet to execute on each frame.  The returned string from snippet is displayed in the rendering output.
+		If this value is NULL, the setting in the preview rendering dialog is used.\n\n */
+		virtual void CreatePreview(PreviewParams *pvp=NULL, MSTR *filename=NULL, MSTR *snippet=NULL)=0;
 //! @}
 
 //! \name Grid Related Methods
@@ -5684,6 +5688,8 @@ class Interface : public FPStaticInterface {
 		<b>BOOL reparentAction=MERGE_REPARENT_PROMPT</b>\n\n
 		Determines how to re-parent nodes during a merge operation.
 		Must be one of the \ref NodeReparentActions
+		<b>bool includeFullGroup=FALSE</b>\n\n
+		If TRUE, expand list of nodes to merge to include all group nodes associated with those nodes
 		\return  Nonzero if the file was merged; otherwise 0. */
 		virtual int MergeFromFile(const MCHAR *name, 
 				BOOL mergeAll=FALSE,    // when true, merge dialog is not put up
@@ -5692,7 +5698,8 @@ class Interface : public FPStaticInterface {
 				int dupAction = MERGE_DUPS_PROMPT,  // what to do when duplicate node names are encountered
 				NameTab* mrgList=NULL,  // names to be merged (mergeAll must be TRUE)
 				int dupMtlAction = MERGE_DUP_MTL_PROMPT,  // what to do when duplicate material names are encountered
-				int reparentAction = MERGE_REPARENT_PROMPT   // what to do when can re-parent
+				int reparentAction = MERGE_REPARENT_PROMPT,   // what to do when can re-parent
+				BOOL includeFullGroup = FALSE    // expand list of nodes to merge to include all associated group nodes
 				)=0;
 //! @}
 
@@ -10177,6 +10184,105 @@ public:
 	virtual void UpdateSceneMaterialLib() = 0;
 };
 
+/*! \brief  Extends Interface17
+ * Client code should retrieve this interface using GetCOREInterface18
+ */
+class Interface18 : public Interface17
+{
+public:
+	/**
+	* The ID for this interface.  Pass this ID to Interface::GetInterface to get an Interface18 pointer.
+	*/
+	CoreExport static const Interface_ID kInterface18InterfaceID;
+
+	/*! \brief Archives the current scene into a format compatible with the specified 3ds Max version
+	*
+	* \param [in] archiveFileName - the fully qualified file name the scene is to be archived to
+	* \param [in] saveAsVersion - the version of 3ds Max in which the file is to be saved. Defaults to current version.
+	* \return true if the file was archived successfully; otherwise false
+	*/
+	virtual bool ArchiveSceneFile(
+		const MCHAR* archiveFileName,
+		unsigned long saveAsVersion = MAX_RELEASE) = 0;
+
+	//! \brief Gets whether the scene file is written compressed
+	virtual bool GetSceneFileCompressOnSave() = 0;
+
+	/*! \brief Sets whether the scene file is written compressed
+	*
+	* \param [in] compress - whether to compress on save
+	* \param [in] persist - whether to persist setting across 3ds Max sessions
+	*/
+	virtual void SetSceneFileCompressOnSave(bool compress, bool persist) = 0;
+
+}; 
+
+/*! \brief  Extends Interface18
+* Client code should retrieve this interface using GetCOREInterface19
+*/
+class Interface19 : public Interface18
+{
+public:
+
+	/**
+	* The ID for this interface.  Pass this ID to Interface::GetInterface to get an Interface19 pointer.
+	*/
+	CoreExport static const Interface_ID kInterface19InterfaceID;
+
+	// Render a 2D bitmap from a procedural texture
+	/*! \remarks	This method renders a textmap (or an entire textmap tree) to the specified bitmap.
+	\par Parameters:
+	<b>Texmap *tex</b>\n\n
+	The Texmap to render to a bitmap.\n\n
+	<b>Bitmap *bm</b>\n\n
+	A pointer to a bitmap to render to. This bitmap must be created at the
+	resolution you wish to render to.\n\n
+	<b>FBox2* range</b>\n\n
+	A pointer to UV range to crop the texmap. When specified, the scale3d parameter won't have any effect.
+	If NULL, will retain the UV parameters as specified in the scene at time t.\n\n
+	<b>TimeValue t</b>\n\n
+	The time at which to render the texmap to the bitmap, defaults to the current frame.
+	<b>float scale3d=1.0f</b>\n\n
+	This is a scale factor applied to 3D Texmaps. This is the scale of the surface
+	in 3d space that is mapped to UV. This controls how much of the texture appears
+	in the bitmap representation.\n\n
+	<b>BOOL filter=FALSE</b>\n\n
+	If TRUE the bitmap is filtered. It is quite a bit slower to rescale bitmaps
+	with filtering on.\n\n
+	<b>BOOL display=FALSE</b>\n\n
+	If TRUE the resulting bitmap is displayed using the virtual frame buffer;
+	otherwise it is not.
+	<b>bool bake</b>\n\n
+	Used to bake the texture to bitmap without including the effects of scale/rotation etc.
+	If true, the function will render the unit square of 2D texture maps, by effectively
+	disabling the UV Generator during texture rendering, so no settings like scale, rotation,
+	tiling etc. have any effect on the result. This baked 2D representation can then later be
+	scaled, rotated and tiled, for use in a renderer that may not support the particular
+	texture, sent to a game engine, or similar.
+	\n\n
+	<b>const MCHAR *name=NULL</b>\n\n
+	Display Name.
+	\n\n
+	<b>float z=0.0f</b>\n\n
+	The w component of UVW.
+	\n\n
+	<b>BOOL mono=false</b>\n\n
+	Use mono channel. Mono channels are those that don't have a color, but rather a single value.
+	\n\n
+	<b>disableBitmapProxies=false</b>\n\n
+	Used to disable bitmap proxies. bitmap proxies are used to reduce the amount of memory required by the bitmapped textures.
+	\n\n
+
+	*/
+	virtual void RenderTexmapRange(Texmap *tex, Bitmap *bm, FBox2* range, TimeValue t, float scale3d=1.0f, BOOL filter=FALSE, BOOL display=FALSE, bool bake = false, const MCHAR *name=NULL, float z=0.0f, BOOL mono=false, bool disableBitmapProxies=false) = 0;
+
+	/*! \brief Set the Play Preview When Done option accessible in the Preferences dialog and the Make Preview dialog
+	\param[play] onOff TRUE to enable the play when done option, FALSE to disable */
+	virtual void SetPlayPreviewWhenDone(BOOL play) = 0;
+	//! \brief Retrieve Play Preview When Done option accessible in the Preferences dialog and the Make Preview dialog
+	virtual BOOL GetPlayPreviewWhenDone() = 0;
+};
+
 /// Methods that control an internal optimization related to reference message
 /// propagation. The optimization consists of preventing the same ref message
 /// from being sent repeatedly to the same refmaker. This optimization improves
@@ -10226,3 +10332,16 @@ CoreExport bool GetEnableOptimizeDependentNotifications();
 CoreExport void GetOptimizeDependentNotificationsStatistics(ULONGLONG &numNotifySkipped, ULONGLONG &numNotifyNotSkipped);
 CoreExport void ResetOptimizeDependentNotificationsStatistics();
 
+/*! \brief Set and get the controller validity interval optimization flag for the base controllers.
+* When this flag is active, all Linear and Bezier controllers will express validity intervals
+* that take into account flat sections in the animation curves that drive them. This allows
+* for a performance improvement during scene evaluation because work can be skipped when dependencies
+* don't actually change.
+*
+* By default, ControllerIntervalOptimization is true.
+* 
+* \param [in] value - Whether or not to enable this optimization
+* \param [in] commitToInit - Whether or not to write this setting into the defaults ini file.
+*/
+CoreExport void SetControllerIntervalOptimization(bool value, bool commitToInit);
+CoreExport bool GetControllerIntervalOptimization();

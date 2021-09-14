@@ -686,7 +686,7 @@ public:
 
 	// the above GetParamBlock() declaration is hiding the declaration
 	// in Animatable. Unhide it....
-	virtual IParamBlock2* GetParamBlock(int i) override { return __super::GetParamBlock(i); }
+	virtual IParamBlock2* GetParamBlock(int i) override { return ReferenceTarget::GetParamBlock(i); }
 
 	/** If a plug-in makes its parameter block available (using
 	GetParamBlock()) then it will need to provide \#defines for indices
@@ -920,7 +920,7 @@ public:
 	\param modes The command modes to support
 	\par Sample Code:
 	\code
-	void SimpleMod::ActivateSubobjSel(int level, XFormModes& modes)
+	void SimpleModBase::ActivateSubobjSel(int level, XFormModes& modes)
 	{
 		switch ( level ) {
 			case 1:									  // Modifier box
@@ -1347,6 +1347,9 @@ namespace MaxGraphics {
 
 }
 
+class IObjectDisplayValidityInternal;
+
+
 /** The object class is the base class for all objects. An object is one of two
 things: A procedural object or a derived object. Derived objects are part of
 the system and may not be created by plug-ins. They are containers for
@@ -1372,6 +1375,8 @@ class Object : public BaseObject {
 	XTCAccessImp *pXTCAccess;
 
 	MaxGraphics::IObjectDisplayInternal* mpDisplayInternal;
+	//holds the validity info of the display for the object
+	IObjectDisplayValidityInternal* mpIObjectDisplayValidityInternal;
 
 public:
 	CoreExport Object();
@@ -2561,7 +2566,11 @@ public:
 	*/
 	virtual void BuildGWCache(GraphicsWindow *gw, Material *ma, int numMat, BOOL threaded) {  }
 
-
+	/*! \brief This are called right before and after a modifier is applied to an object.  This allows for certain types of opitimizations to happens since durinng modifier modification the object
+	knows what channels are changing and can do optimizations to speed things up like invalidating specific display channels which it does not know about when say a baseobject is evaluated.
+	*/
+	virtual void StartStackEval() {}
+	virtual void EndStackEval() {}
 
 };
 
@@ -2784,12 +2793,16 @@ public:
 	\param f The value to set in radians. */
 	virtual void SetFOV(TimeValue t, float f)=0; 
 	/** Returns the field-of-view setting of the camera at the specified time and
-	adjusts the validity interval of the camera at this time to reflect the
-	field-of-view parameter.
+    the validity interval passed is updated with the validity interval of this 
+    parameter.
 	\param t The time to retrieve the field-of-view setting.
 	\param valid  The validity interval to set.
 	\return  The field-of-view of the camera in radians. */
-	virtual float GetFOV(TimeValue t, Interval& valid = Interval(0,0))=0;
+	virtual float GetFOV(TimeValue t, Interval& valid)=0;
+	/** Returns the field-of-view setting of the camera at the specified time.
+	\param t The time to retrieve the field-of-view setting.
+	\return  The field-of-view of the camera in radians. */
+	float GetFOV(TimeValue t) { Interval valid(0,0); return GetFOV(t, valid); }
 	/** Sets the target distance setting (for free cameras) at the specified time.
 	\param t The time at which to set the target distance.
 	\param f The value to set. */
@@ -2801,7 +2814,12 @@ public:
 	\param valid  This validity interval is intersected with the validity interval of the
 	target distance parameter.
 	\return  The target distance of the camera. */
-	virtual float GetTDist(TimeValue t, Interval& valid = Interval(0,0))=0;
+	virtual float GetTDist(TimeValue t, Interval& valid)=0;
+	/** Returns the target distance setting of the camera at the specified time.
+	\param t The time to retrieve the target distance setting.
+	target distance parameter.
+	\return  The target distance of the camera. */
+	float GetTDist(TimeValue t) { Interval valid(0,0); return GetTDist(t, valid); }
 	/** Returns the manual clip flag. This indicates the camera will perform
 	clipping at its hither and yon distances.
 	\return  Nonzero if manual clipping is enabled; otherwise 0. */
@@ -2819,7 +2837,13 @@ public:
 	\param valid The validity interval that this method will update to reflect the clipping
 	distance interval.
 	\return  The clipping distance. */
-	virtual float GetClipDist(TimeValue t, int which, Interval &valid=Interval(0,0))=0;
+	virtual float GetClipDist(TimeValue t, int which, Interval &valid)=0;
+	/** Retrieves the clipping distance of the specified plane at the specified
+	time.
+	\param t The time to retrieve the clipping distance.
+	\param which Indicates which distance to return. One of the values in \ref Clipping_Distances
+	\return  The clipping distance. */
+	float GetClipDist(TimeValue t, int which) { Interval valid(0,0); return GetClipDist(t, which, valid); }
 	/** Sets the clipping distance of the specified plane at the specified time.
 	\param t The time to set the clipping distance.
 	\param which Indicates which distance to set. One of the values in \ref Clipping_Distances
@@ -2838,7 +2862,12 @@ public:
 	\param valid  The validity interval that this method will update to reflect the
 	environment range setting.
 	\return  The environment range distance at the specified time. */
-	virtual float GetEnvRange(TimeValue t, int which, Interval& valid = Interval(0,0))=0;
+	virtual float GetEnvRange(TimeValue t, int which, Interval& valid)=0;
+	/** Retrieves the environment range distance at the specified time.
+	\param t The time to retrieve the environment range.
+	\param which Indicate which distance to set. One of the values in \ref Environment_Range_Distances
+	\return  The environment range distance at the specified time. */
+	float GetEnvRange(TimeValue t, int which) { Interval valid(0,0); return GetEnvRange(t, which, valid); }
 	/** Sets the environment range display flag. This indicates if the camera will
 	display its range settings.
 	\param b The flag state to set.
@@ -3481,17 +3510,25 @@ public:
 	\param t The time to retrieve the angle.
 	\param valid  The validity interval that this method will update to reflect the hotspot setting.
 	\return  The hotspot angle (in degrees). */
-	virtual float GetHotspot(TimeValue t, Interval& valid = Interval(0,0))=0;
+	virtual float GetHotspot(TimeValue t, Interval& valid)=0;
+	/** Retrieves the hotspot angle.
+	\param t The time to retrieve the angle.
+	\return  The hotspot angle (in degrees). */
+	float GetHotspot(TimeValue t) { Interval valid(0,0); return GetHotspot(t, valid); }
 	/** Sets the falloff setting of the light.
 	\param time The time to set the falloff.
 	\param f The falloff angle in degrees. */
 	virtual void SetFallsize(TimeValue time, float f)=0; 
-	/** Returns the falloff angle of the light in radians.
+	/** Returns the falloff angle of the light in degrees.
 	\param t The time to retrieve the falloff angle.
 	\param valid The validity interval that this method will update to reflect the falloff
 	setting.
 	\return  The falloff angle of the light in degrees. */
-	virtual float GetFallsize(TimeValue t, Interval& valid = Interval(0,0))=0;
+	virtual float GetFallsize(TimeValue t, Interval& valid)=0;
+	/** Returns the falloff angle of the light in degrees.
+	\param t The time to retrieve the falloff angle.
+	\return  The falloff angle of the light in degrees. */
+	float GetFallsize(TimeValue t) { Interval valid(0,0); return GetFallsize(t, valid); }
 	/** Sets the specified attenuation range distance at the time passed.
 	\param time The time to set the attenuation distance.
 	\param which Indicates which distance to set. One of the following values: 
@@ -3506,7 +3543,14 @@ public:
 	\ref LIGHT_ATTEN_END - The end range radius.\n
 	\param valid  The validity interval that this method will update to reflect the attenuation setting.
 	\return  The specified attenuation range distance. */
-	virtual float GetAtten(TimeValue t, int which, Interval& valid = Interval(0,0))=0;
+	virtual float GetAtten(TimeValue t, int which, Interval& valid)=0;
+	/** Returns the specified attenuation range distance at the time passed.
+	\param t The time to retrieve the attenuation distance.
+	\param which Indicates which distance to retrieve. One of the following values: 
+	\ref LIGHT_ATTEN_START - The start range radius.\n
+	\ref LIGHT_ATTEN_END - The end range radius.\n
+	\return  The specified attenuation range distance. */
+	float GetAtten(TimeValue t, int which) { Interval valid(0,0); return GetAtten(t, which, valid); }
 	/** Sets the light's target distance.
 	\param time The time to set the distance.
 	\param f The distance to set. */
@@ -3515,7 +3559,11 @@ public:
 	\param t The time to retrieve the distance.
 	\param valid  The validity interval that this method will update to reflect the target distance setting.
 	\return  The light's target distance. */
-	virtual float GetTDist(TimeValue t, Interval& valid = Interval(0,0))=0;
+	virtual float GetTDist(TimeValue t, Interval& valid)=0;
+	/** Retrieves the light's target distance.
+	\param t The time to retrieve the distance.
+	\return  The light's target distance. */
+	float GetTDist(TimeValue t) { Interval valid(0,0); return GetTDist(t, valid); }
 	/** Sets the light's cone display flag. This controls if the cone is depicted
 	graphically in the viewports.
 	\param s Indicates if the cone display should be on or off. If nonzero, the cone
@@ -3543,7 +3591,11 @@ public:
 	\param t The time to retrieve the value.
 	\param valid  The validity interval to intersect with this parameters interval.
 	\return  The color of the light at the specified time. */
-	virtual Point3 GetRGBColor(TimeValue t, Interval &valid = Interval(0,0)) {return Point3(0,0,0);}        
+	virtual Point3 GetRGBColor(TimeValue t, Interval& valid) {return Point3(0,0,0);}        
+	/** Returns the color of the light at the specified time.
+	\param t The time to retrieve the value.
+	\return  The color of the light at the specified time. */
+	Point3 GetRGBColor(TimeValue t) { Interval valid(0,0); return GetRGBColor(t, valid); }
 	/** Sets the intensity of the light to the value passed.
 	\param time The time to set the value.
 	\param f The value to set. */
@@ -3554,7 +3606,11 @@ public:
 	\param t The time to retrieve the value.
 	\param valid  The validity interval to intersect with this parameters interval.
 	\return  The intensity of the light at the specified time */
-	virtual float GetIntensity(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
+	virtual float GetIntensity(TimeValue t, Interval& valid) {return 0.0f;}
+	/** Retrieves the intensity of the light at the specified time.
+	\param t The time to retrieve the value.
+	\return  The intensity of the light at the specified time */
+	float GetIntensity(TimeValue t) { Interval valid(0,0); return GetIntensity(t, valid); }
 	/** Sets the aspect ratio of the light at the specified time.
 	\param t The time to set the value.
 	\param f The value to set. */
@@ -3565,7 +3621,11 @@ public:
 	\param t The time to retrieve the value.
 	\param valid  The validity interval to intersect with this parameters interval.
 	\return  The aspect ratio of the light at the specified time */
-	virtual float GetAspect(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}    
+	virtual float GetAspect(TimeValue t, Interval& valid) {return 0.0f;}    
+	/** Retrieves the aspect ratio of the light at the specified time.
+	\param t The time to retrieve the value.
+	\return  The aspect ratio of the light at the specified time */
+	float GetAspect(TimeValue t) { Interval valid(0,0); return GetAspect(t, valid); }
 	/** Sets the flag to indicate if the light is attenuated.
 	\param s Nonzero to indicate the light is attenuated; otherwise 0. */
 	virtual void SetUseAtten(int s) {}
@@ -3589,7 +3649,11 @@ public:
 	\param t The time to retrieve the value.
 	\param valid  The validity interval to update to reflect this parameters validity interval.
 	\return  The map bias setting at the time passed. */
-	virtual float GetMapBias(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
+	virtual float GetMapBias(TimeValue t, Interval& valid) {return 0.0f;}
+	/** Returns the map bias setting at the time passed.
+	\param t The time to retrieve the value.
+	\return  The map bias setting at the time passed. */
+	float GetMapBias(TimeValue t) { Interval valid(0,0); return GetMapBias(t, valid); }
 	/** Sets the map sample range setting to the value passed at the time passed.
 	\param t The time to set the value.\
 	\param f The value to set. The 3ds Max lights use a range of 0.0 to 20.0. */
@@ -3600,7 +3664,11 @@ public:
 	\param t The time to retrieve the value.
 	\param valid  The validity interval to update to reflect this parameters validity interval.
 	\return  The lights map sample range setting. */
-	virtual float GetMapRange(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
+	virtual float GetMapRange(TimeValue t, Interval& valid) {return 0.0f;}
+	/** Retrieves the lights map sample range setting at the specified time.
+	\param t The time to retrieve the value.
+	\return  The lights map sample range setting. */
+	float GetMapRange(TimeValue t) { Interval valid(0,0); return GetMapRange(t, valid); }
 	/** Sets the lights map size parameter to the value passed at the time passed.
 	\param t The time to set the value.
 	\param f The value to set. */
@@ -3611,7 +3679,11 @@ public:
 	\param t The time to retrieve the value.
 	\param valid  The validity interval to update to reflect this parameters validity interval.
 	\return  The lights map size parameter. */
-	virtual int GetMapSize(TimeValue t, Interval& valid = Interval(0,0)) {return 0;}
+	virtual int GetMapSize(TimeValue t, Interval& valid) {return 0;}
+	/** Returns the lights map size parameter at the specified time.
+	\param t The time to retrieve the value.
+	\return  The lights map size parameter. */
+	int GetMapSize(TimeValue t) { Interval valid(0,0); return GetMapSize(t, valid); }
 	/** Sets the raytrace bias setting to the value passed at the specified time.
 	\param t The time to set the value.
 	\param f The value to set. */
@@ -3622,7 +3694,11 @@ public:
 	\param t The time to retrieve the value.
 	\param valid  The validity interval to update to reflect this parameters validity interval.
 	\return  The lights raytrace bias setting at the specified time. */
-	virtual float GetRayBias(TimeValue t, Interval& valid = Interval(0,0)) {return 0.0f;}
+	virtual float GetRayBias(TimeValue t, Interval& valid) {return 0.0f;}
+	/** Returns the lights raytrace bias setting at the specified time.
+	\param t The time to retrieve the value.
+	\return  The lights raytrace bias setting at the specified time. */
+	float GetRayBias(TimeValue t) { Interval valid(0,0); return GetRayBias(t, valid); }
 	/** Returns the Use Global Settings flag setting. */
 	virtual int GetUseGlobal() {return 0;}
 	/** Sets the lights Use Global Settings flag.
@@ -5337,12 +5413,14 @@ public:
 	// These call ChannelsUsed/Changed() but also OR in GFX_DATA_CHANNEL as appropriate.
 	/** Returns the same value as ChannelsUsed() above except
 	GFX_DATA_CHANNEL will be ORed in if the TOPO_CHANNEL or the
-	TEXMAP_CHANNEL are being used. */
+	TEXMAP_CHANNEL are being used.
+	*/
 	CoreExport ChannelMask TotalChannelsUsed();
 	/** Returns the same value as ChannelsChanged() above
 	except GFX_DATA_CHANNEL will be ORed in if the TOPO_CHANNEL,
 	the TEXMAP_CHANNEL , or the VERTCOLOR_CHANNEL are being
-	changed. */
+	changed. 
+	*/
 	CoreExport ChannelMask TotalChannelsChanged();
 	// this can return:
 	//   DEFORM_OBJ_CLASS_ID -- not really a class, but so what
@@ -5542,6 +5620,42 @@ public:
 	CoreExport virtual void CopyAdditionalChannels(Object *fromObj, Object *toObj) { toObj->CopyAdditionalChannels(fromObj);}
 //! @}
 
+//! \name Self-node determination
+//! @{
+	/** This function allows modifiers to find the nodes they are modifying. Normally, object-space
+	* modifiers don't have information on the node being modified. Modifiers may want to have the
+	* node's transform or material, for example, so it is necessary to search through the modifier
+	* stack to find the node.  This method performs that operation.
+	*
+	* In the Modifier::ModifyObject method, after constructing the LocalModData
+	* and placing it in ModContext.localData, call GetNodeFromModData to
+	* get the node that is being modified. The returned INode pointer can be cached in the
+	* LocalModData so that it is readily available for later use.
+	*
+	* \param data The LocalModData pointer
+	* \param index The index of the node in the list of ReferenceMakers returned by DoEnumDependents,
+	*              considering only nodes.
+	* \return The node being modified (nullptr if none found)
+	*/
+	CoreExport INode* GetNodeFromModData(LocalModData* data, int& index);
+
+	/** This function allows modifiers to find the nodes they are modifying. Normally, object-space
+	* modifiers don't have information on the node being modified. Modifiers may want to have the
+	* node's transform or material, for example, so it is necessary to search through the modifier
+	* stack to find the node.  This method performs that operation.
+	*
+	* In the Modifier::ModifyObject method, call GetNodeFromModContext to
+	* get the node that is being modified. The returned INode pointer can be cached in the
+	* LocalModData so that it is readily available for later use.
+	*
+	* \param mc The ModContext pointer
+	* \param index The index of the node in the list of ReferenceMakers returned by DoEnumDependents,
+	*              considering only nodes.
+	* \return The node being modified (nullptr if none found)
+	*/
+	CoreExport INode* GetNodeFromModContext(ModContext* mc, int& index);
+	//! @}
+
 	// Animatable Overides...
 	CoreExport SvGraphNodeReference SvTraverseAnimGraph(IGraphObjectManager *gom, Animatable *owner, int id, DWORD flags);
 	CoreExport MSTR SvGetName(IGraphObjectManager *gom, IGraphNode *gNode, bool isBeingEdited);
@@ -5564,7 +5678,7 @@ private:
 /** This is a base class developers creating object space modifiers may derives
 	their plug-ins from. It simply provides a default implementation of
 	SuperClassID().  
-	 \see  Class Modifier, Class SimpleMod.*/
+	 \see  Class Modifier, Class SimpleModBase.*/
 class OSModifier : public Modifier {
 public:
 	/** Implemented by the System. 

@@ -161,7 +161,9 @@ objects in one cycle. See Undo/Redo for more details. */
 #define A_BEING_AUTO_DELETED  (1<<15)
 //!@}
 
-//! \brief Reserved for future internal use.
+//! \brief Used internally
+//! This flag bit is used to signal the use of the new End Cap convention in shapeobject.
+//! See MAXX-45426
 #define A_RESERVED_B16	 				(1<<16)
 
 //! \brief Used internally

@@ -125,10 +125,9 @@ public:
     With this monitoring, you will events from notifierType : NotifierType_View and IViewEvent events
     * @param callback The interface used to notify of new events.
     * @param userData An arbitrary pointer which is passed back, with the event, through INotificationCallback.
-    * @param bIsActiveShadeRunningInAViewport Indicates if we are running active shade in a viewport, we need to know that to lock the view to that viewport in that case
-	* @return true if the active view is now monitored, false there was a problem
+    * @return true if the active view is now monitored, false there was a problem
 	*/
-	virtual bool MonitorActiveShadeView(IInteractiveRenderingCallback& callback, void* userData, bool bIsActiveShadeRunningInAViewport = false) =0;
+	virtual bool MonitorActiveShadeView(IInteractiveRenderingCallback& callback, void* userData) =0;
 
     /** Stop monitoring active view
     * @param callback The notification callback passed to the Monitor method.
@@ -156,10 +155,9 @@ public:
      /** Monitor the active view whatever it is : a camera, a viewport or a light. This takes care of the lock/unlock view workflow for active shade.
     * Also when the active view is changed to another view, the event is stored until you ask for the updates and the new view is monitored automatically
 	* @param userData an arbitrary pointer which is passed back, with the event, through INotificationCallback.
-    * @param bIsActiveShadeRunningInAViewport tells if we are running active shade in a viewport, we need to know that to lock the view to that viewport
-	* @return true if the active view is now monitored, false there was a problem
+    * @return true if the active view is now monitored, false there was a problem
 	*/
-	virtual bool MonitorActiveShadeView(void* userData, bool bIsActiveShadeRunningInAViewport = false)=0;
+	virtual bool MonitorActiveShadeView(void* userData)=0;
 
     /** Stop monitoring active view
     * @param userData the user data passed to the Monitor method.

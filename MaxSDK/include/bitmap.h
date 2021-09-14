@@ -672,6 +672,12 @@ method to see if the map has an alpha channel. */
 	The bitmap manager converts the request info to a proxy info with the complete proxy and subject settings. */
 #define MAP_PROXYREQUEST         ((DWORD)(1<<12))	//!< Indicates a request to load proxy bitmap, reduced from original size / bit depth
 
+/*! This flag indicates that PutPixels() was called and the Bitmap has been updated with new data.
+    As an example of use, this flag is cleared by an active shade fragment because we have taken the changes from active shade in that bitmap.
+    So we want to know when we need to update the fragment based on actual changes to the bitmap in order to avoid simply copying unchanged Bitmap data into the fragment buffer.
+    If the flag MAP_WAS_UPDATED is set, we know there are changes since the last time we cleared that flag.*/
+#define MAP_WAS_UPDATED          ((DWORD)(1<<28))	 
+
 #define MAP_HAS_BGIMAGE          ((DWORD)(1<<29))    //!< internal use only
 #define MAP_LEGAL_DELETE	     ((DWORD)(1<<30))    //!< internal use only
 #define MAP_VIEW_FILTERED        ((DWORD)(1<<31))    //!< Test stuff
@@ -3618,6 +3624,7 @@ callback via the method <b>Bitmap::SetNotify()</b>.\n\n
 All methods of this class are implemented by the system.  */
 class BitmapNotify: public MaxHeapOperators{
 public:
+	virtual ~BitmapNotify() {};
 	//-- Call to notify clients the bitmap has changed.
 	//-- flags can be one of the BMNOTIFY_FLAG_XXX flags above
 	/*! \remarks This method is called when the storage for the Bitmap has
@@ -5624,7 +5631,7 @@ BMMExport BOOL			BMMIsFile					( const MCHAR *filename );
 	\param[out] filename  - A string containing the file name portion of the file path
 	\param[out] extension - A string containing the file extension portion of the file path */
 BMMExport void			BMMSplitFilename			( const MCHAR* name, MCHAR* directory, MCHAR* filename, MCHAR* extension );
-BMMExport LPTSTR		BMMGetLastErrorText			( LPTSTR lpszBuf, DWORD dwSize );
+BMMExport LPMSTR		BMMGetLastErrorText			( LPMSTR lpszBuf, DWORD dwSize );
 BMMExport Quantizer*	BMMNewQuantizer				();
 
 //! \brief This function appends a slash character to the end of the path passed unless one already exists. 

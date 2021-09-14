@@ -203,7 +203,7 @@ public:
 		[0, 1, 0]\n
 		[0, 0, 1]\n
 		[0, 0, 0] */
-    static const Matrix3 Identity;
+    GEOMEXPORT static const Matrix3 Identity;
 
     /*! \remarks Compares the elements of this matrix and the one specified element by
     element for exact equality. Returns nonzero if they are equal; otherwise

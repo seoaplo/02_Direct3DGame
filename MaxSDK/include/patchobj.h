@@ -647,7 +647,8 @@ class PatchObject: public GeomObject, IPatchOps, IPatchSelect, IPatchSelectData,
 		CoreExport void Snap(TimeValue t, INode* inode, SnapInfo *snap, IPoint2 *p, ViewExp *vpt);
 		CoreExport CreateMouseCallBack* GetCreateMouseCallBack();
 		CoreExport RefTargetHandle Clone(RemapDir& remap);
-		
+        CoreExport int GetSubObjectLevel() override { return GetSubobjectLevel(); }
+
 		// Gizmo versions:
 		/*! \remarks This method is available in release 4.0 and later
 		only.\n\n

@@ -253,7 +253,9 @@ inline DPoint2& DPoint2::operator*=(double f) {
 }
 
 inline DPoint2& DPoint2::operator/=(double f) {
-	x /= f;	y /= f;
+	DbgAssert(f != 0.0);
+	double invF = 1.0 / f;	// Mimic 2019 behavior
+	x *= invF;	y *= invF;
 	return *this;
 }
 
@@ -278,7 +280,9 @@ inline DPoint2 operator*(const DPoint2& a, double f) {
 }
 
 inline DPoint2 operator/(const DPoint2& a, double f) {
-	return(DPoint2(a.x / f, a.y / f));
+	DbgAssert(f != 0.0);
+	double invF = 1.0 / f;	// Mimic 2019 behavior
+	return(DPoint2(a.x * invF, a.y * invF));
 }
 
 // Helper for converting DPoint2 to Point2

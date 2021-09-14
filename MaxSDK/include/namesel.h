@@ -74,9 +74,9 @@ class GenericNamedSelSetList: public MaxHeapOperators {
 		The selection set data to append.\n\n
 		<b>DWORD id=0</b>\n\n
 		An ID for the selection set.\n\n
-		<b>MSTR name=_M("")</b>\n\n
+		<b>MSTR name</b>\n\n
 		The name for the selection set. */
-		CoreExport void AppendSet(const BitArray &nset,DWORD id=0,MSTR &name=MSTR(_M("")));
+		CoreExport void AppendSet(const BitArray &nset,DWORD id=0,const MSTR &name = MSTR(_M("")));
 		/*! \remarks Inserts the named selection set data into the list of sets
 		maintained by this class.
 		\par Parameters:
@@ -89,7 +89,7 @@ class GenericNamedSelSetList: public MaxHeapOperators {
 		An ID for the selection set.\n\n
 		<b>MSTR \&name=MSTR("")</b>\n\n
 		The name for the selection set. */
-		CoreExport void InsertSet(int pos, const BitArray &nset,DWORD id=0,MSTR &name=MSTR(_M("")));
+		CoreExport void InsertSet(int pos, const BitArray &nset,DWORD id=0,const MSTR &name = MSTR(_M("")));
 		/*! \remarks This method is similar to <b>InsertSet()</b> above, however
 		instead of accepting an explicit location this method inserts the new set
 		alphabetically in the list. (Of course, this requires an alphabetized list to
@@ -102,7 +102,7 @@ class GenericNamedSelSetList: public MaxHeapOperators {
 		<b>MSTR \&name=MSTR("")</b>\n\n
 		The name for the selection set.
 		\return  The position where the set was inserted. */
-		CoreExport int InsertSet(const BitArray &nset,DWORD id=0,MSTR &name=MSTR(_M("")));
+		CoreExport int InsertSet(const BitArray &nset,DWORD id=0,const MSTR &name = MSTR(_M("")));
 		/*! \remarks Removes the selection set whose name is passed.
 		\par Parameters:
 		<b>MSTR name</b>\n\n

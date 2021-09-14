@@ -37,7 +37,7 @@ namespace MaxSDK { namespace Graphics {
 
 	The following code snippet illustrates how a material plug-in may implement IParameterTranslator:
 	\code
-	#include <./graphics/IParameterTranslator.h>
+	_include <./graphics/IParameterTranslator.h>
 	// A material plug-in that has a shader and needs to control the parameter translation process
 	class MyMtlPlugin : public MtlBase, public MaxSDK::Graphics::IParameterTranslator {
 		// Parameter block definition omitted for brevity

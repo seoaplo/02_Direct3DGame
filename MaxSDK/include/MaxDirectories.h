@@ -286,17 +286,25 @@ live longer than a 3ds Max session, being reused whenever possible.
 */
 #define APP_AUTODESK_CLOUD_DIR        40
 
-/*! The ID used to access the directory where plug-ins from Autodesk Exchange Store are installed for current user.
+/*! The ID used to access the directory where plug-ins loaded by Plug-in Package Manager are installed for current user.
 	\see IPathConfigMgr::GetDir() 
 	\see IPathConfigMgr::SetDir(int)
 */
-#define APP_EXCHANGE_STORE_PRIVATE_DIR	41
+#define APP_PLUGIN_PACKAGE_PRIVATE_DIR 41
 
-/*! The ID used to access the directory where plug-ins from Autodesk Exchange Store are installed for all the users.
+//! \deprecated Deprecated as of 3ds Max 2020, use APP_PLUGIN_PACKAGE_PRIVATE_DIR.
+#define APP_EXCHANGE_STORE_PRIVATE_DIR APP_PLUGIN_PACKAGE_PRIVATE_DIR
+#pragma deprecated("APP_EXCHANGE_STORE_PRIVATE_DIR")
+
+/*! The ID used to access the directory where plug-ins loaded by Plug-in Package Manager are installed for all the users.
 	\see IPathConfigMgr::GetDir() 
 	\see IPathConfigMgr::SetDir(int)
 */
-#define APP_EXCHANGE_STORE_PUBLIC_DIR	42
+#define APP_PLUGIN_PACKAGE_PUBLIC_DIR 42
+
+//! \deprecated Deprecated as of 3ds Max 2020, use APP_PLUGIN_PACKAGE_PUBLIC_DIR.
+#define APP_EXCHANGE_STORE_PUBLIC_DIR APP_PLUGIN_PACKAGE_PUBLIC_DIR
+#pragma deprecated("APP_EXCHANGE_STORE_PUBLIC_DIR")
 
 /*! The ID used to access the directory where startup templates are read from in projects.
 	\see IPathConfigMgr::GetDir() 
@@ -333,6 +341,24 @@ live longer than a 3ds Max session, being reused whenever possible.
 	\see IPathConfigMgr::SetDir(int)
 */
 #define APP_SYSTEM_CFD_DIR	48
+
+/*! The ID used to access the directory where fluid simulation files will be placed.
+\see IPathConfigMgr::GetDir()
+\see IPathConfigMgr::SetDir(int)
+*/
+#define APP_FLUID_SIMULATION_DIR	49
+
+/*! The ID used to access the directory where user settings files will be placed.
+\see IPathConfigMgr::GetDir()
+\see IPathConfigMgr::SetDir(int)
+*/
+#define APP_USER_SETTINGS_DIR  50
+
+/*! The ID used to access the directory where user tools files will be placed.
+\see IPathConfigMgr::GetDir()
+\see IPathConfigMgr::SetDir(int)
+*/
+#define APP_USER_TOOLS_DIR  51
 
 //@}
 // closes Max Directories group

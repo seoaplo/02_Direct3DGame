@@ -509,7 +509,7 @@ public:
 	The time to get the value.\n\n
 	<b>float fX</b>\n\n
 	The input X value.\n\n
-	<b>Interval \&ivalid = FOREVER</b>\n\n
+	<b>Interval \&ivalid</b>\n\n
 	The validity interval which is updated by this method to reflect the
 	validity of the curve.\n\n
 	<b>BOOL UseLookupTable = FALSE</b>\n\n
@@ -520,7 +520,24 @@ public:
 	method is called with TRUE and the current lookup table is not initialized
 	yet, or invalid (it will be invalidated, when a point or tangent is moved,
 	or the time has changed in case it is animated). */
-	virtual float GetValue(TimeValue t, float fX, Interval &ivalid = FOREVER, BOOL UseLookupTable = FALSE)=0;			 // Returns the Y-value for a given X-Value
+	virtual float GetValue(TimeValue t, float fX, Interval& ivalid, BOOL UseLookupTable = FALSE)=0;			 // Returns the Y-value for a given X-Value
+	/*! \remarks Returns the Y-value for a given X-Value of the curve. Note
+	that values outside the X-range are extrapolated from the curve using a
+	straight line based on the tangents of the first or last point.
+	\par Parameters:
+	<b>TimeValue t</b>\n\n
+	The time to get the value.\n\n
+	<b>float fX</b>\n\n
+	The input X value.\n\n
+	<b>BOOL UseLookupTable = FALSE</b>\n\n
+	If TRUE a lookup table is used to get the value (for speed). If FALSE the
+	value is computed.\n\n
+	This is used to speed up value access. The default value for the lookup
+	table size is 1000. The lookup table will be calculated whenever this
+	method is called with TRUE and the current lookup table is not initialized
+	yet, or invalid (it will be invalidated, when a point or tangent is moved,
+	or the time has changed in case it is animated). */
+	float GetValue(TimeValue t, float fX, BOOL UseLookupTable = FALSE) { Interval ivalid = FOREVER; return GetValue(t, fX, ivalid, UseLookupTable); }
 	/*! \remarks Sets if the curve can be animated or not.
 	\par Parameters:
 	<b>BOOL Animated</b>\n\n
@@ -597,9 +614,16 @@ public:
 	The time to get the data.\n\n
 	<b>int index</b>\n\n
 	The zero based index of the point.\n\n
-	<b>Interval \&valid = FOREVER</b>\n\n
+	<b>Interval \&valid</b>\n\n
 	The validity interval which is updated. */
-	virtual CurvePoint	GetPoint(TimeValue t, int index, Interval &valid = FOREVER)=0;
+	virtual CurvePoint	GetPoint(TimeValue t, int index, Interval& valid)=0;
+	/*! \remarks Retrieves data about the specfied point.
+	\par Parameters:
+	<b>TimeValue t</b>\n\n
+	The time to get the data.\n\n
+	<b>int index</b>\n\n
+	The zero based index of the point.\n\n*/
+	CurvePoint GetPoint(TimeValue t, int index) { Interval valid = FOREVER; return GetPoint(t, index, valid); }
 
 	//Added by AF (10/26/00)
 	//Currently only supports CURVE_EXTRAPOLATE_LINEAR and CURVE_EXTRAPOLATE_CONSTANT

@@ -6,6 +6,6 @@
 //  otherwise accompanies this software in either electronic or hard copy form.
  
 #pragma once
+
 #include "3dsmaxconfig.h"
 #include "3dsmaxdlport.h"
-

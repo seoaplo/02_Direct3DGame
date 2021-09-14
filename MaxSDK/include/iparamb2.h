@@ -22,6 +22,7 @@ HISTORY: created 1/25/95
 #include "assetmanagement/AssetId.h"
 #include "iparamb2Typedefs.h"
 #include "TabTypes.h"
+#include <memory>
 
 class Matrix3;
 class IAutoRendererParamDlg;
@@ -2778,33 +2779,55 @@ public:
 	PB2Export void			RemoveParamBlockDesc(ParamBlockDesc2* pbd);
 
     //! \brief Creates a Qt widget to be associated with the given parameter map ID.
-    /*! This method is deprecated and will eventually be removed and replaced by ClassDesc2_Extension2017SP2::CreateQtWidget(). 
-        This method is identical to ClassDesc2_Extension2017SP2::CreateQtWidget() but lacks the tabID parameter. */
+    /*! This method should be implemented by the plugin developer in the class descriptor of their plugin.
+        It should instantiate and return a class that inherits from QMaxParamBlockWidget, and that encapsulates a user interface object.
+        The user interface object should be created using a tool like Qt Designer, and it should correspond to the parameter map that is passed in.
+        For a complete example of how to use this method in a plugin, see 'Creating a Qt-based plug-in' in the 3ds Max Developer Guide.\n\n
+        Note that this method and the one below are identical, except that this one lacks the tabID parameter.
+        You should only override the one below if you want to add a Qt widget to the Render Settings dialog. Otherwise, you should override this one.
+        \param owner The owner of the dialog. This will normally be the owner of the parameter block, but in the case of P_CLASS_PARAMS, where the parameter block doesn't
+            have an owner, this will be the object for which the dialog is being displayed.
+        \param paramBlock The parameter block to which the parameter map belongs to.
+            This parameter block must specify the P_AUTO_UI_QT flag, and it must not declare any UI properties using the p_ui flag.
+        \param paramMapID The ID of the parameter map, as specified in the parameter block descriptor.
+        \param [out] rollupTitle Output parameter used to specify the title to be displayed in the rollup's header.
+        \param [out] rollupFlags Output parameter used to specify flags such as APPENDROLL_CLOSED.
+        \param [out] rollupCategory Output parameter used to specify the order in which rollups are positioned with values such as ROLLUP_CAT_STANDARD.
+        \return An instance of a new Qt widget which will be hosted in the parameter map's rollup.
+        \attention The ownership of the Qt widget is transferred to the caller.
+        \remark May return a nullptr if no dialog should be shown for the given parameter map.
+        \remark The default implementation of this method returns a nullptr.
+        \sa \ref parammap_qt. */
     virtual MaxSDK::QMaxParamBlockWidget* CreateQtWidget(
         ReferenceMaker& owner,
         IParamBlock2& paramBlock,
-        const MapID paramMapID,  
-        MSTR& rollupTitle, 
-        int& rollupFlags, 
+        const MapID paramMapID,
+        MSTR& rollupTitle,
+        int& rollupFlags,
         int& rollupCategory);
 
-    //! \brief Creates a Qt widget to be associated with the given parameter map ID.
-    /*! This method is a shortcut which automatically calls ClassDesc2_Extension2017SP2::CreateQtWidget() if the 
-        ClassDesc2_Extension2017SP2 interface is present on this class descriptor, or otherwise falls back to calling the legacy method
-        ClassDesc2::CreateQtWidget(ReferenceMaker&, IParamBlock2&, MapID, MSTR&, int&, int&). */
-	MaxSDK::QMaxParamBlockWidget* CreateQtWidget(
-		ReferenceMaker& owner,
-		IParamBlock2& paramBlock,
-		const MapID BparamMapID,
-		MSTR& rollupTitle,
-		int& rollupFlags,
-		int& rollupCategory,
-		Class_ID& tabID);
+    //! \brief Creates a Qt widget that is connected to the given parameter block.
+    /*! This method is identical to the one above, except that it takes one additional parameter (Class_ID& tabID).
+        You should only override this method if you want to add a Qt widget to the Render Settings dialog. Otherwise, you should override the one above.\n\n
+        Please refer to the documentation of the method above to learn more about this one.
+        \param [out] tabID Output parameter used to specify the Render Settings dialog tab in which the Qt widget is to be added.
+            To add a Qt widget as a new tab to the Render Settings dialog, assign a unique Class ID to this parameter before returning.
+            To obtain a unique Class ID, run the 3ds Max Class ID generator program, gencid.exe, which is located in your \maxsdk\help\ directory.
+        \remark The default implementation of this method calls the one above, ignoring the tabID parameter. */
+    virtual MaxSDK::QMaxParamBlockWidget* CreateQtWidget(
+        ReferenceMaker& owner,
+        IParamBlock2& paramBlock,
+        const MapID paramMapID,
+        MSTR& rollupTitle,
+        int& rollupFlags,
+        int& rollupCategory,
+        Class_ID& tabID);
 };
 
 //==================================================================================================
 // class ClassDesc2_Extension2017SP2
 //
+//! \deprecated This has been deprecated as of 3ds Max 2020, please use MaxSdk::ClassDesc2 instead
 /*! Extension class that adds functionality to class ClassDesc2 for 3ds Max 2017 Service Pack 2.
 
     The plugin developer may implement this method by deriving a plugin's class descriptor from this
@@ -2814,7 +2837,7 @@ public:
 
     Note: this class will eventually disappear, having its functionality folded into ClassDesc2.
 */
-class ClassDesc2_Extension2017SP2
+class MAX_DEPRECATED ClassDesc2_Extension2017SP2
 {
 public:
 
@@ -2981,7 +3004,7 @@ name. See MAXScript SDK.\n\n
 <b>IParamBlock2* class_params;</b>\n\n
 Pointer to class parameter block if the <b>CLASS_PARAM</b> flag is specified
 for the block. See the flags descriptions below for details. */
-class ParamBlockDesc2 : public BaseInterfaceServer
+class ParamBlockDesc2 : public BaseInterfaceServer, public MaxSDK::Util::Noncopyable
 {
 private:
 	va_list check_param(va_list ap, ParamID id);
@@ -3026,6 +3049,11 @@ public:
 	// class param optional
 	IParamBlock2* class_params;	// pointer to class paramblock if P_CLASS_PARAMS descriptor
 
+private:
+	class ParamBlockDesc2ImplData;
+	const std::unique_ptr<ParamBlockDesc2ImplData> mParamBlockDesc2ImplData;
+
+public:
 	// constructors
 	ParamBlockDesc2();
 
@@ -3385,7 +3413,15 @@ public:
 	\par Parameters:
 	<b>ParamID id</b>\n\n
 	The permanent ID of the parameter to delete. */
-	PB2Export void DeleteParam(ParamID id);
+	void DeleteParam(ParamID id) { int i = IDtoIndex(id); DbgAssert(i >= 0); DeleteParamByIndex(i); }
+	/*! \remarks Deletes the specified parameter from the descriptor.
+	\par Parameters:
+	<b>int index</b>\n\n
+	The index of the parameter to delete. */
+	PB2Export void DeleteParamByIndex(int index);
+	/*! \remarks Deletes all parameters from the descriptor. */
+	PB2Export void DeleteAllParams();
+
 	/*! \remarks This method is used for modifying a descriptor incrementally.
 	It alters a parameter definition optional information tag of an existing
 	descriptor. Note: You must not modify a descriptor with this method once it

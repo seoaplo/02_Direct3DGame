@@ -23,7 +23,7 @@ enum class TilePatternFormat
 	First = 0,
 	ZBrush = First,	// 0-based, file format starts from xxxxU0_V0
 	Mudbox,			// 1-based, file format starts from xxxxU1_V1
-	UDIM,			// Mari style, format: 1000 + U * 10 + V, V starts from 1, file format starts from xxxx1001
+	UDIM,			// Mari style, format: 1000 + U * 10 + V, V starts from 1, file format starts from xxxx-1001
 	Custom,			// No pattern, set image file and UV offset at will
 	Num,
 	Last = Num

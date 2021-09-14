@@ -5,7 +5,7 @@
 // CSharpVersionWriter in BuildTools, as we use it to generate src\include\dotNet\AssemblyVersion.cs
 // for C# projects
 #else // MAX
-  #define VERSION_STRING  "Neptune with PDBs N845_RL_x64 02-27-2018 18:58 6b4316d87cb8d4a016c88fdf479827a1f3279f79"
-  #define VERSION_INT   845
+  #define VERSION_STRING  "Athena with PDBs A757_RL_x64 03-05-2019 14:32 c7c3c8b5c9048c91ecd985eb5fe2edf91b202c0e"
+  #define VERSION_INT   757
 #endif
 

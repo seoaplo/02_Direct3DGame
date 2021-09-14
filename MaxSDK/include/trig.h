@@ -16,9 +16,9 @@
 /** Half of the constant Pi defined as a float. */
 #define HALFPI ((float)1.570796326794895)
 /** The coefficient to convert the value of an angle in degrees into radians. */
-#define DEG_TO_RAD (PI/(float)180.0)
+#define DEG_TO_RAD (0.017453292f /* Mimic 2019 behavior (PI / 180.0) */)
 /** The coefficient to convert the value of an angle in radians into degrees. */
-#define RAD_TO_DEG ((float)180.0/PI)
+#define RAD_TO_DEG (57.2957802f /* Mimic 2019 behavior (180.0 / PI) */)
 /** A function macro to convert degrees to radians with float precision. */ 
 #define DegToRad(deg) (((float)deg)*DEG_TO_RAD)
 /** A function macro to convert radians to degrees with float precision. */

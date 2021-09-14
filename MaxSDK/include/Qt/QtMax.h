@@ -14,6 +14,7 @@
 #include "../point2.h"
 #include "../matrix3.h"
 
+// TODO(SDK_BREAK): These Qt includes should be moved elsewhere, but doing so would cause SDK break.
 #pragma warning(push)
 #pragma warning(disable: 4127 4251 4275 4512 4800 )
 #include <QtCore/QtCore>

@@ -20,14 +20,14 @@
 	use_generic						(copy,					"copy");
 	def_node_generic				(reference,				"reference");
 	def_node_generic				(instance,				"instance");
-	def_visible_primitive		(delete,				"delete");		// a prim so I can control collection traversal
+	def_visible_primitive			(delete,				"delete");		// a prim so I can control collection traversal
 	use_generic						(isDeleted,				"isDeleted");
 	def_node_generic				(addModifier,			"addModifier");
-	def_visible_primitive		(addModifierWithLocalData,			"addModifierWithLocalData");
+	def_visible_primitive			(addModifierWithLocalData,			"addModifierWithLocalData");
 	def_node_generic				(deleteModifier,		"deleteModifier");
 	def_node_generic				(collapseStack,			"collapseStack");
 	def_node_generic				(bindSpaceWarp,			"bindSpaceWarp");
-	def_node_generic_debug_ok	(intersects,			"intersects");
+	def_node_generic_debug_ok		(intersects,			"intersects");
 //	def_node_generic				(dependsOn,				"dependsOn");
 
 	def_node_generic				(instanceReplace,		"instanceReplace");
@@ -43,6 +43,10 @@
 	def_node_generic				(flagForeground,		"flagForeground");
 
 	def_visible_primitive			(AttachObjects, 		"AttachObjects");
+	def_visible_primitive			(getUserPropVal,		"getUserPropVal");
+	def_visible_primitive			(setUserPropVal,		"setUserPropVal");
+	def_visible_primitive			(doesUserPropExist,		"doesUserPropExist");
+	def_visible_primitive			(deleteUserProp,		"deleteUserProp");
 
 	/* node state */
 	

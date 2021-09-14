@@ -6,5 +6,6 @@
 	use_generic			( updateXRef,				"updateXRef");
 	def_visible_generic	( flag_xref_changed,		"flagChanged");	
 	use_generic			( delete,					"delete");
+	use_generic			( isDeleted,				"isDeleted");
 
 #pragma warning(pop)

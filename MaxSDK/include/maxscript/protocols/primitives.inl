@@ -64,6 +64,7 @@
 	def_visible_primitive (					export_file,				"exportFile");
 	def_visible_primitive_debug_ok (		getMaxFileVersionData,		"getMaxFileVersionData");
 	def_visible_primitive (					get_last_merged_nodes,		"getLastMergedNodes");
+	def_visible_primitive (					archive_max_file,				"archiveMaxFile");
 
 	def_visible_primitive (					load_material_library,		"loadMaterialLibrary");
 #ifndef USE_CUSTOM_MATNAV // orb 08-23-2001 removing mtl lib saving from maxscript
@@ -260,8 +261,6 @@
 	def_struct_primitive (	pathConfig_SaveToPathConfigFile,		pathConfig,	"SaveTo");
 	def_struct_primitive (	pathConfig_doesFileExist,				pathConfig,	"doesFileExist");
 
-	def_struct_primitive (	pathConfig_GetExchangeStorePlugInInstallPath,	pathConfig,		"GetExchangeStorePlugInInstallPath");
-
 	def_struct_primitive (					mapPaths_add,				pathConfig.mapPaths,		"add");
 	def_struct_primitive (					mapPaths_count,				pathConfig.mapPaths,		"count");
 	def_struct_primitive (					mapPaths_get,				pathConfig.mapPaths,		"get");
@@ -397,8 +396,10 @@
 	def_visible_primitive (					setWaitCursor,				"setWaitCursor");
 	def_visible_primitive (					setArrowCursor,				"setArrowCursor");
 
-	def_visible_primitive_debug_ok (		registerTimeCallback,		"registerTimeCallback");
-	def_visible_primitive_debug_ok (		unregisterTimeCallback,		"unregisterTimeCallback");
+	def_visible_primitive_debug_ok (		registerTimeCallback,			"registerTimeCallback");
+	def_visible_primitive_debug_ok (		unregisterTimeCallback,			"unregisterTimeCallback");
+	def_visible_primitive_debug_ok (		showregisteredTimeCallbacks,	"showregisteredTimeCallbacks");
+
 	def_struct_primitive (					mtlBrowser_browseFrom,		mtlBrowser,			"browseFrom");
 
 
@@ -534,15 +535,19 @@
 	def_visible_primitive (					registerRightClickMenu,				"registerRightClickMenu");
 	def_visible_primitive (					unregisterRightClickMenu,			"unregisterRightClickMenu");
 	def_visible_primitive (					unregisterAllRightClickMenus,		"unregisterAllRightClickMenus");
+
 	def_visible_primitive (					registerRedrawViewsCallback,		"registerRedrawViewsCallback");
 	def_visible_primitive (					unregisterRedrawViewsCallback,		"unregisterRedrawViewsCallback");
-//watje 7-9-00 exposes the new filter callback
-	def_visible_primitive (					registerSelectFilterCallback,		"registerSelectFilterCallback");
-	def_visible_primitive (					unregisterSelectFilterCallback,		"unregisterSelectFilterCallback");
+	def_visible_primitive (					showregisteredRedrawViewsCallbacks,	"showregisteredRedrawViewsCallbacks");
+
+	def_visible_primitive (					registerSelectFilterCallback,			"registerSelectFilterCallback");
+	def_visible_primitive (					unregisterSelectFilterCallback,			"unregisterSelectFilterCallback");
+	def_visible_primitive (					showregisteredSelectFilterCallbacks,	"showregisteredSelectFilterCallbacks");
 
 //watje 7-11-00 exposes the new display filter callback
-	def_visible_primitive (					registerDisplayFilterCallback,		"registerDisplayFilterCallback");
-	def_visible_primitive (					unregisterDisplayFilterCallback,	"unregisterDisplayFilterCallback");
+	def_visible_primitive (					registerDisplayFilterCallback,			"registerDisplayFilterCallback");
+	def_visible_primitive (					unregisterDisplayFilterCallback,		"unregisterDisplayFilterCallback");
+	def_visible_primitive (					showregisteredDisplayFilterCallbacks,	"showregisteredDisplayFilterCallbacks");
 
 // LAM 7/23/02 - moved from gScript
 	def_visible_primitive (					AddSubRollout,				"AddSubRollout");
@@ -582,6 +587,10 @@
 	def_visible_primitive_debug_ok	(		getModContextBBox,			"getModContextBBox");
 
 	def_visible_primitive (					makeValidName,				"makeValidName");
+
+	def_visible_primitive(					IsModuleLoaded,				"IsModuleLoaded");
+	def_visible_primitive(					getMaxscriptStartupState,	"getMaxscriptStartupState");
+
 
 	// --------------- CustAttrib primitives
 
@@ -632,19 +641,10 @@
 	def_struct_primitive_debug_ok (			symbolicPaths_remove_user_path,		symbolicPaths,			"removeUserPath");
 	def_struct_primitive_debug_ok (			symbolicPaths_expandFileName,		symbolicPaths,			"expandFileName");
 
-	// --------------- logsystem primitives
-	def_struct_primitive_debug_ok (			logsys_getNetLogFileName,		logsystem,			"getNetLogFileName");
-
 	// misc.....
 	def_visible_primitive_debug_ok (		get_node_bbox,				"getNodeBBox");
 	def_visible_primitive_debug_ok (		isSceneXRefNode,			"isSceneXRefNode");
 
-	// --------------- TProfiler primitives
-	def_visible_primitive_debug_ok  (  set_enableTprofilerSampling, "SetEnableProfiling");
-	def_visible_primitive_debug_ok  (  get_enableTprofilerSampling, "GetEnableProfiling");
-#ifdef ALPHABETA
-	def_visible_primitive_debug_ok  (  openTprofiler, "OpenProfiler");
-#endif
 	// --------------- ConfigManager primitives
 	def_struct_primitive_debug_ok(cfgMgr_getIniFile, cfgMgr, "getIniFile");
 	def_struct_primitive_debug_ok(cfgMgr_sectionExists, cfgMgr, "sectionExists");

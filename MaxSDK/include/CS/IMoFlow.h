@@ -148,7 +148,7 @@ class TranInfo: public MaxHeapOperators {
 	inline int		GetTransFocus()	 const	{ return transFocus; }
 	inline void		SetTransFocus(int t)	{ transFocus = t; }
 	inline const	MCHAR* GetNote() const	{ return note; }
-	inline void		SetNote(const MCHAR* n) { _tcscpy_s(note, MAXTRANNOTE, n); }
+	inline void		SetNote(const MCHAR* n) { _tcsncpy_s(note, MAXTRANNOTE, n, MAXTRANNOTE-1); }
 };
 
 class Transition: public MaxHeapOperators {
@@ -283,7 +283,7 @@ class Snippet: public MaxHeapOperators {
 	inline void		SetEnd(int e)				{ end = e; }
 	
 	inline const	MCHAR* GetClipName() const	{ return sname; }
-	inline void		SetClipName(const MCHAR* n) { _tcscpy_s(sname, MAXNAME, n); }
+	inline void		SetClipName(const MCHAR* n) { _tcsncpy_s(sname, MAXNAME, n, MAXNAME-1); }
 
 	inline const	MaxSDK::AssetManagement::AssetUser&  GetFile() const	{ return file; }
 	inline void		SetFile(const MaxSDK::AssetManagement::AssetUser& assetUser) { file = assetUser; }
@@ -378,7 +378,7 @@ class Script: public MaxHeapOperators {
 	inline	  float	GetStartRot() { return startrot; }
 	inline	  void	SetStartRot(float r) { startrot = r;}
 	inline    const	MCHAR* GetName() const	{ return name; }
-	inline    void	SetName(const MCHAR* n) { _tcscpy_s(name, MAXSCRIPTNAME, n); }
+	inline    void	SetName(const MCHAR* n) { _tcsncpy_s(name, MAXSCRIPTNAME, n, MAXSCRIPTNAME-1); }
 
     // The following functions are obsolete
 	inline	  int	NumLayers() { return nlayers; }

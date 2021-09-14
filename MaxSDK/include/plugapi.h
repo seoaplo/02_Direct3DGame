@@ -144,9 +144,13 @@ class ReferenceMaker;
 #define MAX_RELEASE_R21_PREVIEW2	20901
 //! 3ds Max R21 (2019) release id
 #define MAX_RELEASE_R21		21000
+//! 3ds Max R22 (2020) Preview release id
+#define MAX_RELEASE_R22_PREVIEW		21900
+//! 3ds Max R22 (2020) release id
+#define MAX_RELEASE_R22				22000
 
 //! Identifier of the current 3ds Max release
-#define MAX_RELEASE					MAX_RELEASE_R21
+#define MAX_RELEASE					MAX_RELEASE_R22
 
 
 
@@ -184,6 +188,8 @@ SDK backward compatibility history:
 - 3ds Max R18 is binary compatible with 3ds Max R17 
 - 3ds Max R19 not binary compatible with previous releases
 - 3ds Max R20 not binary compatible with previous releases
+- 3ds Max R21 not binary compatible with previous releases
+- 3ds Max R22 not binary compatible with previous releases
 
 \see VERSION_3DSMAX
 \see LibVersion
@@ -282,19 +288,25 @@ SDK backward compatibility history:
 #define MAX_API_NUM_R210_PREVIEW	51
 //! 3ds Max R21 (2019) Final SDK; incompatible with 3ds Max R20 (2018).
 #define MAX_API_NUM_R210	52
+//! 3ds Max R22 (2020) Preview SDK; compatible with 3ds Max R21 (2019).
+#define MAX_API_NUM_R220_PREVIEW	53
+//! 3ds Max R22 (2020) Preview 2 SDK (upgrade to Visual Studio 2017); incompatible with 3ds Max R21 (2019).
+#define MAX_API_NUM_R220_PREVIEW2	54
+//! 3ds Max R22 (2020) Final SDK; upgrade to Visual Studio 2017; incompatible with 3ds Max R21 (2019).
+#define MAX_API_NUM_R220	55
 
 /** The 3ds Max SDK current version number. 
 	It is used to verify a plug-in's binary compatibility with a specific version of 3ds Max. 
 	It is encoded into VERSION_3DSMAX which is the version number plug-in must return 
 	from their implementation of LibVersion(). The GET_MAX_API_NUM macro can be used 
 	to extract the SDK version number from a the library version (VERSION_3DSMAX).*/
-#define MAX_API_NUM					MAX_API_NUM_R210
+#define MAX_API_NUM			MAX_API_NUM_R220
 
 /** Denotes the revision of the SDK for a given API. This is incremented.
     when the SDK functionality changes in some significant way (for instance
     a new GetProperty() query  response is added), but the headers have 
     not been changed.*/
-#define MAX_SDK_REV					0
+#define MAX_SDK_REV					0 
 
 /** This is the value is required to be returned by a plug-in DLL's implementation of LibVersion(). */
 #define VERSION_3DSMAX ((MAX_RELEASE<<16)+(MAX_API_NUM<<8)+MAX_SDK_REV)
@@ -360,7 +372,6 @@ MAX_DEPRECATED APPLICATION_ID GetAppID();
 #define THE_GRIDREF_CLASS_ID		0xfffffe00
 #define VIEWREF_CLASS_ID			0xffffff01
 #define BITMAPDAD_CLASS_ID			0xffffff02 // For drag and drop of bitmaps
-#define PARTICLE_SYS_CLASS_ID		0xffffff03 // NOTE: this is for internal use only. Particle systems return GEOMOBJECT_CLASS_ID -- use IsParticleObject() to determine if an object is a particle system.
 #define AGGMAN_CLASS_ID				0xffffff05 // Object aggregation, VIZ
 #define MAXSCRIPT_WRAPPER_CLASS_ID	0xffffff06 // MAX object wrappers within MAXScript
 #define TRACKBAR_CLASS_ID			0xffffff07	// Trackbar 
@@ -370,6 +381,10 @@ MAX_DEPRECATED APPLICATION_ID GetAppID();
 #define LAYER_CLASS_ID				0x0010f0	//!< Obsolete.
 #define TEMP_OBJECT_SUPERCLASSID	0x98aa1d	//super classid of the object that is attached to the temporary merge node
 //@}
+
+//! \deprecated Deprecated as of 3ds Max 2020, use Object::IsParticleSystem() to determine if an object is a particle system.
+#define PARTICLE_SYS_CLASS_ID		0xffffff03 // NOTE: this is for internal use only. Particle systems return GEOMOBJECT_CLASS_ID.
+#pragma deprecated("PARTICLE_SYS_CLASS_ID")
 
 /// \name Super-class IDs for Plug-ins
 /// These are the super-class IDs that can be used by the different plug-in types 

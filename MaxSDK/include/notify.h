@@ -392,7 +392,10 @@ that will be cloned (the original nodes): INodeTab* origNodes */
 notification is sent C times. The NotifyInfo::callParam for NOTIFY_POST_NODES_CLONED is a pointer to this struct: struct{ 
 INodeTab* origNodes; INodeTab* clonedNodes; CloneType cloneType;} */
 #define NOTIFY_POST_NODES_CLONED			0x00000087 
-#define NOTIFY_POST_MERGE_PROCESS			0x00000088
+
+//! \deprecated Deprecated as of 3ds Max 2020, notification is never sent.
+#define NOTIFY_POST_MERGE_PROCESS 0x00000088
+#pragma deprecated("NOTIFY_POST_MERGE_PROCESS")
 
 // xavier robitaille | 03.02.07
 //! \brief Sent before a system path changes.
@@ -992,6 +995,21 @@ See NOTIFY_INTERACTIVE_PLUGIN_INSTANCE_CREATION_STARTED.
 //! \brief Sent after project folder is changed.
 #define NOTIFY_POST_PROJECT_FOLDER_CHANGE 0x00000105
 
+//! \brief Sent immediately before MAXScript loads its startup scripts. stdscripts will have already been read.
+#define NOTIFY_PRE_MXS_STARTUP_SCRIPT_LOAD 0x00000106
+
+//! \brief Sent when ActiveShade in the viewport is toggled on/off.
+#define NOTIFY_ACTIVESHADE_IN_VIEWPORT_TOGGLED          0x00000107
+
+//! \brief Sent when potentially starting to shut 3ds Max down, before checking for things that can cancel the shutdown, such as scene dirty or ExitMAXCallback callback object returning false.
+#define NOTIFY_SYSTEM_SHUTDOWN_CHECK                0x00000108
+
+//! \brief Sent if system shutdown was cancelled
+#define NOTIFY_SYSTEM_SHUTDOWN_CHECK_FAILED         0x00000109
+
+//! \brief Sent if system shutdown was not cancelled. and system shutdown is about to start
+#define NOTIFY_SYSTEM_SHUTDOWN_CHECK_PASSED         0x0000010A
+
 // !!!!!!!!!!!!  If you are adding more notification codes, read the following!  !!!!!!!!!!!!
 
 // Note #1: If you add more built-in notification codes, consider
@@ -1001,7 +1019,7 @@ See NOTIFY_INTERACTIVE_PLUGIN_INSTANCE_CREATION_STARTED.
 //    adding them to MAXScript. See maxscrpt\maxcallbacks.cpp
 
 // Note #3: If you add more built-in notification codes, you may need to update
-//    NOTIFY_CUSTOM_LOW in notify.cpp (~line 571) and update the comments above it
+//    NOTIFY_CUSTOM_LOW in core\Tests\NotifyTest.cpp (~line 75) and update the comments above it
 
 // Note #4: If you add more built-in notification codes, consider
 //	  adding them to MaxPlus/facade/facade_notifications.h and/or
@@ -1018,10 +1036,12 @@ indicating the type of new scene operation that was carried out.
 //@{
 //! \brief All objects are deleted, including their animation data
 #define PRE_NEW_NEW_ALL 0x1
-//! \brief Objects are not deleted, hierarchical links between them and animation data are deleted
+//! \deprecated Deprecated as of 3ds Max 2019.1, use PRE_NEW_NEW_ALL instead.
 #define PRE_NEW_KEEP_OBJECTS 0x2
-//! \brief Objects and hierarchical links between them are not deleted, animation data is deleted
+#pragma deprecated("PRE_NEW_KEEP_OBJECTS")
+//! \deprecated Deprecated as of 3ds Max 2019.1, use PRE_NEW_NEW_ALL instead.
 #define PRE_NEW_KEEP_OBJECTS_AND_HIERARCHY 0x3
+#pragma deprecated("PRE_NEW_KEEP_OBJECTS_AND_HIERARCHY")
 //@}
 
 /** \anchor notify_file_process_type

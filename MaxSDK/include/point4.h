@@ -62,10 +62,8 @@ public:
    Point4(const Point3& a, float W=0.0f) { 
 		 x = a.x; y = a.y; z = a.z; w = W; 
 	 } 
-   
-	 Point4(const Point4& a) { 
-		 x = a.x; y = a.y; z = a.z; w = a.w; 
-	 } 
+
+	 Point4(const Point4&) = default;
     
      /*! \remarks Constructor. x, y, z and w are initialized to af[0], af[1], af[2] and af[3] respectively. */
     Point4(const float af[4]) { 
@@ -249,8 +247,10 @@ inline Point4& Point4::operator*=(float f) {
    }
 
 inline Point4& Point4::operator/=(float f) { 
+   DbgAssert(f != 0.0f);
    if (f==0.0f) f = .000001f;
-   x /= f;  y /= f;  z /= f;   w /= f;
+   float invF = 1.0f / f;	// Mimic 2019 behavior
+   x *= invF;  y *= invF;  z *= invF;   w *= invF;
 
    return *this; 
    }
@@ -302,8 +302,9 @@ inline Point4 operator*(const Point4& a, float f) {
 /*! \remarks Returns a Point4 that is the specified Point4 divided by the
 specified float. */
 inline Point4 operator/(const Point4& a, float f) {
-   assert( f != 0.0f );
-   return(Point4(a.x/f, a.y/f, a.z/f, a.w/f));
+   DbgAssert(f != 0.0f);
+   float invF = 1.0f / f;	// Mimic 2019 behavior
+   return(Point4(a.x * invF, a.y * invF, a.z * invF, a.w * invF));
    }
 
 /*! \remarks Returns a Point4 that is the specified Point4 with the specified

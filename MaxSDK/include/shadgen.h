@@ -135,18 +135,24 @@ class ShadowType: public ReferenceTarget {
 
 		// This interface is solely for the default shadow map type ( Class_ID(STD_SHADOW_MAP_CLASS_ID,0) )
 		virtual void SetMapRange(TimeValue t, float f) {}
-		virtual float GetMapRange(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
+		virtual float GetMapRange(TimeValue t, Interval& valid) { return 0.0f; }
+		float GetMapRange(TimeValue t) { Interval valid(0,0); return GetMapRange(t, valid); }
 		virtual void SetMapSize(TimeValue t, int f) {}
-		virtual int GetMapSize(TimeValue t, Interval& valid = Interval(0,0)) { return 0; }
+		virtual int GetMapSize(TimeValue t, Interval& valid) { return 0; }
+		int GetMapSize(TimeValue t) { Interval valid(0,0); return GetMapSize(t, valid); }
 		virtual void SetMapBias(TimeValue t, float f) {} 
-		virtual float GetMapBias(TimeValue t, Interval& valid = Interval(0,0)) { return 0.0f; }
+		virtual float GetMapBias(TimeValue t, Interval& valid) { return 0.0f; }
+		float GetMapBias(TimeValue t) { Interval valid(0,0); return GetMapBias(t, valid); }
 		virtual void SetAbsMapBias(TimeValue t, int a) {}
-		virtual int GetAbsMapBias(TimeValue t, Interval& valid = Interval(0,0)) { return 0; }
+		virtual int GetAbsMapBias(TimeValue t, Interval& valid) { return 0; }
+		int GetAbsMapBias(TimeValue t) { Interval valid(0,0); return GetAbsMapBias(t, valid); }
 
 		// This interface is solely for the default raytrace shadow type ( Class_ID(STD_RAYTRACE_SHADOW_CLASS_ID,0) )
-		virtual float GetRayBias(TimeValue t, Interval &valid = Interval(0,0)) { return 0.0f; }
+		virtual float GetRayBias(TimeValue t, Interval& valid) { return 0.0f; }
+		float GetRayBias(TimeValue t) { Interval valid(0,0); return GetRayBias(t, valid); }
 		virtual	void SetRayBias(TimeValue t, float f) {}
-		virtual int GetMaxDepth(TimeValue t, Interval &valid = Interval(0,0)) { return 1; } 
+		virtual int GetMaxDepth(TimeValue t, Interval& valid) { return 1; } 
+		int GetMaxDepth(TimeValue t) { Interval valid(0,0); return GetMaxDepth(t, valid); }
 		virtual void SetMaxDepth(TimeValue t, int f) {}
 
 		// Because this method is inlined and only uses existing methods

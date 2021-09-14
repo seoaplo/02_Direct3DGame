@@ -135,6 +135,18 @@ class Box2: public RECT, public MaxHeapOperators {
 	\par Operators:
 	*/
 	GEOMEXPORT int Contains(const IPoint2& p) const;  // is point in this box?
+	/*! \remarks Intersection test between a line and a rectangle. Returns true if they intersecting.
+	 * \par Parameters:
+	<b>int x0</b>\n\n
+	Line start x coordinate.\n\n
+	<b>int y0</b>\n\n
+	Line start y coordinate.
+	<b>int x1</b>\n\n
+	Line end x coordinate.\n\n
+	<b>int y1</b>\n\n
+	Line end y coordinate.\n\n */
+	GEOMEXPORT bool IntersectsLine(int x0, int y0, int x1, int y1) const;
+
 	};
 
 typedef Box2 Rect;

@@ -15,7 +15,7 @@
 
 #include "maxheap.h"
 
-template <class T> class LinkedEntryT: public MaxHeapOperators {
+template <class T> class LinkedEntryT : public MaxHeapOperators {
 public:
 	T data;
 	void* next;
@@ -28,7 +28,7 @@ Simple linked list class.  Methods and operators are provided to create new
 linked lists, return the number of items in the list, access item using the
 array operator ([]), and assign one list to another.  All methods of this class
 are implemented by the system. */
-template <class T, class TE> class LinkedListT: public MaxHeapOperators
+template <class T, class TE> class LinkedListT : public MaxHeapOperators
 {
 private:
 	TE* head;
@@ -51,7 +51,7 @@ public:
 	to NULL and the count is set to 0. */
 	void New()
 	{
-		while(head)
+		while (head)
 		{
 			TE* next = (TE*)head->next;
 			delete head;
@@ -71,10 +71,10 @@ public:
 	void Append(T& item)
 	{
 		TE* entry = new TE(item);
-		if(tail)
+		if (tail)
 			tail->next = entry;
 		tail = entry;
-		if(!head)
+		if (!head)
 			head = entry;
 		count++;
 	}
@@ -86,13 +86,13 @@ public:
 	T& operator[](int index)
 	{
 		TE* e = head;
-		while(index && e) {
+		while (index && e) {
 			e = (TE*)e->next;
 			index--;
 		}
 		// This should never happen, so we'll punt and return...
 		// the head's data
-		if(!e) {
+		if (!e) {
 			DbgAssert(0);
 			return head->data;
 		}
@@ -106,7 +106,7 @@ public:
 	LinkedListT& operator=(LinkedListT &from)
 	{
 		New();
-		for(int i = 0; i < from.Count(); ++i)
+		for (int i = 0; i < from.Count(); ++i)
 			Append(from[i]);
 		return *this;
 	}

@@ -43,7 +43,7 @@ class QMenu;
 namespace MaxSDK {
 //-----------------------------------------------------------------------------
 
-template<typename T,class S> class QmaxSpinBoxPrivate;
+template<typename T,typename S> class QmaxSpinBoxPrivate;
 
 class CoreExport QmaxDoubleSpinBox: public QDoubleSpinBox
 {	

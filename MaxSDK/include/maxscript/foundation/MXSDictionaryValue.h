@@ -66,7 +66,7 @@ public:
 	def_property(keys);
 
 	// helper function for mxs exposure - throws error if key not of proper type
-	void type_check_key(Value* key, const TCHAR* where);
+	void type_check_key(Value* key, const MCHAR* where);
 
 	/* ---------------------- MXSDictionaryValue primitives  --------------------- */
 #include "../macros/define_implementations.h"

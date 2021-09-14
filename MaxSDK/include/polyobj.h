@@ -342,7 +342,11 @@ public:
 	*/
 	PolyLibExport void BuildGWCache(GraphicsWindow *gw, Material *ma, int numMat,BOOL threaded);	
 
-
+	/*! \brief This are called right before and after a modifier is applied to an object.  This allows for certain types of opitimizations to happens since durinng modifier modification the object
+	knows what channels are changing and can do optimizations to speed things up like invalidating specific display channels which it does not know about when say a baseobject is evaluated.
+	*/
+	PolyLibExport virtual void StartStackEval() override;
+	PolyLibExport virtual void EndStackEval() override;
 };
 
 #pragma warning(pop)

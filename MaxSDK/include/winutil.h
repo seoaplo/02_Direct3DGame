@@ -230,12 +230,16 @@ namespace MaxSDK
 
 /*! Returns a floating point value parsed from the specified windows control. */
 CoreExport float GetWindowFloat(HWND hwnd,BOOL* valid = NULL);
+/*! Returns a floating point value parsed using formatted with user locale input. */
+CoreExport float GetFloatFromText(const MCHAR* buf, BOOL *valid);
 /*! Returns an integer value parsed from the specified windows control. */
 CoreExport int GetWindowInt(HWND hwnd,BOOL* valid = NULL);
 /*! Converts an integer value to a string for display in a windows control. */
 CoreExport BOOL SetWindowTextInt( HWND hwnd, int i );
 /*! Converts a floating point value to a string for display in a control. The precision parameter is used to determine the number of values to display to the right of the decimal point. */
 CoreExport BOOL SetWindowTextFloat( HWND hwnd, float f, int precision = 3 );
+/*! Converts a floating point value to a string in the user locale. The precision parameter is used to determine the number of values appearing to the right of the decimal point. */
+CoreExport MSTR GetTextFromFloat(float f, int precision = 3);
 /*! Sets the dialog box control to display the passed floating point value. Trailing zeros are removed. */
 CoreExport BOOL SetDlgItemFloat( HWND hwnd, int idControl, float val );
 /*! Returns a floating point value parsed from the specified dialog box control. */
@@ -701,6 +705,8 @@ private:
 	DialogItemSizeData();
 };
 
+static BOOL CALLBACK GetInitialPositionECP(HWND hwnd, LPARAM lParam);
+
 class DialogResizer: public MaxHeapOperators
 {
 public:
@@ -741,7 +747,7 @@ public:
 	CoreExport static void LoadDlgPosition(HWND hDlg, const MCHAR* keyname, 
 				const MCHAR* section = NULL, const MCHAR* inifn = NULL);
 
-	friend static BOOL CALLBACK GetInitialPositionECP(HWND hwnd, LPARAM lParam);
+	friend BOOL CALLBACK GetInitialPositionECP(HWND hwnd, LPARAM lParam);
 
 private:
 	MaxSDK::Array<DialogItemSizeData> mControls;
@@ -754,7 +760,7 @@ private:
 
 //! This is a helper class that switches the Locale settings to a temporary
 //! value and restores the previous locale setting in the destructor.
-//! To use this class simply instanciate a variable of it's class at the beginning
+//! To use this class simply instantiate a variable of it's class at the beginning
 //! of a method. The given locale setting will be set until the method is left and
 //! the destructor of the class is called automatically.
 class MaxLocaleHandler: public MaxHeapOperators {
@@ -765,12 +771,12 @@ public:
 	//!
 	//! \param[in] category - The category affected by locale. See _tsetlocale in MSDN help for more info
 	//! \param[in] localeSetting - The locale name. See _tsetlocale in MSDN help for more info
-	CoreExport MaxLocaleHandler(int category = LC_ALL, const MCHAR* localeSetting = _M("C"));
+	UtilExport MaxLocaleHandler(int category = LC_ALL, const MCHAR* localeSetting = _M("C"));
 	//! \brief Destructor, resets locale setting to original value
-	CoreExport ~MaxLocaleHandler();
+	UtilExport ~MaxLocaleHandler();
 
    //! \brief Resets locale setting to original value, before the object goes out of scope.
-   CoreExport void RestoreLocale();
+   UtilExport void RestoreLocale();
 
 private:
 
@@ -778,6 +784,16 @@ private:
     MSTR m_oldLocale;
 };
 
+//! \brief GetUserLocale retrieves user specific locale specifications
+//! Method to retrieve a cached user locale
+//! The context to use this method is preferably when interacting through the user interface
+//! As an example, to interpret and/or display floating point numbers using user specified
+//! decimal separator symbol. The method could be used in conjunction with _stscanf_l/_sntprintf_s_l
+//! note: writing floating point numbers to data files MUST ALWAYS
+//!       be done using a dot (.) as decimal separator (default C Locale)
+//!       disregarding user Locale settings (you may use MaxLocaleHandler to help)
+//! returns The cached user locale
+UtilExport const _locale_t& GetUserLocale();
 
 
 /**********************************************************************

@@ -37,8 +37,19 @@ class Number : public Value
 {
 public:
 #  define  is_integer_number(v) ((DbgVerify(!is_sourcepositionwrapper(v)), (v))->tag == class_tag(Integer) || (v)->tag == class_tag(Integer64) || (v)->tag == class_tag(IntegerPtr))
+// integer_type_check macro checks integer types validity for all Integer types
+// For integer value number converted to int using value->to_int(); covers Integer, Inter64 and IntegerPtr
+// When converted this way it is the preferred Value type checking macro over using type_check macro.
+#  define  integer_type_check(v, where) if (!is_integer_number(v)) type_check(v, Integer, where)
+
 #  define  is_float_number(v) ((DbgVerify(!is_sourcepositionwrapper(v)), (v))->tag == class_tag(Float) || (v)->tag == class_tag(Double))
+// float_type_check macro checks float types validity for all Floating types
+// For floating value number converted to float using value->to_float(); covers for Float, Double
+// When converted this way it is the preferred Value type checking macro over using type_check macro.
+#  define  float_type_check(v, where) if (!is_float_number(v)) type_check(v, Float, where)
+
 #  define  is_number(o) (is_integer_number(o) || is_float_number(o))
+
 	classof_methods (Number, Value);
 
 	static   Value* read(const MCHAR* str, bool heapAlloc = false);

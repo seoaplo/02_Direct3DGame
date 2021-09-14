@@ -29,7 +29,7 @@
 #endif
  
 #ifndef MAXVER_COPYRIGHT
-#define MAXVER_COPYRIGHT		"© 2018 Autodesk, Inc. All rights reserved.\0"
+#define MAXVER_COPYRIGHT		"© 2019 Autodesk, Inc. All rights reserved.\0"
 #endif
 
 #ifndef MAXVER_COMPANYNAME

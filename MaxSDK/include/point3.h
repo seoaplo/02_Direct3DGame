@@ -18,7 +18,11 @@
 #include "gfloat.h"
 #include "assert1.h"
 #include "point2.h"
-#include <math.h>
+#include <cmath>
+
+class Color;
+class AColor;
+class Point4;
 
 /*! \sa  Class IPoint3, Class DPoint3, Class Matrix3.\n\n
 \par Description:
@@ -48,149 +52,169 @@ This is equivalent to <b>Point3(0.0f, 1.0f, 0.0f);</b>\n\n
 <b>static const Point3 ZAxis;</b>\n\n
 This data member is available in release 3.0 and later only.\n\n
 This is equivalent to <b>Point3(0.0f, 0.0f, 1.0f);</b>  */
-class GEOMEXPORT Point3: public MaxHeapOperators {
-// Warning - instances of this class are saved as a binary blob to scene file
-// Adding/removing members will break file i/o
+class GEOMEXPORT Point3 : public MaxHeapOperators {
+	// Warning - instances of this class are saved as a binary blob to scene file
+	// Adding/removing members will break file i/o
 public:
-   float x,y,z;
+	float x = 0.f;
+	float y = 0.f;
+	float z = 0.f;
 
-   //! Initializes all vector components to zero.
-   Point3() : x(0.0f), y(0.0f), z(0.0f) {  }
-   /*! \remarks Constructor. x, y, and z are initialized to the values specified. */
-   Point3(float X, float Y, float Z)  { 
-		 x = X; y = Y; z = Z; 
-	 }
-   /*! \remarks Constructor. x, y, and z are initialized to the specified values (cast as floats). */
-   Point3(double X, double Y, double Z) { 
-		 x = (float)X; y = (float)Y; z = (float)Z; 
-	 }
-   /*! \remarks Constructor. x, y, and z are initialized to the specified values (cast as floats). */
-   Point3(int X, int Y, int Z) { 
-		 x = (float)X; y = (float)Y; z = (float)Z; 
-	 }
-   /*! \remarks Constructor. x, y, and z are initialized to the specified Point3. */
-   Point3(const Point3& a) { 
-		 x = a.x; y = a.y; z = a.z; 
-	 } 
-   /*! \remarks Constructor. x, y, and z are initialized to af[0], af[1], and af[2] respectively.
-   */
-   Point3(const float af[3]) { 
-		 x = af[0]; y = af[1]; z = af[2]; 
-	 }
+	//! Initializes all vector components to zero.
+	Point3() = default;
+	/*! \remarks Constructor. x, y, and z are initialized to the values specified. */
+	Point3(float X, float Y, float Z) {
+		x = X;
+		y = Y;
+		z = Z;
+	}
+	/*! \remarks Constructor. x, y, and z are initialized to the specified values (cast as floats). */
+	Point3(double X, double Y, double Z) {
+		x = static_cast<float>(X);
+		y = static_cast<float>(Y);
+		z = static_cast<float>(Z);
+	}
+	/*! \remarks Constructor. x, y, and z are initialized to the specified values (cast as floats). */
+	Point3(int X, int Y, int Z) {
+		x = static_cast<float>(X);
+		y = static_cast<float>(Y);
+		z = static_cast<float>(Z);
+	}
+	/*! \remarks Constructor. x, y, and z are initialized to the specified Point3. */
+	Point3(const Point3& a) {
+		x = a.x;
+		y = a.y;
+		z = a.z;
+	}
+	//Point3(const Point3&) = default; // Disabled until we update ephere.
 
-    // Data members
-    static const Point3 Origin;
-    static const Point3 XAxis;
-    static const Point3 YAxis;
-    static const Point3 ZAxis;
+	/*! \remarks Move Constructor. x, y, and z are initialized to the specified Point3. */
+	Point3(Point3&&) = default;
+	/*! \remarks Copy Assignement Operator. x, y, and z are initialized to the specified Point3. */
+	Point3& operator=(const Point3&) = default;
+	/*! \remarks Move Assignement Operator. x, y, and z are initialized to the specified Point3. */
+	Point3& operator=(Point3&&) = default;
+
+	/*! \remarks Constructor. x, y, and z are initialized to af[0], af[1], and af[2] respectively.*/
+	Point3(const float af[3]) {
+		x = af[0];
+		y = af[1];
+		z = af[2];
+	}
+
+	/*! \remarks Color Constructor. x = r, y = g, and z = b. */
+	Point3(const Color& c);
+	Point3(Color&& c);
+	/*! \remarks AColor Constructor. x = r, y = g, and z = b. */
+	Point3(const AColor& c);
+	Point3(AColor&& c);
+	/*! \remarks Point4 Constructor. x = x, y = y, and z = z. */
+	Point3(const Point4& p);
+	Point3(Point4&& p);
+
+	// Data members
+	static const Point3 Origin;
+	static const Point3 XAxis;
+	static const Point3 YAxis;
+	static const Point3 ZAxis;
 
 	/*! \remarks Allows access to x, y and z using the subscript operator.
 	\return  An value for <b>i</b> of 0 will return x, 1 will return y, 2 will
 	return z. */
-    float& operator[](int i) { 
-        DbgAssert((i >= 0) && (i <= 2));
+	float& operator[](int i) {
+		DbgAssert((i >= 0) && (i <= 2));
 		return (&x)[i];
-	 }     
+	}
 	/*! \remarks Allows access to x, y and z using the subscript operator.
 	\return  An value for <b>i</b> of 0 will return x, 1 will return y, 2 will
 	return z. */
-    const float& operator[](int i) const { 
-        DbgAssert((i >= 0) && (i <= 2));
-		return (&x)[i]; 
-	 }  
+	const float& operator[](int i) const {
+		DbgAssert((i >= 0) && (i <= 2));
+		return (&x)[i];
+	}
 
-   // Conversion function
-   /*! \remarks Conversion function. Returns the address of the Point3.x */
-   operator float*() { 
-		 return(&x); 
-	 }
+	// Conversion function
+	/*! \remarks Conversion function. Returns the address of the Point3.x */
+	operator float*() { return (&x); }
 
-   // Unary operators
-   /*! \remarks Unary - operator. Negates x, y and z. */
-   Point3 operator-() const { 
-		 return(Point3(-x,-y,-z)); 
-	 } 
-   /*! \remarks Unary +. Returns the Point3. */
-   Point3 operator+() const { 
-		 return *this; 
-	 }
-    
-    // Property functions
+	// Unary operators
+	/*! \remarks Unary - operator. Negates x, y and z. */
+	Point3 operator-() const { return (Point3(-x, -y, -z)); }
+	/*! \remarks Unary +. Returns the Point3. */
+	Point3 operator+() const { return *this; }
+
+	// Property functions
 	/*! \remarks Returns the 'Length' of this point (vector). This is:\n\n
 	<b>sqrt(v.x*v.x+v.y*v.y+v.z*v.z)</b> */
-    float Length() const;
-	 /*! \remarks Returns the 'Length' of this point (vector) using a faster
+	float Length() const;
+	/*! \remarks Returns the 'Length' of this point (vector) using a faster
 	 assembly language implementation for square root. This is:\n\n
 	 <b>Sqrt(v.x*v.x+v.y*v.y+v.z*v.z)</b> */
-    float FLength() const;
-	 /*! \remarks The 'Length' squared of this point. This is
+	float FLength() const;
+	/*! \remarks The 'Length' squared of this point. This is
 	 <b>v.x*v.x+v.y*v.y+v.z*v.z.</b> */
-    float LengthSquared() const;
-    int MaxComponent() const;
-    int MinComponent() const;
-    Point3 Normalize() const;     // more accurate than FNormalize()
-    Point3 FNormalize() const;    // faster than Normalize()
+	float  LengthSquared() const;
+	int	MaxComponent() const;
+	int	MinComponent() const;
+	Point3 Normalize() const;   // more accurate than FNormalize()
+	Point3 FNormalize() const;  // faster than Normalize()
 
-   // Assignment operators
-   /*! \remarks Subtracts a Point3 from this Point3. */
-   inline Point3& operator-=(const Point3&);
-   /*! \remarks Adds a Point3 to this Point3. */
-   inline Point3& operator+=(const Point3&);
-   /*! \remarks Multiplies this Point3 by a floating point value. */
-   inline Point3& operator*=(float); 
-   /*! \remarks Divides this Point3 by a floating point value. */
-   inline Point3& operator/=(float);
-   /*! \remarks Element-by-element multiplication of two Point3s:\n\n
+	// Assignment operators
+	/*! \remarks Subtracts a Point3 from this Point3. */
+	inline Point3& operator-=(const Point3&);
+	/*! \remarks Adds a Point3 to this Point3. */
+	inline Point3& operator+=(const Point3&);
+	/*! \remarks Multiplies this Point3 by a floating point value. */
+	inline Point3& operator*=(float);
+	/*! \remarks Divides this Point3 by a floating point value. */
+	inline Point3& operator/=(float);
+	/*! \remarks Element-by-element multiplication of two Point3s:\n\n
    <b>(x*x, y*y, z*z)</b>. */
-   inline Point3& operator*=(const Point3&); // element-by-element multiply.
+	inline Point3& operator*=(const Point3&);  // element-by-element multiply.
 
-    inline Point3& Set(float X, float Y, float Z);
+	inline Point3& Set(float X, float Y, float Z);
 
-   // Test for equality
-   /*! \remarks Equality operator. Test for equality between two Point3's.
+	// Test for equality
+	/*! \remarks Equality operator. Test for equality between two Point3's.
    \return  Nonzero if the Point3's are equal; otherwise 0. */
-   int operator==(const Point3& p) const { 
-		 return ((p.x==x)&&(p.y==y)&&(p.z==z)); 
-	 }
-   int operator!=(const Point3& p) const { 
-		 return ((p.x!=x)||(p.y!=y)||(p.z!=z)); 
-	 }
-    int Equals(const Point3& p, float epsilon = 1E-6f) const;
+	int operator==(const Point3& p) const { return ((p.x == x) && (p.y == y) && (p.z == z)); }
+	int operator!=(const Point3& p) const { return ((p.x != x) || (p.y != y) || (p.z != z)); }
+	int Equals(const Point3& p, float epsilon = 1E-6f) const;
 
-    // In-place normalize
-    Point3& Unify();
-    float LengthUnify();              // returns old Length
+	// In-place normalize
+	Point3& Unify();
+	float   LengthUnify();  // returns old Length
 
-   // Binary operators
-   /*! \remarks Subtracts a Point3 from a Point3. */
-   inline  Point3 operator-(const Point3&) const;
-   /*! \remarks Adds a Point3 to a Point3. */
-   inline  Point3 operator+(const Point3&) const;
-   /*! \remarks Divides a Point3 by a Point3 element by element. */
-   inline  Point3 operator/(const Point3&) const;
-   /*! \remarks Multiplies a Point3 by a Point3 element by element.\n\n
+	// Binary operators
+	/*! \remarks Subtracts a Point3 from a Point3. */
+	inline Point3 operator-(const Point3&) const;
+	/*! \remarks Adds a Point3 to a Point3. */
+	inline Point3 operator+(const Point3&) const;
+	/*! \remarks Divides a Point3 by a Point3 element by element. */
+	inline Point3 operator/(const Point3&) const;
+	/*! \remarks Multiplies a Point3 by a Point3 element by element.\n\n
    <b>(x*x, y*y, z*z)</b>. */
-   inline  Point3 operator*(const Point3&) const;   
+	inline Point3 operator*(const Point3&)const;
 
-   /*! \remarks The cross product of two Point3's (vectors).
+	/*! \remarks The cross product of two Point3's (vectors).
    \return  The cross product of two Point3's. */
-   Point3 operator^(const Point3&) const; // CROSS PRODUCT
-   inline float operator%(const Point3&) const;     // DOT PRODUCT
+	Point3		 operator^(const Point3&) const;  // CROSS PRODUCT
+	inline float operator%(const Point3&) const;  // DOT PRODUCT
 
-   //! Converts this Point3 into a Point2 using the X and Y components. Useful for passing a Point3 where a Point2 is expected.
-   Point2 XY() const;
+	//! Converts this Point3 into a Point2 using the X and Y components. Useful for passing a Point3 where a Point2 is expected.
+	Point2 XY() const;
 };
 
 /*! \remarks Returns the 'Length' of the point (vector). This is:\n\n
 <b>sqrt(v.x*v.x+v.y*v.y+v.z*v.z)</b> */
-GEOMEXPORT float Length(const Point3&); 
+GEOMEXPORT float Length(const Point3&);
 /*! \remarks Returns the 'Length' of the point (vector) using a faster
 assembly language implementation for square root. This is:\n\n
 <b>Sqrt(v.x*v.x+v.y*v.y+v.z*v.z)</b> */
-GEOMEXPORT float FLength(const Point3&); 
+GEOMEXPORT float FLength(const Point3&);
 /*! \remarks The 'Length' squared of the point. This is
 <b>v.x*v.x+v.y*v.y+v.z*v.z.</b> */
-GEOMEXPORT float LengthSquared(const Point3&); 
+GEOMEXPORT float LengthSquared(const Point3&);
 /*! \remarks Returns the component with the maximum absolute value. 0=x, 1=y,
 2=z. */
 GEOMEXPORT int MaxComponent(const Point3&);  // the component with the maximum abs value
@@ -203,7 +227,7 @@ GEOMEXPORT Point3 Normalize(const Point3&);  // Accurate normalize
 /*! \remarks Returns a normalized unit vector using faster assembly language
 code than that used by <b>Normalize()</b>. This is a Point3 with each component
 divided by the point <b>Length()</b>. */
-GEOMEXPORT Point3 FNormalize(const Point3&); // Fast normalize 
+GEOMEXPORT Point3 FNormalize(const Point3&);  // Fast normalize
 /*! \remarks This returns the cross product of the specified Point3's
 (vectors). The cross product of two vectors is a third vector, perpendicular to
 the plane formed by the two vectors. */
@@ -219,136 +243,115 @@ unit direction vector <b>dir</b>.
 Point of origin.\n\n
 <b>Point3 dir;</b>\n\n
 Unit direction vector. */
-class Ray: public MaxHeapOperators {
-   // Warning - instances of this class are saved as a binary blob to scene file
-   // Adding/removing members will break file i/o
+class Ray : public MaxHeapOperators {
+	// Warning - instances of this class are saved as a binary blob to scene file
+	// Adding/removing members will break file i/o
 public:
-    Ray() {}
-    Ray(const Point3& p_p, const Point3& p_dir) : p(p_p), dir(p_dir)     {}
-    Point3 p;   // point of origin
-    Point3 dir; // unit vector
+	Ray() {}
+	Ray(const Point3& p_p, const Point3& p_dir) : p(p_p), dir(p_dir) {}
+	Point3 p;	// point of origin
+	Point3 dir;  // unit vector
 };
-
-
 
 // Inlines:
 
-inline float Point3::Length() const {  
-   return (float)sqrt(x*x+y*y+z*z);
-   }
+inline float Point3::Length() const { return sqrt(x * x + y * y + z * z); }
 
-inline float Point3::FLength() const { 
-   return Sqrt(x*x+y*y+z*z);
-   }
+inline float Point3::FLength() const { return Sqrt(x * x + y * y + z * z); }
 
-__forceinline float Point3::LengthSquared() const { 
-   return (x*x+y*y+z*z);
-   }
+__forceinline float Point3::LengthSquared() const { return (x * x + y * y + z * z); }
 
-inline float Length(const Point3& v) { 
-   return v.Length();
-   }
+inline float Length(const Point3& v) { return v.Length(); }
 
-inline float FLength(const Point3& v) {   
-   return v.FLength();
-   }
+inline float FLength(const Point3& v) { return v.FLength(); }
 
-__forceinline float LengthSquared(const Point3& v) {   
-   return v.LengthSquared();
-   }
+__forceinline float LengthSquared(const Point3& v) { return v.LengthSquared(); }
 
-__forceinline Point3& Point3::operator-=(const Point3& a) {  
-   x -= a.x;   y -= a.y;   z -= a.z;
-   return *this;
-   }
-
-__forceinline Point3& Point3::operator+=(const Point3& a) {
-   x += a.x;   y += a.y;   z += a.z;
-   return *this;
-   }
-
-__forceinline Point3& Point3::operator*=(float f) {
-   x *= f;   y *= f; z *= f;
-   return *this;
-   }
-
-__forceinline Point3& Point3::operator/=(float f) { 
-   x /= f;  y /= f;  z /= f;  
-   return *this; 
-   }
-
-__forceinline Point3& Point3::operator*=(const Point3& a) { 
-   x *= a.x;   y *= a.y;   z *= a.z;   
-   return *this; 
-   }
-
-__forceinline Point3& Point3::Set(float X, float Y, float Z) {
-    x = X;
-    y = Y;
-    z = Z;
-    return *this;
-    }
-
-__forceinline Point3 Point3::operator-(const Point3& b) const {
-   return(Point3(x-b.x,y-b.y,z-b.z));
-   }
-
-__forceinline Point3 Point3::operator+(const Point3& b) const {
-   return(Point3(x+b.x,y+b.y,z+b.z));
-   }
-
-__forceinline Point3 Point3::operator/(const Point3& b) const {
-   assert(b.x != 0.0f && b.y != 0.0f && b.z != 0.0f);
-   return Point3(x/b.x,y/b.y,z/b.z);
-   }
-
-__forceinline Point3 Point3::operator*(const Point3& b) const {  
-   return Point3(x*b.x, y*b.y, z*b.z); 
-   }
-
-__forceinline float Point3::operator%(const Point3& b) const {
-   return (x*b.x + y*b.y + z*b.z);
-   }
-
-__forceinline Point2 Point3::XY() const
-{
-    return Point2(x, y);
+__forceinline Point3& Point3::operator-=(const Point3& a) {
+	x -= a.x;
+	y -= a.y;
+	z -= a.z;
+	return *this;
 }
 
-/*! \remarks Returns a Point3 that is the specified Point3 multiplied by the
-specified float. */
-__forceinline Point3 operator*(float f, const Point3& a) {
-   return(Point3(a.x*f, a.y*f, a.z*f));
-   }
+__forceinline Point3& Point3::operator+=(const Point3& a) {
+	x += a.x;
+	y += a.y;
+	z += a.z;
+	return *this;
+}
+
+__forceinline Point3& Point3::operator*=(float f) {
+	x *= f;
+	y *= f;
+	z *= f;
+	return *this;
+}
+
+__forceinline Point3& Point3::operator/=(float f) {
+	DbgAssert(f != 0.0f);
+	float invF = 1.0f / f;	// Mimic 2019 behavior
+	x *= invF;
+	y *= invF;
+	z *= invF;
+	return *this;
+}
+
+__forceinline Point3& Point3::operator*=(const Point3& a) {
+	x *= a.x;
+	y *= a.y;
+	z *= a.z;
+	return *this;
+}
+
+__forceinline Point3& Point3::Set(float X, float Y, float Z) {
+	x = X;
+	y = Y;
+	z = Z;
+	return *this;
+}
+
+__forceinline Point3 Point3::operator-(const Point3& b) const { return (Point3(x - b.x, y - b.y, z - b.z)); }
+
+__forceinline Point3 Point3::operator+(const Point3& b) const { return (Point3(x + b.x, y + b.y, z + b.z)); }
+
+__forceinline Point3 Point3::operator/(const Point3& b) const {
+	assert(b.x != 0.0f && b.y != 0.0f && b.z != 0.0f);
+	return Point3(x / b.x, y / b.y, z / b.z);
+}
+
+__forceinline Point3 Point3::operator*(const Point3& b) const { return Point3(x * b.x, y * b.y, z * b.z); }
+
+__forceinline float Point3::operator%(const Point3& b) const { return (x * b.x + y * b.y + z * b.z); }
+
+__forceinline Point2 Point3::XY() const { return Point2(x, y); }
 
 /*! \remarks Returns a Point3 that is the specified Point3 multiplied by the
 specified float. */
-__forceinline Point3 operator*(const Point3& a, float f) {
-   return(Point3(a.x*f, a.y*f, a.z*f));
-   }
+__forceinline Point3 operator*(float f, const Point3& a) { return (Point3(a.x * f, a.y * f, a.z * f)); }
+
+/*! \remarks Returns a Point3 that is the specified Point3 multiplied by the
+specified float. */
+__forceinline Point3 operator*(const Point3& a, float f) { return (Point3(a.x * f, a.y * f, a.z * f)); }
 
 /*! \remarks Returns a Point3 that is the specified Point3 divided by the
 specified float. */
 __forceinline Point3 operator/(const Point3& a, float f) {
-   DbgAssert(f != 0.0f);
-   return(Point3(a.x/f, a.y/f, a.z/f));
-   }
+	DbgAssert(f != 0.0f);
+	float invF = 1.0f / f;	// Mimic 2019 behavior
+	return (Point3(a.x * invF, a.y * invF, a.z * invF));
+}
 
 /*! \remarks Returns a Point3 that is the specified Point3 with the specified
 floating point valued added to each component x, y, and z. */
-__forceinline Point3 operator+(const Point3& a, float f) {
-   return(Point3(a.x+f, a.y+f, a.z+f));
-   }
+__forceinline Point3 operator+(const Point3& a, float f) { return (Point3(a.x + f, a.y + f, a.z + f)); }
 
 /*! \remarks Returns the dot product of two Point3s. This is the sum of each
 of the components multiplied together, element by element
 <b>a.x*b.x+a.y*b.y+a.z*b.z</b>\n\n
 The dot product has the property of equaling the product of the magnitude
 (length) of the two vector times the cosine of the angle between them. */
-__forceinline float DotProd(const Point3& a, const Point3& b) { 
-   return(a.x*b.x+a.y*b.y+a.z*b.z); 
-   }
-
+__forceinline float DotProd(const Point3& a, const Point3& b) { return (a.x * b.x + a.y * b.y + a.z * b.z); }
 
 // These typedefs must be the same as each other, since
 // vertex colors are contained in a MeshMap.

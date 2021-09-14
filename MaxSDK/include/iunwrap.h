@@ -445,6 +445,8 @@ enum {  unwrap_planarmap,unwrap_save,unwrap_load, unwrap_reset, unwrap_edit,
 
 		unwrap_setmax5flatten,
 
+		unwrap_getfiltermap, unwrap_setfiltermap,
+
 		};
 //****************************************************************
 

@@ -197,7 +197,7 @@ namespace MaxSDK { namespace Graphics {
 			const float z, 
 			const int stencil) = 0;
 
-		/** This method draws indexed primitives to screen
+		/** This method draws indexed primitives to screen, warning : primitive restart is not supported, you will need several calls to handle this
 		\param[in] primitiveType	type of primitive (line, triangle)
 		\param[in] vertices			the primitive data pointer. In system memory.
 		\param[in] primitiveCount	the number of primitives.

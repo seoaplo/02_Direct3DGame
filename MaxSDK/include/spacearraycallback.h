@@ -72,7 +72,7 @@ private:
 	STYPE sType;
 	CTYPE context;
 	float width;
-	TSTR msg_buffer;
+	MSTR msg_buffer;
 	int countLimit;
 
 public:

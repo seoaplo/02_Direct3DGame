@@ -98,10 +98,8 @@ class HashTable;
 
 // forward declarations...
 
-
-extern ScripterExport Undefined undefined;
-extern ScripterExport bool dontThrowAccessorError;
-
+extern ScripterExport Undefined undefined;  // corresponds to the mxs system global variable 'undefined'
+extern ScripterExport bool dontThrowAccessorError; // used internally by is_prop_cf in order to not throw exception when testing to see if name is used as a property
 
 // the root MAXScript class
 class Value : public Collectable
@@ -548,11 +546,12 @@ visible_class_debug_ok (Boolean)
 
 class Boolean;
 class ValueLoader;
-extern ScripterExport Boolean true_value;
-extern ScripterExport Boolean false_value;
+extern ScripterExport Boolean true_value;  // corresponds to the mxs system global variable 'true'
+extern ScripterExport Boolean false_value;  // corresponds to the mxs system global variable 'false'
 #pragma warning(push)
 #pragma warning(disable:4100)
 
+// Have singletons of this class corresponding to the 'true' and 'false' values
 class Boolean : public Value
 {
 public:
@@ -587,6 +586,7 @@ public:
 visible_class_debug_ok (Undefined)
 #endif
 
+// Have singleton instances of this class for the 'undefined' and 'dontCollect' variables, and for flow control
 class Undefined : public Value
 {
 public:
@@ -603,9 +603,8 @@ public:
 	void	to_fpvalue(FPValue& v);
 };
 
-extern ScripterExport Undefined undefined;
-extern ScripterExport Undefined dontCollect;
-extern ScripterExport Undefined loopExit;
+extern ScripterExport Undefined dontCollect;  // corresponds to the mxs system global variable 'dontCollect' which is used in for loops
+extern ScripterExport Undefined loopExit;   // used internally to flag that a for loop was exited via the while conditional
 
 /* ----- */
 
@@ -613,6 +612,7 @@ extern ScripterExport Undefined loopExit;
 visible_class_debug_ok (Ok)
 #endif
 
+// Have singleton of this class corresponding to the 'ok' value
 class Ok : public Value
 {
 public:
@@ -628,7 +628,7 @@ public:
 	void	to_fpvalue(FPValue& v);
 };
 
-extern ScripterExport Ok ok;
+extern ScripterExport Ok ok;  // corresponds to the mxs system global variable 'ok'
 
 /* ----- */
 
@@ -636,6 +636,7 @@ extern ScripterExport Ok ok;
 visible_class_debug_ok (Empty)
 #endif
 
+// Have singleton of this class corresponding to the 'empty' value
 class Empty : public Value
 {
 public:
@@ -651,7 +652,7 @@ public:
 	void	to_fpvalue(FPValue& v);
 };
 
-extern ScripterExport Empty empty;
+extern ScripterExport Empty empty;  // corresponds to the mxs system global variable 'emptyVal'. Used when node user property key exists, but there is no value associated with it
 
 /* ----- */
 
@@ -659,6 +660,7 @@ extern ScripterExport Empty empty;
 visible_class_debug_ok (Unsupplied)
 #endif
 
+// Have singleton of this class corresponding to the 'unsupplied' value
 class Unsupplied : public Value
 {
 public:
@@ -674,7 +676,7 @@ public:
 	void	to_fpvalue(FPValue& v);
 };
 
-extern ScripterExport Unsupplied unsupplied;
+extern ScripterExport Unsupplied unsupplied;   // corresponds to the mxs system global variable 'unsupplied'. Typically used for keyword params that are not specified
 
 
 /* ----- */
@@ -706,4 +708,4 @@ public:
 	ScripterExport virtual void	sprint(CharStream* stream);
 };
 #pragma warning(pop)
-extern ScripterExport NoValue noValue;
+extern ScripterExport NoValue noValue;   // corresponds to the mxs system global variable 'silentValue'. Printing this value results in no output.

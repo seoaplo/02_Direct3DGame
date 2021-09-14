@@ -208,11 +208,11 @@ public:
     //! Returns RENDERER_CLASS_ID
     virtual SClass_ID SuperClassID() override final;
     //! Call forwarded to class descriptor (see UnifiedRenderer::ClassDescriptor).
-    virtual void GetClassName(TSTR&	s) override final;
+    virtual void GetClassName(MSTR&	s) override final;
     //! This default implementation returns the number of parameter blocks.
     virtual int NumSubs() override;
     //! This default implementation returns the name of the parameter block at index i.
-    virtual TSTR SubAnimName(int i) override;
+    virtual MSTR SubAnimName(int i) override;
     //! This default implementation returns the param block at index i.
     virtual Animatable*	SubAnim(int	i) override;
     //! Calls: "delete this" and performs cleanup
@@ -268,9 +268,9 @@ public:
     //! Returns RENDERER_CLASS_ID
     virtual	SClass_ID SuperClassID() override final;
     //! This default implementation returns "Renderer"
-    virtual	const TCHAR* Category() override;
+    virtual	const MCHAR* Category() override;
     //! Made pure virtual to enforce implementation.
-    virtual	const TCHAR* InternalName() override = 0;
+    virtual	const MCHAR* InternalName() override = 0;
     //! Made pure virtual to enforce implementation.
     //! \remark Consider calling MaxSDK::GetHInstance().
     virtual	HINSTANCE HInstance() override = 0;

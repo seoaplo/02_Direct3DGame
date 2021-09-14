@@ -268,7 +268,8 @@ public:
 	//! \param[in] useMapFile If TRUE the mapFileName file name parameter will be used to specify what map file to use. 
 	//! If FALSE then default mapping is used.
 	//! \param[in, out] mapFileName The file name of the map file to use if the useMapFile parameter is TRUE.
-	//! \return TRUE if a file gets loaded, otherwise FALSE
+	//! Note that the character array passed in should have a size of MAX_PATH.
+	//! \return TRUE if a file gets loaded, otherwise FALSE.
 
 	virtual BOOL LoadAnimation(const MCHAR *filename,Tab<INode *> &nodes,DWORD loadFlag, TimeValue insertTime,
 		BOOL useMapFile, MCHAR *mapFileName) const = 0;
@@ -290,7 +291,8 @@ public:
 	//! \param[in] useMapFile If TRUE the mapFileName file name parameter will be used to specify what map file to use. 
 	//! If FALSE then default mapping is used.
 	//! \param[in, out] mapFileName The file name of the map file to use if the useMapFile parameter is TRUE.
-	//! \return TRUE if a file gets loaded, otherwise FALSE
+	//! Note that the character array passed in should have a size of MAX_PATH.
+	//! \return TRUE if a file gets loaded, otherwise FALSE.
 
 	virtual BOOL LoadAnimationNodeAnims(const MCHAR *filename,MaxSDK::Array<NodeAndAnims> &nodeAnims,DWORD loadFlag, TimeValue insertTime,
 		BOOL useMapFile, MCHAR *mapFileName) const = 0;

@@ -97,7 +97,7 @@ namespace MaxSDK { namespace Graphics {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifndef DISABLE_UNIT_TESTS
 		// for unit test only
-		static size_t GetNetStringCount();
+		FragmentGraphAPI static size_t GetNetStringCount();
 #endif
 #endif
 		/** Default constructor. The default type of the variable is int and 

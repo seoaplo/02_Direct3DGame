@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "../../maxsdk/include/strclass.h"
-#include "../../maxsdk/include/dbgprint.h"
-#include "../../maxsdk/include/noncopyable.h"
+#include "../strclass.h"
+#include "../dbgprint.h"
+#include "../noncopyable.h"
 
 namespace MaxSDK
 {
@@ -48,22 +48,22 @@ namespace MaxSDK
 			public:
 				ScopedTrace(const MCHAR* function_name) : mFunction(function_name)
 				{
-					DebugPrint(_M("Scope: %s - START\n"), mFunction);
+					DebugPrint(_M("Scope: %s - START\n"), mFunction.data());
 				}
 				ScopedTrace(const MCHAR* function_name, const MCHAR* extra_message) : mFunction(function_name), mMessage(extra_message)
 				{
-					DebugPrint(_M("Scope: %s - START - %s\n"), mFunction, mMessage);
+					DebugPrint(_M("Scope: %s - START - %s\n"), mFunction.data(), mMessage.data());
 				}
 				void Print(const MCHAR* message)
 				{
-					DebugPrint(_M("Scope: %s - %s\n"), mFunction, message);
+					DebugPrint(_M("Scope: %s - %s\n"), mFunction.data(), message);
 				}
 				~ScopedTrace()
 				{
 					if (mMessage.isNull())
-						DebugPrint(_M("Scope: %s - END\n"), mFunction);
+						DebugPrint(_M("Scope: %s - END\n"), mFunction.data());
 					else
-						DebugPrint(_M("Scope: %s - END - %s\n"), mFunction, mMessage);
+						DebugPrint(_M("Scope: %s - END - %s\n"), mFunction.data(), mMessage.data());
 				}
 		};
 	}

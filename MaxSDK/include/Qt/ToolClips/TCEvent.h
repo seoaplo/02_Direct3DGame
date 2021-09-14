@@ -84,6 +84,67 @@ public:
     */
     static QEvent::Type type();
 
+    /** \brief Sets the key for which the toolclip widget should
+    * display a toolclip.
+    * If there is no matching toolclip found for the key, the toolclip
+    * widget will display the simple tooltip.
+    * By default the TCEvent's key is initialized with the
+    * the reference widget's object name.
+    * \param key The key for which the toolclip widget should
+    * display a toolclip.
+    * \see toolClipKey(), toolTip()
+    */
+    void setToolClipKey( const QString& key );
+
+    /** \brief Returns the key for which the toolclip widget should 
+    * display a toolclip.
+    * If there is no matching toolclip found for the key, the toolclip
+    * widget will display the simple tooltip.
+    * By default the TCEvent's key is initialized with the
+    * the reference widget's object name.
+    * \see setToolClipKey(), toolTip()
+    */
+    QString toolClipKey() const;
+
+    /** \brief Defines a simple tooltip which is displayed by the toolclip
+    * widget if there is no matching toolclip key available.
+    * By default the TCEvent's tooltip is initialized with the tooltip
+    * of the reference widget.
+    * \param tooltip The simple tooltip that should be shown if there is no
+    * toolclip available.
+    * \see toolTip()
+    */
+    void setToolTip( const QString& tooltip );
+
+    /** \brief Returns a simple tooltip which is displayed by the toolclip
+    * widget if there is no matching toolclip key available.
+    * By default the TCEvent's tooltip is initialized with the tooltip
+    * of the reference widget.
+    * \see setToolTip()
+    */
+    QString toolTip() const;
+
+    /** \brief Defines the alignment of the toolclip widget.
+    * The toolclip can be aligned horizontally or vertically to the mouse
+    * over area, which is either given by the bounding rectangle of the 
+    * reference widget or, if specified, by the toolclip area rectangle.
+    * By default the alignment will be vertically so that the toolclip is
+    * shown beneath the mouse over area.
+    * \param align The alignment of the toolclip widget to the mouse over area.
+    * \see toolClipAlign(), setToolClipAreaRect(), setToolClipRefWidget()
+    */
+    void setToolClipAlign( Qt::Orientation align );
+
+    /** \brief Returns the alignment of the toolclip widget.
+    * The toolclip can be aligned horizontally or vertically to the mouse
+    * over area, which is either given by the bounding rectangle of the
+    * reference widget or, if specified, by the toolclip area rectangle.
+    * By default the alignment will be vertically so that the toolclip is
+    * shown beneath the mouse over area.
+    * \see setToolClipAlign(), setToolClipAreaRect(), setToolClipRefWidget()
+    */
+    Qt::Orientation toolClipAlign() const;
+
 private:
     Q_DISABLE_COPY( TCEvent );
     Q_DECLARE_PRIVATE( TCEvent );

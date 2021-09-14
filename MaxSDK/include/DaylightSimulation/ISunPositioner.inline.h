@@ -7,7 +7,7 @@
 //  otherwise accompanies this software in either electronic or hard copy form.   
 //
 //////////////////////////////////////////////////////////////////////////////
-
+#pragma once
 namespace MaxSDK 
 {;
 

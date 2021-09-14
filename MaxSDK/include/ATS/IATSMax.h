@@ -80,7 +80,7 @@ public:
 	*/
 	virtual int				NumFilesSelected() = 0;
 	//! \brief Get selected files
-	/*! \param[out] fileList reference to a Tab of TSTRs.  This parameter
+	/*! \param[out] fileList reference to a Tab of MSTRs.  This parameter
 	will be filled with a copy of the selected files names
 	\return number of files selected in dialog
 	*/
@@ -89,7 +89,7 @@ public:
 	//! \brief Get a tab of files based on their file system status
 	/*! \param[in] dwFSStatus is a mask of kATSFSStatusXXX flags used to match
 	against file entries.
-	\param[out] fileList reference to a Tab of TSTRs.  This parameter
+	\param[out] fileList reference to a Tab of MSTRs.  This parameter
 	will be filled with a copy of the files matching the dwFSStatus flags.
 	\return number of files found
 	*/
@@ -102,8 +102,8 @@ public:
 	virtual DWORD			GetFileSystemStatus( const MCHAR* szFilename ) = 0;
 
 	//! \brief Get the resolved file paths for a given list of files
-	/*! \param[in] fileList reference to a Tab of TSTRs.
-	\param[out] resolvedFileList reference to a Tab of TSTRs that contains the same number of entries
+	/*! \param[in] fileList reference to a Tab of MSTRs.
+	\param[out] resolvedFileList reference to a Tab of MSTRs that contains the same number of entries
 	in fileList.  If the file was found or is still missing the entry in resolvedFileList will be 
 	the same as fileList.  If the file was resolved the entry in resolvedFileList will contains 
 	the resolved file path.  Resolved files are files not found in the location specified within the
@@ -125,7 +125,7 @@ public:
 	*/
 	virtual int				NumFiles() = 0;
 	//! \brief Get files
-	/*! \param[out] fileList reference to a Tab of TSTRs.  This parameter
+	/*! \param[out] fileList reference to a Tab of MSTRs.  This parameter
 	will be filled with a copy of the files names in the dialog
 	\return number of files in dialog
 	*/
@@ -144,7 +144,7 @@ public:
 	//! \brief Get list of dependent files
 	/*! \param[in] szFile string containing the filename to list dependent files from
 	\param[in] bRecurse specifies if method should include all dependent files
-	\param[out] fileList reference to a Tab of TSTRs.  This parameter
+	\param[out] fileList reference to a Tab of MSTRs.  This parameter
 	will be filled with a copy of the dependent files names
 	\param[in] bIncludeOutputFiles specifies if output files should be included in dependency list
 	\return number of files added to fileList
@@ -158,7 +158,7 @@ public:
 	virtual bool			IsInputFile( const MCHAR* szFile ) = 0;
 
 	//! \brief Select files
-	/*! \param[in] fileList reference to a Tab of TSTRs.  This parameter
+	/*! \param[in] fileList reference to a Tab of MSTRs.  This parameter
 	specifies the list of files to select in the dialog.
 	*/
 	virtual void			SelectFiles( const MaxSDK::Array<MSTR> &fileList ) = 0;
@@ -323,27 +323,27 @@ public:
 	virtual bool			IsFileShareLocked( int iProviderIndex, const MCHAR* szFile ) = 0;
 	//! \brief Checkin list of files to an ATS Provider
 	/*! \param[in] iProviderIndex 0-based index of ATS Provider
-	\param[in] fileList reference to a Tab of TSTRs.
+	\param[in] fileList reference to a Tab of MSTRs.
 	\param[in] strComment reference to MSTR
 	\return true if status from version control provider was successful, false if otherwise
 	*/
 	virtual bool			Checkin( int iProviderIndex, const MaxSDK::Array<MSTR> &fileList, MSTR &strComment  ) = 0;
 	//! \brief Checkout list of files to an ATS Provider
 	/*! \param[in] iProviderIndex 0-based index of ATS Provider
-	\param[in] fileList reference to a Tab of TSTRs.
+	\param[in] fileList reference to a Tab of MSTRs.
 	\param[in] strComment reference to MSTR
 	\return true if status from version control provider was successful, false if otherwise
 	*/
 	virtual bool			Checkout( int iProviderIndex, const MaxSDK::Array<MSTR> &fileList, MSTR &strComment  ) = 0;
 	//! \brief Undo Checkout for list of files fr an ATS Provider
 	/*! \param[in] iProviderIndex 0-based index of ATS Provider
-	\param[in] fileList reference to a Tab of TSTRs.
+	\param[in] fileList reference to a Tab of MSTRs.
 	\return true if status from version control provider was successful, false if otherwise
 	*/
 	virtual bool			UnCheckout( int iProviderIndex, const MaxSDK::Array<MSTR> &fileList ) = 0;
 	//! \brief Add list of files to an ATS Provider
 	/*! \param[in] iProviderIndex 0-based index of ATS Provider
-	\param[in] fileList reference to a Tab of TSTRs.
+	\param[in] fileList reference to a Tab of MSTRs.
 	\param[in] strComment reference to MSTR
 	\param[in] pIsHidden optional pointer to Tab<bool> that corresponds to the fileList. A true entry indicates that
 	the file will be added with a hidden status (if supported by the provider).
@@ -352,7 +352,7 @@ public:
 	virtual bool			AddFiles( int iProviderIndex, const MaxSDK::Array<MSTR> &fileList, MSTR &strComment, Tab<bool> *pIsHidden = NULL ) = 0;
 	//! \brief Get latest version of list of files for an ATS Provider
 	/*! \param[in] iProviderIndex 0-based index of ATS Provider
-	\param[in] fileList reference to a Tab of TSTRs.
+	\param[in] fileList reference to a Tab of MSTRs.
 	\return true if status from version control provider was successful, false if otherwise
 	*/
 	virtual bool			GetLatest( int iProviderIndex, const MaxSDK::Array<MSTR> &fileList ) = 0;

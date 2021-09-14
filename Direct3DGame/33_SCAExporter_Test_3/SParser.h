@@ -4,6 +4,7 @@
 #include "SObjStd.h"
 
 #define _CRT_SECURE_NO_WARNINGS
+#define MAX_PASER_SIZE 1000
 
 enum SET_DATA_TYPES
 {
@@ -25,8 +26,8 @@ class SParser
 {
 public:
 	FILE*	m_pStream;
-	TCHAR	m_pBuffer[MAX_PATH];
-	TCHAR	m_pString[MAX_PATH];
+	TCHAR	m_pBuffer[MAX_PASER_SIZE];
+	TCHAR	m_pString[MAX_PASER_SIZE];
 public:
 	//================================================================================
 	// File Open / Close
