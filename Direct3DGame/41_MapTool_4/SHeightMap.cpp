@@ -50,7 +50,7 @@ bool SHeightMap::CreateHeightMap(const TCHAR* strHeightMapTex)
 				{
 					UINT colStart = col * 4;	// RGBA 시작 주소
 					UINT uRed = pTexels[rowStart + colStart + 0];
-					m_fHeightList[row * desc.Width + col] = uRed;	// DWORD이므로 pitch/4	
+					m_fHeightList[row * desc.Width + col] = static_cast<float>(uRed);	// DWORD이므로 pitch/4	
 				}
 			}
 			m_pContext->Unmap(pTexture2D, D3D11CalcSubresource(0, 0, 1));

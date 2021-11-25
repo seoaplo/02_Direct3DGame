@@ -12,9 +12,9 @@ public:
 
 	ID3D11ShaderResourceView* m_pAlphaTexture;
 public:
-	virtual bool Build(SMap* pMap,	int   iMaxDepth = 5, float fMinSize = 10.0f);
-	SNode*  CreateNode(SNode* pParentNode, float fLeft, float fRight, float fBottom, float fTop) override;
-	bool   SubDivide(SNode* pNode)override;
+	virtual bool Build(SMap* const pMap,	int   iMaxDepth = 5, float fMinSize = 10.0f);
+	SNode* const CreateNode(const SNode* const  pParentNode, float fLeft, float fRight, float fBottom, float fTop) override;
+	bool   SubDivide(SNode* const  pNode)override;
 	void	ComputeBoundingBox(SNode* pNode);
 	void	ComputeBoundingBoxFromChild(SNode* pNode);
 
@@ -25,7 +25,7 @@ public:
 
 	void UpdateNode(SNode* pNode);
 public:
-	bool  Render(ID3D11DeviceContext*	pContext)override;
+	bool  Render(ID3D11DeviceContext* const pContext)override;
 public:
 	SQuadTreeMap();
 	virtual ~SQuadTreeMap();

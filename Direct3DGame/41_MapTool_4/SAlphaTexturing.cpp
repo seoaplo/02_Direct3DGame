@@ -58,6 +58,7 @@ bool SAlphaTexturing::Draw(ID3D11DeviceContext* pContext, PC_VERTEX TargetVertex
 		DXGame::SDxState::SetBlendState(pContext, RSNumber);
 		return m_RenderTarget.End(pContext);
 	}
+	return false;
 }
 bool SAlphaTexturing::Release()
 {

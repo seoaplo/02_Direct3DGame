@@ -42,7 +42,7 @@ void SToolForm::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, CellNumSize);
 	DDX_Text(pDX, IDC_EDIT5, CellDistance);
 	DDX_Text(pDX, IDC_EDIT2, m_fDistance);
-	DDV_MinMaxInt(pDX, m_fDistance, 0, INT_MAX);
+	DDV_MinMaxInt(pDX, static_cast<int>(m_fDistance), 0, INT_MAX);
 	DDX_Text(pDX, IDC_EDIT4, m_fHeightValue);
 	DDX_Text(pDX, IDC_EDIT6, m_dwSmooth);
 	DDV_MinMaxUInt(pDX, m_dwSmooth, 0, 100);

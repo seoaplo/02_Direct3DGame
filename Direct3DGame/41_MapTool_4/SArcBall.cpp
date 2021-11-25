@@ -73,10 +73,10 @@ void SArcBall::OnBegin(int nX, int nY)
 {
 	// Only enter the drag state if the click falls
 	// inside the clic rectangle
-	if (nX >= m_Offset.x &&
-		nX < m_Offset.x + m_nWidth &&
-		nY >= m_Offset.y &&
-		nY < m_Offset.y + m_nHeight)
+	if (static_cast<LONG>(nX) >= m_Offset.x &&
+		static_cast<LONG>(nX) < m_Offset.x + m_nWidth &&
+		static_cast<LONG>(nY) >= m_Offset.y &&
+		static_cast<LONG>(nY) < m_Offset.y + m_nHeight)
 	{
 		m_bDrag = true;
 		m_qDown = m_qNow;

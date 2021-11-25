@@ -218,15 +218,15 @@ struct PLANE_TEXTURECOORD
 	}
 	PLANE_TEXTURECOORD operator=(RECT TargetRect)
 	{
-		Rect.Plane_LeftTop.x			= TargetRect.left;
-		Rect.Plane_LeftBottom.x		= TargetRect.left;
-		Rect.Plane_RightTop.x		= TargetRect.right;
-		Rect.Plane_RightBottom.x		= TargetRect.right;
+		Rect.Plane_LeftTop.x			= static_cast<float>(TargetRect.left);
+		Rect.Plane_LeftBottom.x		= static_cast<float>(TargetRect.left);
+		Rect.Plane_RightTop.x		= static_cast<float>(TargetRect.right);
+		Rect.Plane_RightBottom.x		= static_cast<float>(TargetRect.right);
 
-		Rect.Plane_LeftTop.y		= TargetRect.top;
-		Rect.Plane_RightTop.y	= TargetRect.top;
-		Rect.Plane_LeftBottom.y	= TargetRect.bottom;
-		Rect.Plane_RightBottom.y = TargetRect.bottom;
+		Rect.Plane_LeftTop.y		= static_cast<float>(TargetRect.top);
+		Rect.Plane_RightTop.y	= static_cast<float>(TargetRect.top);
+		Rect.Plane_LeftBottom.y	= static_cast<float>(TargetRect.bottom);
+		Rect.Plane_RightBottom.y = static_cast<float>(TargetRect.bottom);
 
 		return *this;
 	}
@@ -265,33 +265,16 @@ struct PLANE_PNCTLIST
 	}
 	PLANE_PNCTLIST operator=(RECT TargetTexCoordRect)
 	{
-		Rect.Plane_LeftTop.t.x = TargetTexCoordRect.left;
-		Rect.Plane_LeftBottom.t.x = TargetTexCoordRect.left;
-		Rect.Plane_RightTop.t.x = TargetTexCoordRect.right;
-		Rect.Plane_RightBottom.t.x = TargetTexCoordRect.right;
+		Rect.Plane_LeftTop.t.x = static_cast<float>(TargetTexCoordRect.left);
+		Rect.Plane_LeftBottom.t.x = static_cast<float>(TargetTexCoordRect.left);
+		Rect.Plane_RightTop.t.x = static_cast<float>(TargetTexCoordRect.right);
+		Rect.Plane_RightBottom.t.x = static_cast<float>(TargetTexCoordRect.right);
 
-		Rect.Plane_LeftTop.t.y = TargetTexCoordRect.top;
-		Rect.Plane_RightTop.t.y = TargetTexCoordRect.top;
-		Rect.Plane_LeftBottom.t.y = TargetTexCoordRect.bottom;
-		Rect.Plane_RightBottom.t.y = TargetTexCoordRect.bottom;
+		Rect.Plane_LeftTop.t.y = static_cast<float>(TargetTexCoordRect.top);
+		Rect.Plane_RightTop.t.y = static_cast<float>(TargetTexCoordRect.top);
+		Rect.Plane_LeftBottom.t.y = static_cast<float>(TargetTexCoordRect.bottom);
+		Rect.Plane_RightBottom.t.y = static_cast<float>(TargetTexCoordRect.bottom);
 
-		/*D3DXVECTOR2 vCenter;
-		vCenter.x = (Rect.Plane_RightBottom.t.x - Rect.Plane_LeftTop.t.x) / 2;
-		vCenter.y = (Rect.Plane_RightBottom.t.y - Rect.Plane_LeftTop.t.y) / 2;
-
-		D3DXVec2Normalize(&vCenter, &vCenter);
-
-		Rect.Plane_LeftTop.p.x = -vCenter.x;
-		Rect.Plane_LeftTop.p.y = vCenter.y;
-
-		Rect.Plane_RightTop.p.x = vCenter.x;
-		Rect.Plane_RightTop.p.y = vCenter.y;
-
-		Rect.Plane_RightBottom.p.x = vCenter.x;
-		Rect.Plane_RightBottom.p.y = -vCenter.y;
-
-		Rect.Plane_LeftBottom.p.x = -vCenter.x;
-		Rect.Plane_LeftBottom.p.y = -vCenter.y;*/
 
 		return *this;
 	}

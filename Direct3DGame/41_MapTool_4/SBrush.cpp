@@ -47,13 +47,13 @@ bool SBrush::Set(const STexture* pTargetTexture, float fWidth, float fHeight)
 	D3DXMatrixOrthoLH(&m_Point.m_ConstantData.matProj, fWidth, fHeight, 0.0f, 1.0f);
 	D3DXMatrixTranspose(&m_Point.m_ConstantData.matProj, &m_Point.m_ConstantData.matProj);
 
-	m_Point.m_ConstantData.dwWidth = fWidth;
-	m_Point.m_ConstantData.dwHeight = fHeight;
+	m_Point.m_ConstantData.dwWidth = static_cast<DWORD>(fWidth);
+	m_Point.m_ConstantData.dwHeight = static_cast<DWORD>(fHeight);
 
 	m_Point.Create(m_pDevice, m_pContext, pTargetTexture->m_szName.c_str(), L"AlphaTexture.hlsl");
 
-	m_RenderTarget.Create(m_pDevice, desc.Width, desc.Height);
-	m_RenderTarget.Set(m_pDevice, 0, 0, desc.Width, desc.Height);
+	m_RenderTarget.Create(m_pDevice, static_cast<float>(desc.Width), static_cast<float>(desc.Height));
+	m_RenderTarget.Set(m_pDevice, 0, 0, static_cast<float>(desc.Width), static_cast<float>(desc.Height));
 	m_RenderTarget.Clear(m_pContext, D3DXVECTOR4(0.0, 0.0, 0.0, 1.0));
 
 
@@ -66,6 +66,7 @@ bool SBrush::Set(const STexture* pTargetTexture, float fWidth, float fHeight)
 	m_RenderTarget.m_pSRV->GetDesc(&SRVDesc);
 
 	m_pDevice->CreateShaderResourceView(m_SecondRenderTexture.Get(), &SRVDesc, m_SecondRenderTarget.GetAddressOf());
+	return true;
 }
 
 bool SBrush::Draw(ID3D11DeviceContext* pContext, PC_VERTEX TargetVertex, float fDistance, float fSmoothSize, DWORD RSNumber)
@@ -79,6 +80,7 @@ bool SBrush::Draw(ID3D11DeviceContext* pContext, PC_VERTEX TargetVertex, float f
 		m_Point.Draw(pContext, TargetVertex.p, TargetVertex.c);
 		return m_RenderTarget.End(pContext);
 	}
+	return false;
 }
 bool SBrush::Release()
 {

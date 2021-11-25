@@ -33,9 +33,9 @@ public:
 	int CellNumSize;
 	float CellDistance;
 	// 높이 설정 범위
-	int m_fDistance;
+	float m_fDistance;
 	// 높이 설정 기준값
-	int m_fHeightValue;
+	float m_fHeightValue;
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedRadio1();

@@ -1,13 +1,13 @@
 #include "SQuadTree.h"
 
 
-bool SQuadTree::Init()
+ bool SQuadTree::Init()
 {
 	m_iObjListSize = 0;
 	m_iNodeListSize = 0;
 	return true;
 }
-bool SQuadTree::Frame()
+ bool SQuadTree::Frame()
 {
 	for (auto ObjPtr : m_DrawObjList) ObjPtr = nullptr;
 	m_iObjListSize = 0;
@@ -19,11 +19,11 @@ bool SQuadTree::Frame()
 	DrawFindNode(m_pRootNode);
 	return true;
 }
-bool SQuadTree::Render(ID3D11DeviceContext*	pContext)
+ bool SQuadTree::Render(ID3D11DeviceContext* const pContext)
 {
 	return true;
 }
-bool SQuadTree::Release()
+ bool SQuadTree::Release()
 {
 	if(m_DrawObjList.size() > 0) m_DrawObjList.clear();
 	if (m_DrawNodeList.size() > 0) m_DrawNodeList.clear();
@@ -31,7 +31,7 @@ bool SQuadTree::Release()
 	m_pRootNode = nullptr;
 	return true;
 }
-bool SQuadTree::DeleteNode(SNode* pNode)
+ bool SQuadTree::DeleteNode(const SNode* const pNode)
 {
 	if (pNode == nullptr) return true;
 	for (int iChild = 0; iChild < pNode->m_ChildList.size(); iChild++)
@@ -41,13 +41,13 @@ bool SQuadTree::DeleteNode(SNode* pNode)
 	delete pNode;
 	return true;
 }
-void SQuadTree::Update(ID3D11Device* pDevice, SCamera* pCamera)
+void SQuadTree::Update(ID3D11Device* const pDevice, SCamera* const pCamera)
 {
 	m_pDevice = pDevice;
 	m_pCamera = pCamera;
 }
 
-bool SQuadTree::Build(float fWidth, float fHeight)
+ bool SQuadTree::Build(float fWidth, float fHeight)
 {
 	m_fWidth = fWidth;
 	m_fHeight = fHeight;
@@ -58,7 +58,7 @@ bool SQuadTree::Build(float fWidth, float fHeight)
 	else						return false;
 }
 
-bool SQuadTree::BuildTree(SNode* pNode)
+ bool SQuadTree::BuildTree( SNode* const pNode)
 {
 	if (SubDivide(pNode))
 	{
@@ -69,10 +69,10 @@ bool SQuadTree::BuildTree(SNode* pNode)
 	}
 	return true;
 }
-bool SQuadTree::SubDivide(SNode* pNode)
+ bool SQuadTree::SubDivide(SNode* const pNode)
 {
 	assert(pNode);
-	if ((DWORD)m_iMaxDepthLimit <= pNode->m_dwDepth)
+	if (m_dwMaxDepthLimit <= pNode->m_dwDepth)
 	{
 		pNode->m_IsLeaf = TRUE;
 		return false;
@@ -128,8 +128,8 @@ bool SQuadTree::SubDivide(SNode* pNode)
 	return true;
 }
 
-SNode* SQuadTree::CreateNode(
-				SNode* pParentNode, 
+SNode * const SQuadTree::CreateNode(const
+				SNode* const pParentNode,
 				float fLeft, float fRight,
 				float fBottom, float fTop)
 {
@@ -163,16 +163,17 @@ SNode* SQuadTree::CreateNode(
 	if (pParentNode)
 	{
 		pNode->m_dwDepth = pParentNode->m_dwDepth + 1;
-		if ((DWORD)m_iMaxDepthLimit < pNode->m_dwDepth)
+		if ((DWORD)m_dwMaxDepthLimit < pNode->m_dwDepth)
 		{
-			m_iMaxDepthLimit = pNode->m_dwDepth;
+			m_dwMaxDepthLimit = pNode->m_dwDepth;
 		}
 	}
 	return pNode;
 }
-SNode* SQuadTree::FindNode(SNode* pNode, SBaseObj* pObj)
+SNode* const SQuadTree::FindNode(const SNode* const pNode, SBaseObj* const pObj)
 {
 	assert(pNode);
+	SNode* FindNode = const_cast<SNode*>(pNode);
 	do
 	{
 		// 4개의 자식 중에서 찾는다
@@ -187,14 +188,14 @@ SNode* SQuadTree::FindNode(SNode* pNode, SBaseObj* pObj)
 		// 큐에 들어 있는 리스트가 없다면 pNode가 완전히 포함하는 노드가 된다.
 		if (m_QuadTreeQueue.empty()) break;
 		// 완전히 오브젝트가 포함된 부모노드를 꺼온다
-		pNode = m_QuadTreeQueue.front();
+		FindNode = m_QuadTreeQueue.front();
 		m_QuadTreeQueue.pop();
 	} 
-	while (pNode);
-	return pNode;
+	while (FindNode);
+	return FindNode;
 }
 
-void SQuadTree::DrawFindNode(SNode* pNode)
+void SQuadTree::DrawFindNode(SNode* const pNode)
 {
 	assert(pNode);
 
@@ -225,10 +226,10 @@ void SQuadTree::DrawFindNode(SNode* pNode)
 	}
 }
 
-void SQuadTree::VisibleNode(SNode* pNode)
+void SQuadTree::VisibleNode(SNode* const pNode)
 {
 	assert(m_pCamera);
-	if (pNode->m_dwDepth > m_iRenderDepth) return;
+	if (pNode->m_dwDepth > static_cast<DWORD>(m_iRenderDepth)) return;
 	//m_DrawNodeList.push_back(pNode);
 	m_DrawNodeList[m_iNodeListSize] = pNode;
 	m_iNodeListSize++;
@@ -244,7 +245,7 @@ void SQuadTree::VisibleNode(SNode* pNode)
 		}*/
 	}
 }
-void SQuadTree::VisibleObject(SNode* pNode)
+void SQuadTree::VisibleObject(const SNode* const pNode)
 {
 	for (auto& Object : pNode->m_ObjectList)
 	{
@@ -256,7 +257,7 @@ void SQuadTree::VisibleObject(SNode* pNode)
 		}
 	}
 }
-int	SQuadTree::AddObject(SBaseObj* pObj)
+ int SQuadTree::AddObject(SBaseObj* const pObj)
 {
 	if (CheckRect(m_pRootNode, pObj))
 	{
@@ -269,7 +270,7 @@ int	SQuadTree::AddObject(SBaseObj* pObj)
 	}
 	return 0;
 }
-int	SQuadTree::CheckRect(SNode* pNode, SBaseObj* pObj)
+ int	SQuadTree::CheckRect(SNode* const pNode, SBaseObj* const pObj)
 {
 	if (pNode == nullptr || pObj == nullptr) return -1;
 

@@ -1,22 +1,23 @@
 #include "SQuadTreeMap.h"
 
-bool SQuadTreeMap::Build(SMap* pMap, int   iMaxDepth, float fMinSize)
+bool SQuadTreeMap::Build(SMap* const pMap, int   iMaxDepth, float fMinSize)
 {
-	m_dwWidth = pMap->m_iNumSellCols;
-	m_dwHeight = pMap->m_iNumSellRows;
-	m_iSellNum = pMap->m_iSellNum;
+	m_dwWidth = static_cast<DWORD>(pMap->m_iNumSellCols);
+	m_dwHeight = static_cast<DWORD>(pMap->m_iNumSellRows);
+	m_iSellNum = static_cast<DWORD>(pMap->m_iSellNum);
 	m_pMap = pMap;
 
 	m_pRootNode = CreateNode(nullptr,
-		0, m_dwWidth - 1,
-		m_dwWidth * (m_dwHeight - 1),
-		m_dwWidth * m_dwHeight - 1);
+		0.0f,
+		static_cast<float>(m_dwWidth - 1),
+		static_cast<float>(m_dwWidth * (m_dwHeight - 1)),
+		static_cast<float>(m_dwWidth * m_dwHeight - 1));
 
-	m_iMaxDepthLimit = log2(m_dwWidth - 1);
+	m_dwMaxDepthLimit = static_cast<DWORD>(log2(m_dwWidth - 1));
 	m_fMinDivideSize = (pMap->m_fSellDistance * pMap->m_iSellNum) / 2;
 	return BuildTree(m_pRootNode);
 }
-SNode* SQuadTreeMap::CreateNode(SNode* pParentNode, float fLeft, float fRight, float fBottom, float fTop)
+SNode* const SQuadTreeMap::CreateNode(const SNode* const pParentNode, float fLeft, float fRight, float fBottom, float fTop)
 {
 	SNode* pNode = new SNode;
 	pNode->m_ChildList.reserve(4);
@@ -39,7 +40,7 @@ SNode* SQuadTreeMap::CreateNode(SNode* pParentNode, float fLeft, float fRight, f
 bool SQuadTreeMap::SubDivide(SNode* pNode)
 {
 	CreateBuffer(pNode);
-	if (m_iMaxDepthLimit <= pNode->m_dwDepth)
+	if (m_dwMaxDepthLimit <= pNode->m_dwDepth)
 	{
 		pNode->m_IsLeaf = TRUE;
 		return false;
@@ -69,33 +70,33 @@ bool SQuadTreeMap::SubDivide(SNode* pNode)
 
 	SNode* pChildNode = CreateNode(
 		pNode,
-		pNode->m_CornerIndex[0],
-		dwEdgeCenter[0],
-		dwEdgeCenter[3],
-		dwCenter);
+		static_cast<float>(pNode->m_CornerIndex[0]),
+		static_cast<float>(dwEdgeCenter[0]),
+		static_cast<float>(dwEdgeCenter[3]),
+		static_cast<float>(dwCenter));
 	pNode->m_ChildList.push_back(pChildNode);
 	pChildNode = CreateNode(
 		pNode,
-		dwEdgeCenter[0],
-		pNode->m_CornerIndex[1],
-		dwCenter,
-		dwEdgeCenter[1]);
-	pNode->m_ChildList.push_back(pChildNode);
-
-	pChildNode = CreateNode(
-		pNode,
-		dwCenter,
-		dwEdgeCenter[1],
-		dwEdgeCenter[2],
-		pNode->m_CornerIndex[3]);
+		static_cast<float>(dwEdgeCenter[0]),
+		static_cast<float>(pNode->m_CornerIndex[1]),
+		static_cast<float>(dwCenter),
+		static_cast<float>(dwEdgeCenter[1]));
 	pNode->m_ChildList.push_back(pChildNode);
 
 	pChildNode = CreateNode(
 		pNode,
-		dwEdgeCenter[3],
-		dwCenter,
-		pNode->m_CornerIndex[2],
-		dwEdgeCenter[2]);
+		static_cast<float>(dwCenter),
+		static_cast<float>(dwEdgeCenter[1]),
+		static_cast<float>(dwEdgeCenter[2]),
+		static_cast<float>(pNode->m_CornerIndex[3]));
+	pNode->m_ChildList.push_back(pChildNode);
+
+	pChildNode = CreateNode(
+		pNode,
+		static_cast<float>(dwEdgeCenter[3]),
+		static_cast<float>(dwCenter),
+		static_cast<float>(pNode->m_CornerIndex[2]),
+		static_cast<float>(dwEdgeCenter[2]));
 	pNode->m_ChildList.push_back(pChildNode);
 	return true;
 }
@@ -103,19 +104,7 @@ void SQuadTreeMap::ComputeBoundingBox(SNode* pNode)
 {
 	if(pNode == nullptr) return;
 	D3DXVECTOR2 vHeight;
-	/*if (pNode->m_dwDepth < m_iMaxDepthLimit)
-	{
-		vHeight.x = -99999.0f;
-		vHeight.y = -99999.0f;
-	}
-	else
-	{
-		vHeight = GetHeightFromNode(
-			pNode->m_CornerIndex[0],
-			pNode->m_CornerIndex[1],
-			pNode->m_CornerIndex[2],
-			pNode->m_CornerIndex[3]);
-	}*/
+
 	vHeight = GetHeightFromNode(
 		pNode->m_CornerIndex[0],
 		pNode->m_CornerIndex[1],
@@ -244,7 +233,7 @@ void SQuadTreeMap::CreateIndexBuffer(SNode* pNode)
 	pNode->m_IndexBuffer.Attach(
 		DXGame::CreateIndexBuffer(m_pDevice,
 			&pNode->m_IndexData.at(0),
-			pNode->m_IndexData.size(), sizeof(DWORD)));
+			static_cast<DWORD>(pNode->m_IndexData.size()), sizeof(DWORD)));
 }
 bool  SQuadTreeMap::Render(ID3D11DeviceContext*	pContext)
 {
@@ -266,7 +255,7 @@ bool  SQuadTreeMap::Render(ID3D11DeviceContext*	pContext)
 
 		pContext->IASetIndexBuffer(pNode->m_IndexBuffer.Get(),
 			DXGI_FORMAT_R32_UINT, 0);
-		pContext->DrawIndexed(pNode->m_IndexData.size(), 0, 0);
+		pContext->DrawIndexed(static_cast<UINT>(pNode->m_IndexData.size()), 0, 0);
 	}
 	return true;
 }
@@ -296,10 +285,10 @@ void SQuadTreeMap::UpVectexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, floa
 
 
 
-	DWORD dwStartRow = floorf(fBottom);
-	DWORD dwEndRow = ceilf(fTop);
-	DWORD dwStartCol = floorf(fLeft);
-	DWORD dwEndCol = ceilf(fRight);
+	DWORD dwStartRow = static_cast<DWORD>(floorf(fBottom));
+	DWORD dwEndRow = static_cast<DWORD>(ceilf(fTop));
+	DWORD dwStartCol = static_cast<DWORD>(floorf(fLeft));
+	DWORD dwEndCol = static_cast<DWORD>(ceilf(fRight));
 
 	for (DWORD iRow = dwStartRow;	iRow < dwEndRow;
 		iRow++)

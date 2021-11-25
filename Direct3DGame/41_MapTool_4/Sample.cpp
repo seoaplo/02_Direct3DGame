@@ -8,8 +8,8 @@ HRESULT	Sample::CreateResource()
 	m_nClientWidth = m_rcClientRect.right;
 
 	m_Select.Init(m_hWnd, m_nClientWidth, m_nClientHeight);
-	m_DefaultRT.Set(GetDevice(), 0, 0, m_nClientWidth, m_nClientHeight);
-	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, (float)m_nClientWidth / (float)(m_nClientHeight), 1.0f, 3000.0f);
+	m_DefaultRT.Set(GetDevice(), 0, 0, static_cast<float>(m_nClientWidth), static_cast<float>(m_nClientHeight));
+	m_pMainCamera->SetProjMatrix(D3DX_PI * 0.25f, static_cast<float>(m_nClientWidth) / static_cast<float>(m_nClientHeight), 1.0f, 3000.0f);
 
 	return S_OK; 
 }
@@ -32,8 +32,8 @@ HRESULT	Sample::CreateConstantBuffer()
 
 	cbDesc.ByteWidth = sizeof(VS_CBNeverChanges);
 	m_cbNeverChanges.cb_AmbientLightColor = D3DXVECTOR4(0.8f, 0.8f, 0.8f, 1);
-	m_cbNeverChanges.cb_DiffuseLightColor = D3DXVECTOR4(1, 1, 1, 1);
-	m_cbNeverChanges.cb_SpecularLightColor = D3DXVECTOR4(0.3, 0.3, 0.3, 1.0f);
+	m_cbNeverChanges.cb_DiffuseLightColor = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_cbNeverChanges.cb_SpecularLightColor = D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1.0f);
 
 	D3D11_SUBRESOURCE_DATA InitData;
 	ZeroMemory(&InitData, sizeof(InitData));
@@ -57,7 +57,7 @@ S_BoxObject::S_BoxObject()
 	m_Box.vMax = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_Box.vMin = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);
 
-	m_vPosition = D3DXVECTOR3(25 - rand() % 50, 0, 25 - rand() % 50);
+	m_vPosition = D3DXVECTOR3(static_cast<float>(25 - rand() % 50), 0.0f, static_cast<float>(25 - rand() % 50));
 	m_vColor = D3DXVECTOR4((rand() % 256) / 255.0f, (rand() % 256) / 255.0f, (rand() % 256) / 255.0f, 1.0f);
 
 	// g_matWorld Matrix = S * R
@@ -175,7 +175,7 @@ bool Sample::Init()
 	{
 		return false;
 	}
-	m_MiniMap.Set(GetDevice(), 0, m_SwapChainDesc.BufferDesc.Height - 300, 300, 300);
+	m_MiniMap.Set(GetDevice(), 0, static_cast<float>(m_SwapChainDesc.BufferDesc.Height - 300.0f), 300.0f, 300.0f);
 	m_AlphaTexture.Init(GetDevice(), GetContext());
 	m_Brush.Init(GetDevice(), GetContext());
 
@@ -272,14 +272,14 @@ bool Sample::Frame()
 		// 프러스텀 카메라 세팅.
 		m_QuadTree.Update(GetDevice(), m_pMainCamera.get());
 
-		m_QuadTree.Build(&m_Map, 7.0f, 10.0f);
+		m_QuadTree.Build(&m_Map, 7, 10.0f);
 
 		SetTexture();
 
 		m_Map.m_pAlphaSRV = m_AlphaTexture.m_RenderTarget.m_pSRV.Get();
 		m_Map.m_pBrush = m_Brush.m_RenderTarget.m_pSRV.Get();
 
-		m_MiniMap.Set(GetDevice(), 0, m_SwapChainDesc.BufferDesc.Height - 300, 300, 300);
+		m_MiniMap.Set(GetDevice(), 0, static_cast<float>(m_SwapChainDesc.BufferDesc.Height - 300.0f), 300.0f, 300.0f);
 
 		bMap = true;
 		bCreateMap = false;
@@ -292,7 +292,7 @@ bool Sample::Frame()
 		m_QuadTree.Frame();
 		m_Map.Frame();
 		m_PickNode = m_QuadTree.CheckPicking(m_Select);
-		m_AlphaVertex.p = m_QuadTree.m_vPickVector;
+		m_AlphaVertex.p = m_QuadTree.GetPickVector();
 
 
 		if (I_InputManager.MouseButtonState(0) == KEY_HOLD)
@@ -321,7 +321,7 @@ bool Sample::Frame()
 bool Sample::Render()
 {
 
-	m_DefaultRT.Begin(GetContext(), D3DXVECTOR4(0.3, 0.3, 0.3, 1));
+	m_DefaultRT.Begin(GetContext(), D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1.0f));
 
 	//--------------------------------------------------------------------------------------
 	// Direction 오브젝트 랜더링
@@ -397,7 +397,7 @@ bool Sample::Release()
 bool Sample::DrawQuadLine(SNode* pNode)
 {
 	if (pNode == NULL) return false;
-	if (m_QuadTree.m_iRenderDepth < pNode->m_dwDepth) return false;
+	if (static_cast<DWORD>(m_QuadTree.m_iRenderDepth) < pNode->m_dwDepth) return false;
 	D3DXVECTOR4 vColor = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (pNode->m_dwDepth == 0) vColor = D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f);
 	if (pNode->m_dwDepth == 1) vColor = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -583,7 +583,7 @@ void Sample::SetHeightVertex(SNode* pNode, DWORD dwMode, float fDistance, float 
 {
 	if (pNode == nullptr) return;
 
-	m_QuadTree.SetVertexHeight(*pNode, m_QuadTree.m_vPickVector, dwMode, fDistance, fHeight);
+	m_QuadTree.SetVertexHeight(*pNode, m_QuadTree.GetPickVector(), dwMode, fDistance, fHeight);
 	
 }
 void Sample::DrawPickingTile(SNode* pNode)
@@ -636,12 +636,12 @@ void Sample::DrawPickingTile(SNode* pNode)
 HRESULT Sample::ScreenViewPort(UINT iWidth, UINT iHeight)
 {
 	HRESULT hr = S_OK;
-	UINT iRectWidth = iWidth / 3;
-	UINT iRectHeight = iHeight / 3;
+	UINT iRectWidth = static_cast<UINT>(iWidth / 3);
+	UINT iRectHeight = static_cast<UINT>(iHeight / 3);
 	//====================================================
 	// 미니맵 영역 설정
 	//====================================================
-	m_MiniMap.Set(0, iHeight - iRectHeight, iRectWidth, iRectHeight, 0.0f, 1.0f);
+	m_MiniMap.Set(nullptr, static_cast<float>(iHeight - iRectHeight), static_cast<float>(iRectWidth), static_cast<float>(iRectHeight), 0.0f, 1.0f);
 	return hr;
 }
 void Sample::SetTexture()
@@ -746,7 +746,7 @@ bool Sample::LoadFile()
 			(m_Map.m_iNumSellCols - 1) * m_Map.m_fSellDistance,
 			(m_Map.m_iNumSellRows - 1) * m_Map.m_fSellDistance);
 		m_QuadTree.Update(GetDevice(), m_pMainCamera.get());
-		m_QuadTree.Build(&m_Map, 7.0f, 10.0f);
+		m_QuadTree.Build(&m_Map, 7, 10.0f);
 
 		m_Map.m_pAlphaSRV = m_AlphaTexture.m_RenderTarget.m_pSRV.Get();
 		m_Map.m_pBrush = m_Brush.m_RenderTarget.m_pSRV.Get();

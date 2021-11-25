@@ -1,35 +1,34 @@
 #include "SQuadTreeArray.h"
-
+const static DWORD dwNodeIndexSize = 6;
+const static DWORD dwQuad = 4;
 
 bool SQuadTreeArray::Init()
 {
 	m_vPickVector = D3DXVECTOR3(9999.9f, 9999.9f, 9999.9f);
 	m_PickingNodeList.clear();
-
 	m_DrawNodeList.clear();
 	m_DrawObjList.clear();
+
 	return true;
 }
 bool SQuadTreeArray::Frame()
 {
-	for (int i = 0; i < m_iObjListSize; i++)
-	{
-		m_DrawObjList[i] = nullptr;
-	}
-	m_iObjListSize = 0;
+	if (!m_pCamera) return false;
 
-	for (int i = 0; i < m_iNodeListSize; i++)
-	{
-		m_DrawNodeList[i] = nullptr;
-	}
+	// 초기화
+	const int iNull = NULL;
+
+	memcpy(m_DrawObjList.data(), &iNull, sizeof(m_DrawNodeList.data()) *  m_DrawObjList.size());
+	m_iObjListSize = 0;
+	memcpy(m_DrawNodeList.data(), &iNull, sizeof(m_DrawNodeList.data()) * m_DrawNodeList.size());
 	m_iNodeListSize = 0;
 
-	if (!m_pCamera) return false;
 	DrawFindNode();
 	return true;
 }
 bool  SQuadTreeArray::Render(ID3D11DeviceContext*	pContext)
 {
+	// 렌더 설정 초기화
 	pContext->UpdateSubresource(
 		m_pMap->_dxobj.g_pConstantBuffer.Get(),
 		0, NULL, &m_pMap->_cbData, 0, 0);
@@ -39,18 +38,22 @@ bool  SQuadTreeArray::Render(ID3D11DeviceContext*	pContext)
 	m_pMap->RenderSetTexture(pContext);
 	pContext->IASetIndexBuffer(m_pIndexBuffer.Get(),
 		DXGI_FORMAT_R32_UINT, 0);
-	for(int i = 0; i < m_iNodeListSize; i++)
+
+	// DrawIndexed(iNodeIndexSize , iStartIndex, 0);
+	// 전부 다 그림, 
+
+	for(int iCount = 0; iCount < m_iNodeListSize; ++iCount)
 	{
-		SNode* pNode = m_DrawNodeList[i];
+		const SNode* pNode = m_DrawNodeList[iCount];
 
 
-		int iNodeIndexSize = pow(4, m_iMaxDepthLimit - pNode->m_dwDepth) * m_dwTileIndexBufferSize;
+		int iNodeIndexSize = static_cast<int>(pow(4, m_dwMaxDepthLimit - pNode->m_dwDepth)) * m_dwTileIndexBufferSize;
 		int iStartIndex = pNode->m_dwDepth - 1;
 		int iDepthPow = 0;
 
-		for (int iCount = 1; iCount <= iStartIndex; iCount++)
+		for (int iCount = 1; iCount <= iStartIndex; ++iCount)
 		{
-			iDepthPow += pow(4, iCount);
+			iDepthPow += static_cast<int>(pow(dwQuad, iCount));
 		}
 		if (iStartIndex = iStartIndex > 0)
 		{
@@ -65,6 +68,8 @@ bool  SQuadTreeArray::Render(ID3D11DeviceContext*	pContext)
 		iStartIndex *= iNodeIndexSize;
 		pContext->DrawIndexed(iNodeIndexSize, iStartIndex, 0);
 	}
+
+	// 초기화
 	m_vPickVector = D3DXVECTOR3(9999.9f, 9999.9f, 9999.9f);
 	m_PickingNodeList.clear();
 	m_HeightNodeList.clear();
@@ -73,13 +78,13 @@ bool  SQuadTreeArray::Render(ID3D11DeviceContext*	pContext)
 bool SQuadTreeArray::Release()
 {
 	SQuadTreeMap::Release();
-	m_vPickVector = D3DXVECTOR3(9999.9f, 9999.9f, 9999.9f);
+	m_vPickVector = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_PickingNodeList.clear();
 	m_dwTileIndexBufferSize = 0;
 	m_IndexBufferData.clear();
 	return true;
 }
-bool SQuadTreeArray::DeleteNode(SNode* pNode)
+bool SQuadTreeArray::DeleteNode(const SNode* const  pNode)
 {
 	m_NodeList.clear();
 	m_IndexBufferData.clear();
@@ -104,39 +109,35 @@ bool SQuadTreeArray::Build(SMap* pMap, int   iMaxDepth, float fMinSize)
 	m_dwHeight = pMap->m_iNumSellRows;
 	m_iSellNum = pMap->m_iSellNum;
 	m_pMap = pMap;
-	m_dwTileIndexBufferSize = m_iSellNum * m_iSellNum * 6;
+	m_dwTileIndexBufferSize = m_iSellNum * m_iSellNum * dwNodeIndexSize;
 
-	for (auto NodePtr : m_DrawNodeList) NodePtr = nullptr;
-	m_iNodeListSize = 0;
-
-
-	m_iMaxDepthLimit = log2(pMap->m_iNumCols);
-	int NodeMaxNum = 0;
-	for (int iCount = 0; iCount <= m_iMaxDepthLimit; iCount++)
+	m_dwMaxDepthLimit = static_cast<DWORD>(log2(pMap->m_iNumCols));
+	int iNodeMaxNum = 0;
+	for (DWORD dwCount = 0; dwCount <= m_dwMaxDepthLimit; ++dwCount)
 	{
-		NodeMaxNum += pow(4, iCount);
+		iNodeMaxNum += static_cast<int>(pow(dwQuad, dwCount));
 	}
-	m_NodeList.resize(NodeMaxNum);
-	m_DrawNodeList.resize(NodeMaxNum);
+	m_NodeList.resize(iNodeMaxNum);
+	m_DrawNodeList.resize(iNodeMaxNum);
 
 
 	m_IndexBufferData.reserve(pMap->_IndexList.size());
-
 	m_fMinDivideSize = (pMap->m_fSellDistance * pMap->m_iSellNum) / 2;
 
 
 	m_pRootNode = CreateNode(0, 0,
-		0, m_dwWidth - 1,
-		m_dwWidth * (m_dwHeight - 1),
-		m_dwWidth * m_dwHeight - 1);
+		0.0f, 
+		static_cast<float>(m_dwWidth - 1),
+		static_cast<float>(m_dwWidth * (m_dwHeight - 1)),
+		static_cast<float>(m_dwWidth * m_dwHeight - 1));
 
 	return BuildTree(m_pRootNode);
 }
-SNode* SQuadTreeArray::CreateNode(SNode* pNode, float fLeft, float fRight, float fBottom, float fTop)
+SNode* const SQuadTreeArray::CreateNode(const SNode* const pNode, float fLeft, float fRight, float fBottom, float fTop)
 {
 	return false;
 }
-SNode* SQuadTreeArray::CreateNode(DWORD iNodeNum, DWORD dwDepth, float fLeft, float fRight, float fBottom, float fTop)
+SNode* const SQuadTreeArray::CreateNode(DWORD iNodeNum, DWORD dwDepth, float fLeft, float fRight, float fBottom, float fTop)
 {
 	if (iNodeNum > m_NodeList.size()) return nullptr;
 
@@ -154,9 +155,9 @@ SNode* SQuadTreeArray::CreateNode(DWORD iNodeNum, DWORD dwDepth, float fLeft, fl
 
 	return &TargetNode;
 }
-bool SQuadTreeArray::SubDivide(SNode* pNode)
+bool SQuadTreeArray::SubDivide(SNode* const pNode)
 {
-	if (m_iMaxDepthLimit <= pNode->m_dwDepth)
+	if (m_dwMaxDepthLimit <= pNode->m_dwDepth)
 	{
 		pNode->m_IsLeaf = TRUE;
 		CreateBuffer(pNode);
@@ -174,62 +175,62 @@ bool SQuadTreeArray::SubDivide(SNode* pNode)
 
 	DWORD dwEdgeCenter[4];
 	DWORD dwCenter =
-		(pNode->m_CornerIndex[0] + pNode->m_CornerIndex[3]) / 2;
+		static_cast<DWORD>((pNode->m_CornerIndex[0] + pNode->m_CornerIndex[3]) / 2);
 
 
 	dwEdgeCenter[0] =
-		(pNode->m_CornerIndex[0] + pNode->m_CornerIndex[1]) / 2;
+		static_cast<DWORD>((pNode->m_CornerIndex[0] + pNode->m_CornerIndex[1]) / 2);
 	dwEdgeCenter[1] =
-		(pNode->m_CornerIndex[1] + pNode->m_CornerIndex[3]) / 2;
+		static_cast<DWORD>((pNode->m_CornerIndex[1] + pNode->m_CornerIndex[3]) / 2);
 	dwEdgeCenter[2] =
-		(pNode->m_CornerIndex[2] + pNode->m_CornerIndex[3]) / 2;
+		static_cast<DWORD>((pNode->m_CornerIndex[2] + pNode->m_CornerIndex[3]) / 2);
 	dwEdgeCenter[3] =
-		(pNode->m_CornerIndex[0] + pNode->m_CornerIndex[2]) / 2;
+		static_cast<DWORD>((pNode->m_CornerIndex[0] + pNode->m_CornerIndex[2]) / 2);
 
 	int iChildNum = (pNode->m_dwIndex * 4) + 1;
 
 	SNode* pChildNode = CreateNode(
 		iChildNum,
 		pNode->m_dwDepth + 1,
-		pNode->m_CornerIndex[0],
-		dwEdgeCenter[0],
-		dwEdgeCenter[3],
-		dwCenter);
+		static_cast<float>(pNode->m_CornerIndex[0]),
+		static_cast<float>(dwEdgeCenter[0]),
+		static_cast<float>(dwEdgeCenter[3]),
+		static_cast<float>(dwCenter));
 	pNode->m_ChildList.push_back(pChildNode);
 
 	iChildNum += 1;
 	pChildNode = CreateNode(
 		iChildNum,
 		pNode->m_dwDepth + 1,
-		dwEdgeCenter[0],
-		pNode->m_CornerIndex[1],
-		dwCenter,
-		dwEdgeCenter[1]);
+		static_cast<float>(dwEdgeCenter[0]),
+		static_cast<float>(pNode->m_CornerIndex[1]),
+		static_cast<float>(dwCenter),
+		static_cast<float>(dwEdgeCenter[1]));
 	pNode->m_ChildList.push_back(pChildNode);
 
 	iChildNum += 1;
 	pChildNode = CreateNode(
 		iChildNum,
 		pNode->m_dwDepth + 1,
-		dwEdgeCenter[3],
-		dwCenter,
-		pNode->m_CornerIndex[2],
-		dwEdgeCenter[2]);
+		static_cast<float>(dwEdgeCenter[3]),
+		static_cast<float>(dwCenter),
+		static_cast<float>(pNode->m_CornerIndex[2]),
+		static_cast<float>(dwEdgeCenter[2]));
 	pNode->m_ChildList.push_back(pChildNode);
 
 	iChildNum += 1;
 	pChildNode = CreateNode(
 		iChildNum,
 		pNode->m_dwDepth + 1,
-		dwCenter,
-		dwEdgeCenter[1],
-		dwEdgeCenter[2],
-		pNode->m_CornerIndex[3]);
+		static_cast<float>(dwCenter),
+		static_cast<float>(dwEdgeCenter[1]),
+		static_cast<float>(dwEdgeCenter[2]),
+		static_cast<float>(pNode->m_CornerIndex[3]));
 	pNode->m_ChildList.push_back(pChildNode);
 	return true;
 }
 
-bool SQuadTreeArray::BuildTree(SNode* pNode)
+bool SQuadTreeArray::BuildTree(SNode* const pNode)
 {
 
 	std::queue<SNode*> IndexArray0;
@@ -240,7 +241,7 @@ bool SQuadTreeArray::BuildTree(SNode* pNode)
 	DWORD dwDepth = 0;
 	SNode* pTargetNode = nullptr;
 
-	while (dwDepth <= m_iMaxDepthLimit)
+	while (dwDepth <= m_dwMaxDepthLimit)
 	{
 		std::queue<SNode*>& TargetNodeQueue = dwDepth % 2 == 0 ? IndexArray0 : IndexArray1;
 		std::queue<SNode*>& TargetNodeChildQueue = dwDepth % 2 == 0 ? IndexArray1 : IndexArray0;
@@ -251,49 +252,26 @@ bool SQuadTreeArray::BuildTree(SNode* pNode)
 			TargetNodeQueue.pop();
 
 			SubDivide(pTargetNode);
-			for (int iCount = 0; iCount < pTargetNode->m_ChildList.size(); iCount++)
+			for (int iCount = 0; iCount < pTargetNode->m_ChildList.size(); ++iCount)
 			{
 				TargetNodeChildQueue.push(pTargetNode->m_ChildList[iCount]);
 			}
 		}
 		if (TargetNodeChildQueue.empty())
 		{
-			m_iMaxDepthLimit = dwDepth;
+			m_dwMaxDepthLimit = dwDepth;
 			break;
 		}
-		dwDepth++;
+		++dwDepth;
 	}
 
 	m_pIndexBuffer.Attach(
 		DXGame::CreateIndexBuffer(m_pDevice,
 			&m_IndexBufferData.at(0),
-			m_IndexBufferData.size(), sizeof(DWORD)));
+			static_cast<DWORD>(m_IndexBufferData.size()), sizeof(DWORD)));
 
-	SetRenderDepth(m_iMaxDepthLimit);
+	SetRenderDepth(m_dwMaxDepthLimit);
 	return true;
-}
-
-SNode* SQuadTreeArray::FindNode(SNode* pNode, SBaseObj* pObj)
-{
-	assert(pNode);
-	do
-	{
-		// 4개의 자식 중에서 찾는다
-		for (int iChild = 0; iChild < pNode->m_ChildList.size(); iChild++)
-		{
-			if (pNode->m_ChildList[iChild] && CheckRect(pNode->m_ChildList[iChild], pObj))
-			{
-				m_QuadTreeQueue.push(pNode->m_ChildList[iChild]);
-				break;
-			}
-		}
-		// 큐에 들어 있는 리스트가 없다면 pNode가 완전히 포함하는 노드가 된다.
-		if (m_QuadTreeQueue.empty()) break;
-		// 완전히 오브젝트가 포함된 부모노드를 꺼내온다
-		pNode = m_QuadTreeQueue.front();
-		m_QuadTreeQueue.pop();
-	} while (pNode);
-	return pNode;
 }
 
 void SQuadTreeArray::DrawFindNode()
@@ -305,7 +283,7 @@ void SQuadTreeArray::DrawFindNode()
 	SNode* pTargetNode = nullptr;
 	S_POSITION s_Pos;
 
-	while (dwDepth <= m_iRenderDepth)
+	while (dwDepth <= static_cast<DWORD>(m_iRenderDepth))
 	{
 		std::queue<SNode*>& TargetNodeQueue = dwDepth % 2 == 0 ? DrawNodeQueue0 : DrawNodeQueue1;
 		std::queue<SNode*>& TargetNodeChildQueue = dwDepth % 2 == 0 ? DrawNodeQueue1 : DrawNodeQueue0;
@@ -330,7 +308,7 @@ void SQuadTreeArray::DrawFindNode()
 			else if (s_Pos == P_SPANNING)
 			{
 				VisibleObject(pTargetNode);
-				for (int iCount = 0; iCount < pTargetNode->m_ChildList.size(); iCount++)
+				for (int iCount = 0; iCount < pTargetNode->m_ChildList.size(); ++iCount)
 				{
 					TargetNodeChildQueue.push(pTargetNode->m_ChildList[iCount]);
 				}
@@ -340,21 +318,21 @@ void SQuadTreeArray::DrawFindNode()
 		{
 			break;
 		}
-		dwDepth++;
+		++dwDepth;
 	}
 }
 
 void SQuadTreeArray::VisibleNode(SNode* pNode)
 {
 	assert(m_pCamera);
-	if (pNode->m_dwDepth > m_iRenderDepth) return;
+	if (pNode->m_dwDepth > static_cast<DWORD>(m_iRenderDepth)) return;
 
 	m_DrawNodeList[m_iNodeListSize] = pNode;
-	m_iNodeListSize++;
+	++m_iNodeListSize;
 
 	VisibleObject(pNode);
 }
-void SQuadTreeArray::VisibleObject(SNode* pNode)
+void SQuadTreeArray::VisibleObject(const SNode* const  pNode)
 {
 	for (auto& Object : pNode->m_ObjectList)
 	{
@@ -365,7 +343,7 @@ void SQuadTreeArray::VisibleObject(SNode* pNode)
 			{
 				m_DrawObjList.push_back(Object);
 
-				for (int i = m_iObjListSize; i < m_DrawObjList.size(); i++)
+				for (int i = m_iObjListSize; i < m_DrawObjList.size(); ++i)
 				{
 					m_DrawObjList[i] = nullptr;
 				}
@@ -373,12 +351,12 @@ void SQuadTreeArray::VisibleObject(SNode* pNode)
 			else
 			{
 				m_DrawObjList[m_iObjListSize] = Object;
-				m_iObjListSize++;
+				++m_iObjListSize;
 			}
 		}
 	}
 }
-int	SQuadTreeArray::AddObject(SBaseObj* pObj)
+int	SQuadTreeArray::AddObject(SBaseObj* const pObj)
 {
 	if (CheckRect(m_pRootNode, pObj))
 	{
@@ -391,7 +369,7 @@ int	SQuadTreeArray::AddObject(SBaseObj* pObj)
 	}
 	return 0;
 }
-int	SQuadTreeArray::CheckRect(SNode* pNode, SBaseObj* pObj)
+int	SQuadTreeArray::CheckRect(SNode* const pNode, SBaseObj* const pObj)
 {
 	if (pNode == nullptr || pObj == nullptr) return -1;
 
@@ -419,11 +397,11 @@ D3DXVECTOR2 SQuadTreeArray::GetHeightFromNode(DWORD nLeft, DWORD nRight, DWORD n
 	DWORD dwEndCol = nRight % m_dwWidth;
 	for (DWORD dwRow = dwStartRow;
 		dwRow < dwEndRow;
-		dwRow++)
+		++dwRow)
 	{
 		for (DWORD dwCol = dwStartCol;
 			dwCol < dwEndCol;
-			dwCol++)
+			++dwCol)
 		{
 			DWORD dwIndex = dwRow * m_dwWidth + dwCol;
 			if (m_pMap->m_VertexList[dwIndex].p.y < fMin)
@@ -442,13 +420,13 @@ D3DXVECTOR2 SQuadTreeArray::GetHeightFromNode(DWORD nLeft, DWORD nRight, DWORD n
 	}
 	return D3DXVECTOR2(fMin, fMax);
 }
-void SQuadTreeArray::CreateBuffer(SNode* pNode)
+void SQuadTreeArray::CreateBuffer(SNode* const pNode)
 {
 	if (pNode == nullptr) return;
 
 	CreateIndexBuffer(pNode);
 }
-void SQuadTreeArray::CreateIndexBuffer(SNode* pNode)
+void SQuadTreeArray::CreateIndexBuffer(SNode* const pNode)
 {
 	DWORD dwStartRow = pNode->m_CornerIndex[0] / m_dwWidth;
 	DWORD dwEndRow = (pNode->m_CornerIndex[2] / m_dwWidth);
@@ -459,10 +437,10 @@ void SQuadTreeArray::CreateIndexBuffer(SNode* pNode)
 
 	DWORD Index[4];
 	for (DWORD iRow = dwStartRow;	iRow < dwEndRow;
-		iRow++)
+		++iRow)
 	{
 		for (DWORD iCol = dwStartCol; iCol < dwEndCol;
-			iCol++)
+			++iCol)
 		{
 			DWORD dwIndex = iRow * m_dwWidth + iCol;
 			int iNextRow = iRow + 1;
@@ -483,7 +461,7 @@ void SQuadTreeArray::CreateIndexBuffer(SNode* pNode)
 		}
 	}
 }
-SNode*	SQuadTreeArray::CheckPicking(SSelect& TargetSelect)
+SNode* const SQuadTreeArray::CheckPicking(SSelect& TargetSelect)
 {
 	FindePickingNode(TargetSelect);
 
@@ -509,7 +487,7 @@ SNode*	SQuadTreeArray::CheckPicking(SSelect& TargetSelect)
 	return pNode;
 }
 
-bool SQuadTreeArray::FindePickingNode(SSelect& TargetSelect)
+const bool SQuadTreeArray::FindePickingNode(SSelect& TargetSelect)
 {
 
 	std::queue<SNode*> DrawNodeQueue0;
@@ -517,9 +495,8 @@ bool SQuadTreeArray::FindePickingNode(SSelect& TargetSelect)
 	DrawNodeQueue0.push(&m_NodeList[0]);
 	DWORD dwDepth = 0;
 	SNode* pTargetNode = nullptr;
-	S_POSITION s_Pos;
 
-	while (dwDepth <= m_iMaxDepthLimit)
+	while (dwDepth <= m_dwMaxDepthLimit)
 	{
 		std::queue<SNode*>& TargetNodeQueue = dwDepth % 2 == 0 ? DrawNodeQueue0 : DrawNodeQueue1;
 		std::queue<SNode*>& TargetNodeChildQueue = dwDepth % 2 == 0 ? DrawNodeQueue1 : DrawNodeQueue0;
@@ -548,70 +525,21 @@ bool SQuadTreeArray::FindePickingNode(SSelect& TargetSelect)
 		{
 			break;
 		}
-		dwDepth++;
+		++dwDepth;
 	}
 	return true;
 }
 
-bool SQuadTreeArray::FindePickingFace(SSelect& TargetSelect, SNode* pNode)
+const bool SQuadTreeArray::FindePickingFace(SSelect& TargetSelect, SNode* const pNode)
 {
 	if (pNode == nullptr) return false;
 
-	/*int iStartIndex = pNode->m_dwDepth - 1;
-	int iDepthPow = 0;
-
-	for (int iCount = 1; iCount <= iStartIndex; iCount++)
-	{
-		iDepthPow += pow(4, iCount);
-	}
-	iStartIndex = pNode->m_dwIndex - iDepthPow - 1;
-	iStartIndex *= m_dwTileIndexBufferSize;
-
-	int iMaxFace = m_dwTileIndexBufferSize / 3;
-
-	int v0 = iStartIndex;
-	int v1 = iStartIndex + 1;
-	int v2 = iStartIndex + 2;
-	for (int iFace = 0; iFace < iMaxFace; iFace++)
-	{
-
-		int iIndex0 = m_IndexBufferData[v0];
-		int iIndex1 = m_IndexBufferData[v0 + 1];
-		int iIndex2 = m_IndexBufferData[v0 + 2];
-
-		D3DXVECTOR3& Vertex0 = m_pMap->m_VertexList[iIndex0].p;
-		D3DXVECTOR3& Vertex1 = m_pMap->m_VertexList[iIndex1].p;
-		D3DXVECTOR3& Vertex2 = m_pMap->m_VertexList[iIndex2].p;
-
-
-		D3DXVECTOR3& vStart = TargetSelect.m_Ray.vOrigin;
-		D3DXVECTOR3& vEnd = TargetSelect.m_Ray.vDirection * 9999.9f;
-
-		D3DXVECTOR3 vNormal = m_pMap->ComputeFaceNormal(iIndex0, iIndex1, iIndex2);
-
-		if (TargetSelect.GetIntersection(
-			vStart, vEnd, vNormal,
-			Vertex0, Vertex1, Vertex2)
-			)
-		{
-			if (TargetSelect.PointInPolygon(
-				TargetSelect.m_vIntersection, vNormal,
-				Vertex0, Vertex1, Vertex2))
-			{
-				return true;
-			}
-		}
-		v0 += 3;
-		v1 = v0 + 1;
-		v2 = v0 + 2;
-	}*/
-
 	DWORD dwWidth = m_dwWidth;
 
-	int dwStartRow = (pNode->m_CornerIndex[0]) / dwWidth;
-	int dwEndRow = (pNode->m_CornerIndex[2]) / dwWidth;
-	int dwStartCol = (pNode->m_CornerIndex[0]) % dwWidth;
-	int dwEndCol = (pNode->m_CornerIndex[1]) % dwWidth;
+	DWORD dwStartRow = (pNode->m_CornerIndex[0]) / dwWidth;
+	DWORD dwEndRow = (pNode->m_CornerIndex[2]) / dwWidth;
+	DWORD dwStartCol = (pNode->m_CornerIndex[0]) % dwWidth;
+	DWORD dwEndCol = (pNode->m_CornerIndex[1]) % dwWidth;
 
 	dwStartRow = max(dwStartRow, 0);
 	dwStartCol = max(dwStartCol, 0);
@@ -619,34 +547,34 @@ bool SQuadTreeArray::FindePickingFace(SSelect& TargetSelect, SNode* pNode)
 	dwEndCol = min(dwEndCol, m_pMap->m_iNumSellCols - 1);
 
 	int iIndex = 0;
-	for (DWORD iRow = dwStartRow;	iRow < dwEndRow;
-		iRow++)
+	for (DWORD dwRow = dwStartRow;	dwRow < dwEndRow;
+		++dwRow)
 	{
-		for (DWORD iCol = dwStartCol; iCol < dwEndCol;
-			iCol++)
+		for (DWORD dwCol = dwStartCol; dwCol < dwEndCol;
+			++dwCol)
 		{
-			DWORD dwIndex = iRow * dwWidth + iCol;
-			int iNextRow = iRow + 1;
-			int iNextCol = iCol + 1;
+			DWORD dwIndex = dwRow * dwWidth + dwCol;
+			DWORD dwNextRow = dwRow + 1;
+			DWORD dwNextCol = dwCol + 1;
 
-			int i0 = iRow * dwWidth + iCol;
-			int i1 = iRow * dwWidth + iNextCol;
-			int i2 = iNextRow * dwWidth + iCol;
+			DWORD dw0 = dwRow * dwWidth + dwCol;
+			DWORD dw1 = dwRow * dwWidth + dwNextCol;
+			DWORD dw2 = dwNextRow * dwWidth + dwCol;
 
-			int i3 = i2;
-			int i4 = i1;
-			int i5 = iNextRow * dwWidth + iNextCol;
+			DWORD dw3 = dw2;
+			DWORD dw4 = dw1;
+			DWORD dw5 = dwNextRow * dwWidth + dwNextCol;
 			iIndex += 6;
 
-			D3DXVECTOR3 Vertex0 = m_pMap->m_VertexList[i0].p;
-			D3DXVECTOR3 Vertex1 = m_pMap->m_VertexList[i1].p;
-			D3DXVECTOR3 Vertex2 = m_pMap->m_VertexList[i2].p;
+			D3DXVECTOR3 Vertex0 = m_pMap->m_VertexList[dw0].p;
+			D3DXVECTOR3 Vertex1 = m_pMap->m_VertexList[dw1].p;
+			D3DXVECTOR3 Vertex2 = m_pMap->m_VertexList[dw2].p;
 
 
 			D3DXVECTOR3 vStart = TargetSelect.m_Ray.vOrigin;
 			D3DXVECTOR3 vEnd = TargetSelect.m_Ray.vDirection * 99999.0f;
 
-			D3DXVECTOR3 vNormal = m_pMap->ComputeFaceNormal(i0, i1, i2);
+			D3DXVECTOR3 vNormal = m_pMap->ComputeFaceNormal(dw0, dw1, dw2);
 
 			if (TargetSelect.GetIntersection(
 				vStart, vEnd, vNormal,
@@ -661,11 +589,11 @@ bool SQuadTreeArray::FindePickingFace(SSelect& TargetSelect, SNode* pNode)
 				}
 			}
 
-			Vertex0 = m_pMap->m_VertexList[i3].p;
-			Vertex1 = m_pMap->m_VertexList[i4].p;
-			Vertex2 = m_pMap->m_VertexList[i5].p;
+			Vertex0 = m_pMap->m_VertexList[dw3].p;
+			Vertex1 = m_pMap->m_VertexList[dw4].p;
+			Vertex2 = m_pMap->m_VertexList[dw5].p;
 
-			vNormal = m_pMap->ComputeFaceNormal(i3, i4, i5);
+			vNormal = m_pMap->ComputeFaceNormal(dw3, dw4, dw5);
 
 			if (TargetSelect.GetIntersection(
 				vStart, vEnd, vNormal,
@@ -684,7 +612,7 @@ bool SQuadTreeArray::FindePickingFace(SSelect& TargetSelect, SNode* pNode)
 
 	return false;
 }
-void SQuadTreeArray::SetVertexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, DWORD dwMode, float fDistance, float fHeight)
+void SQuadTreeArray::SetVertexHeight(SNode& pNode, const D3DXVECTOR3& vIntersection, DWORD dwMode, float fDistance, float fHeight)
 {
 
 	if (fHeight < 0.0001) return;
@@ -709,16 +637,16 @@ void SQuadTreeArray::SetVertexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, D
 	fTop = min(fTop + iHalfRow, m_pMap->m_iNumSellRows);
 
 
-	DWORD dwStartRow = floorf(fBottom);
-	DWORD dwEndRow = ceilf(fTop);
-	DWORD dwStartCol = floorf(fLeft);
-	DWORD dwEndCol = ceilf(fRight);
+	DWORD dwStartRow = static_cast<DWORD>(floorf(fBottom));
+	DWORD dwEndRow = static_cast<DWORD>(ceilf(fTop));
+	DWORD dwStartCol = static_cast<DWORD>(floorf(fLeft));
+	DWORD dwEndCol = static_cast<DWORD>(ceilf(fRight));
 
 	for (DWORD iRow = dwStartRow;	iRow < dwEndRow;
-		iRow++)
+		++iRow)
 	{
 		for (DWORD iCol = dwStartCol; iCol < dwEndCol;
-			iCol++)
+			++iCol)
 		{
 			DWORD Index = iRow * m_dwWidth + iCol;
 			if (Index < 0 || Index >= m_pMap->m_VertexList.size()) continue;
@@ -760,7 +688,7 @@ void SQuadTreeArray::SetVertexHeight(SNode& pNode, D3DXVECTOR3& vIntersection, D
 	UpdateNode();
 }
 
-void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, float fDistance)
+void SQuadTreeArray::CheckBrushNode(SNode* pNode, const D3DXVECTOR3& vPickVector, float fDistance)
 {
 	bool bFindParent = true;
 	D3DXVECTOR2 vPickVector2D =
@@ -770,7 +698,7 @@ void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, floa
 	while (bFindParent != false && pNode->m_dwDepth > 0)
 	{
 		bFindParent = false;
-		for (int iCount = 0; iCount < 4; iCount++)
+		for (int iCount = 0; iCount < 4; ++iCount)
 		{
 			D3DXVECTOR2 TargetVertex =
 				D3DXVECTOR2(pNode->m_sBox.vCenter.x,
@@ -781,8 +709,6 @@ void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, floa
 
 			float fLength = sqrt((pNode->m_sBox.fExtent[0] * pNode->m_sBox.fExtent[0]) +
 				(pNode->m_sBox.fExtent[2] * pNode->m_sBox.fExtent[2]));
-			/*float fLength = pNode->m_sBox.fExtent[0] > pNode->m_sBox.fExtent[2] ?
-							pNode->m_sBox.fExtent[0] : pNode->m_sBox.fExtent[2];*/
 
 			if (D3DXVec2Length(&TargetVertex) < fDistance + fLength)
 			{
@@ -798,7 +724,7 @@ void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, floa
 	std::queue<SNode*> FindBrushNodeQueue0;
 	std::queue<SNode*> FindBrushNodeQueue1;
 
-	if (pNode->m_dwDepth == m_iMaxDepthLimit)
+	if (pNode->m_dwDepth == m_dwMaxDepthLimit)
 	{
 		m_HeightNodeList.push_back(pNode);
 		return;
@@ -820,9 +746,8 @@ void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, floa
 		FindBrushNodeQueue1.push(pNode->m_ChildList[3]);
 	}
 	SNode* pTargetNode = nullptr;
-	S_POSITION s_Pos;
 
-	while (dwDepth <= m_iMaxDepthLimit)
+	while (dwDepth <= m_dwMaxDepthLimit)
 	{
 		std::queue<SNode*>& TargetNodeQueue = dwDepth % 2 == 0 ? FindBrushNodeQueue0 : FindBrushNodeQueue1;
 		std::queue<SNode*>& TargetNodeChildQueue = dwDepth % 2 == 0 ? FindBrushNodeQueue1 : FindBrushNodeQueue0;
@@ -836,8 +761,6 @@ void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, floa
 				D3DXVECTOR2(pTargetNode->m_sBox.vCenter.x,
 							pTargetNode->m_sBox.vCenter.z);
 
-			/*float fLength = pTargetNode->m_sBox.fExtent[0] > pTargetNode->m_sBox.fExtent[2] ?
-							pTargetNode->m_sBox.fExtent[0] : pTargetNode->m_sBox.fExtent[2];*/
 
 			float fLength = sqrt((pTargetNode->m_sBox.fExtent[0] * pTargetNode->m_sBox.fExtent[0]) +
 				(pTargetNode->m_sBox.fExtent[2] * pTargetNode->m_sBox.fExtent[2]));
@@ -860,7 +783,7 @@ void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, floa
 		{
 			break;
 		}
-		dwDepth++;
+		++dwDepth;
 	}
 	UpdateNode();
 }
@@ -868,7 +791,7 @@ void SQuadTreeArray::CheckBrushNode(SNode* pNode, D3DXVECTOR3& vPickVector, floa
 void SQuadTreeArray::UpdateNode()
 {
 
-	int iStartIndex = m_HeightNodeList.size() - 1;
+	int iStartIndex = static_cast<int>(m_HeightNodeList.size()) - 1;
 
 	for (; iStartIndex >= 0; iStartIndex--)
 	{
@@ -883,7 +806,7 @@ void SQuadTreeArray::UpdateNode()
 	}
 }
 
-bool SQuadTreeArray::SaveFile(FILE* pStream)
+const bool SQuadTreeArray::SaveFile(FILE* pStream)
 {
 	if (pStream == nullptr) return false;
 
@@ -893,7 +816,7 @@ bool SQuadTreeArray::SaveFile(FILE* pStream)
 		m_dwHeight,
 		m_iSellNum,
 		m_dwTileIndexBufferSize,
-		m_iMaxDepthLimit,
+		m_dwMaxDepthLimit,
 		m_fMinDivideSize);
 
 
@@ -960,7 +883,7 @@ bool SQuadTreeArray::SaveFile(FILE* pStream)
 }
 
 
-bool SQuadTreeArray::LoadFile(SParser& Paser)
+const bool SQuadTreeArray::LoadFile(SParser& Paser)
 {
 	bool bCheck;
 	if (m_pDevice == nullptr) return false;
@@ -977,7 +900,7 @@ bool SQuadTreeArray::LoadFile(SParser& Paser)
 			&m_dwHeight,
 			&m_iSellNum,
 			&m_dwTileIndexBufferSize,
-			&m_iMaxDepthLimit,
+			&m_dwMaxDepthLimit,
 			&m_fMinDivideSize);
 	ZeroMemory(String, _countof(String));
 
@@ -1042,9 +965,9 @@ bool SQuadTreeArray::LoadFile(SParser& Paser)
 	m_pIndexBuffer.Attach(
 		DXGame::CreateIndexBuffer(m_pDevice,
 			&m_IndexBufferData.at(0),
-			m_IndexBufferData.size(), sizeof(DWORD)));
+			static_cast<UINT>(m_IndexBufferData.size()), sizeof(DWORD)));
 
-	SetRenderDepth(m_iMaxDepthLimit);
+	SetRenderDepth(m_dwMaxDepthLimit);
 
 	return true;
 }

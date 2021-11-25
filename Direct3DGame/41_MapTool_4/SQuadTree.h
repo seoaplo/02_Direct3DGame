@@ -20,7 +20,7 @@ public:
 
 	int				m_iNumDepth;
 	int				m_iRenderDepth;
-	int				m_iMaxDepthLimit;
+	DWORD			m_dwMaxDepthLimit;
 
 	
 	std::queue<SNode*>			m_QuadTreeQueue;
@@ -36,26 +36,26 @@ public:
 	virtual bool	Frame();
 	virtual bool	Render(ID3D11DeviceContext*	pContext);
 	virtual bool	Release();
-	virtual bool	DeleteNode(SNode* pNode);
+	virtual bool	DeleteNode(const SNode* const pNode);
 public:
 	virtual bool			Build(float fWidth, float fHeight);
-	virtual bool			BuildTree(SNode* pNode);
-	virtual bool	SubDivide(SNode* pNode);
+	virtual bool			BuildTree( SNode* const pNode);
+	virtual bool	SubDivide( SNode* const pNode);
 public:
-	virtual SNode*	CreateNode(SNode* pParentNode, float fLeft, float fRight, float fBottom, float fTop);
-	virtual SNode*			FindNode(SNode* pNode, SBaseObj* pObj);
-	virtual void			DrawFindNode(SNode* pNode);
-	virtual void			VisibleNode(SNode* pNode);
-	virtual void			VisibleObject(SNode* pNode);
+	virtual SNode* const 	CreateNode(const SNode* const pParentNode, float fLeft, float fRight, float fBottom, float fTop);
+	virtual SNode* const			FindNode(const SNode* const pNode,  SBaseObj* const pObj);
+	virtual void			DrawFindNode( SNode* const pNode);
+	virtual void			VisibleNode( SNode* const pNode);
+	virtual void			VisibleObject(const SNode* const pNode);
 public:
-	virtual int				AddObject(SBaseObj* pObj);
-	virtual int				CheckRect(SNode* pNode, SBaseObj* pObj);
+	virtual int				AddObject( SBaseObj* const pObj);
+	virtual int				CheckRect( SNode* const  pNode,  SBaseObj* const pObj);
 
 public:
-	virtual void			Update(ID3D11Device* pDevice, SCamera* pCamera);
+	virtual void			Update(ID3D11Device* const pDevice, SCamera* const pCamera);
 	void			SetRenderDepth(int iRenderDepth){ m_iRenderDepth = iRenderDepth; }
 
-	void			SetMaxDepthLimit(int iMaxDepth) { m_iMaxDepthLimit = iMaxDepth; }
+	void			SetMaxDepthLimit(int iMaxDepth) { m_dwMaxDepthLimit = iMaxDepth; }
 	void			SetMinDivideSize(int iMinDivideSize) { m_fMinDivideSize = (float)iMinDivideSize; }
 public:
 	SQuadTree();
